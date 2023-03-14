@@ -1,1 +1,6 @@
 /* Application styles */
+/*
+ *= require msip/application.css
+ *= require_tree .
+ *= require_self
+ */

@@ -9,3 +9,5 @@
 /test/dummy/storage/
 /test/dummy/tmp/
 test/dummy/.env
+test/dummy/app/javascript/controllers/msip
+test/dummy/public/jos19
