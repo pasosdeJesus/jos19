@@ -24,7 +24,8 @@ module Jos19
           end
 
           def atributos_form_jos19
-            atributos_form_cor1440_gen - [:caso_ids, :familiar_ids]
+            atributos_form_cor1440_gen - 
+              [:caso_ids, :familiar_ids, :familiarvictima_ids]
           end
 
           def atributos_form
