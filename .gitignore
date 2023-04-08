@@ -11,3 +11,4 @@
 test/dummy/.env
 test/dummy/app/javascript/controllers/msip
 test/dummy/public/jos19
+test/dummy/node_modules/

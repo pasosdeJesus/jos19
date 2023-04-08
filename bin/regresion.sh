@@ -62,7 +62,7 @@ if (test "$?" != "0") then {
 echo "== Pruebas de regresión al sistema"
 mkdir -p $rutaap/cobertura-sistema/
 rm -rf $rutaap/cobertura-sistema/{*,.*}
-if (test "$CI" = "") then { # Por ahora no en gitlab-ci
+if (test "$CI" = "" -a -d $rutaap/test/system ) then { # Por ahora no en gitlab-ci
   (cd $rutaap; CONFIG_HOSTS=127.0.0.1 ${RAILS} msip:stimulus_motores test:system)
   if (test "$?" != "0") then {
     echo "No pasaron pruebas del sistema rails";
