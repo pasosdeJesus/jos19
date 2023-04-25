@@ -1,5 +1,4 @@
-require "jos19/version"
-require "jos19/railtie"
+require "jos19/engine"
 
 module Jos19
   # Your code goes here...
