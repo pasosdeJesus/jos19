@@ -393,18 +393,21 @@ module Jos19
     # Unificar la información de un segundo beneficario en un primero y elimina el
     # segundo
     # @return [menserr, null] si hay error o ["", persona_id] si no
-    def unificar_dos_beneficiarios(p1_id, p2_id, current_usuario)
+    def unificar_dos_personas(p1_id, p2_id, current_usuario)
       menserr = ''
       if !p1_id || p1_id.to_i <= 0 ||
           Msip::Persona.where(id: p1_id.to_i).count == 0
-        menserr += "Primera identificación de beneficiario no válida #{p1_id.to_s}.\n"
+        menserr += "Primera identificación de beneficiario no válida "\
+          "#{p1_id.to_s}.\n"
       end
       if !p2_id || p2_id.to_i <= 0 ||
           Msip::Persona.where(id: p2_id.to_i).count == 0
-        menserr += "Segunda identificación de beneficiario no válida #{p2_id.to_s}.\n"
+        menserr += "Segunda identificación de beneficiario no válida "\
+          "#{p2_id.to_s}.\n"
       end
       if p1_id.to_i == p2_id.to_i
-        menserr += "Primera y segunda identificación son iguales no unificando.\n"
+        menserr += "Primera y segunda identificación son iguales, "\
+        "no se unifican.\n"
       end
       if menserr != ""
         return [menserr, nil]
@@ -417,19 +420,28 @@ module Jos19
       cp2 = Sivel2Gen::Victima.where(persona_id: p2.id).pluck(:caso_id)
       cc = cp1 & cp2
       if cc.count == 1
-        menserr += "El caso #{cc.first} tiene ambos beneficiarios como víctimas; por previción antes debe eliminar alguna de esas víctimas de ese caso.\n"
+        menserr += "El caso #{cc.first} tiene ambos beneficiarios como "\
+        "víctimas; por previción antes debe eliminar alguna de esas "\
+        "víctimas de ese caso.\n"
       elsif cc.count > 1
-        menserr += "Los casos #{cc.inspect} tienen a ambos beneficiarios como víctimas; por previción antes en cada uno de esos casos debe eliminar alguna de las dos víctimas.\n"
+        menserr += "Los casos #{cc.inspect} tienen a ambos beneficiarios "\
+          "como víctimas; por previción antes en cada uno de esos casos "\
+          "debe eliminar alguna de las dos víctimas.\n"
       end
 
-
-      ap1 = Cor1440Gen::Asistencia.where(persona_id: p1.id).pluck(&:actividad_id)
-      ap2 = Cor1440Gen::Asistencia.where(persona_id: p2.id).pluck(&:actividad_id)
+      ap1 = Cor1440Gen::Asistencia.where(persona_id: p1.id).
+        pluck(&:actividad_id)
+      ap2 = Cor1440Gen::Asistencia.where(persona_id: p2.id).
+        pluck(&:actividad_id)
       ac = ap1 & ap2
       if ac.count == 1
-        menserr += "La actividad #{ac.first} tiene ambos beneficiarios como asistentes; por previción antes debe eliminar alguno de esos asistentes de esa actividad.\n"
+        menserr += "La actividad #{ac.first} tiene ambos beneficiarios como "\
+        "asistentes; por previción antes debe eliminar alguno de los "\
+        "asistentes duplicados de esa actividad.\n"
       elsif ac.count > 1
-        menserr += "Las actividades #{ac.inspect} tienen a ambos beneficiarios como asistentes; por previción antes en cada una de esas actividades debe eliminar alguno de los dos asistentes.\n"
+        menserr += "Las actividades #{ac.inspect} tienen a ambos "\
+        "beneficiarios como asistentes; por previción antes en cada una de "\
+        "esas actividades debe eliminar alguno de los dos asistentes.\n"
       end
 
       eunif = Msip::Etiqueta.where(nombre:'BENEFICIARIOS UNIFICADOS').take
@@ -603,7 +615,7 @@ module Jos19
 
       return ["", p1.id]
     end
-    module_function :unificar_dos_beneficiarios
+    module_function :unificar_dos_personas
 
     def consulta_duplicados_autom
       # La siguiente vista haría breve la siguiente consulta pero
@@ -725,7 +737,7 @@ module Jos19
         cuerpo: []
       }
       pares.each do |f|
-        mens, idunif = unificar_dos_beneficiarios(f['id1'], f['id2'], current_usuario)
+        mens, idunif = unificar_dos_personas(f['id1'], f['id2'], current_usuario)
         if (mens == "")
           mens = "Unificados en <a target=_blank href='\/personas/#{idunif}'>#{idunif}</a>".html_safe
         end
