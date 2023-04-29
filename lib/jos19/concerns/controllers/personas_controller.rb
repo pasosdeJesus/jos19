@@ -32,6 +32,10 @@ module Jos19
             atributos_form_jos19
           end
 
+          def vistas_manejadas
+            ['Persona']
+          end
+
           def filtro_nombresrepetidos_fechas(personas, cfecha = 'msip_persona.created_at')
             pfid = ''
             if (params[:nombresrepetidos] && params[:nombresrepetidos][:fechaini] && 
@@ -365,6 +369,424 @@ module Jos19
           end
 
 
+          # Unificar dos casos, eliminando el de código mayor y dejando
+          # su información como etiqueta en el primero
+          # @return caso_id donde unifica si lo logra o nil
+          def unificar_dos_casos(c1_id, c2_id, current_usuario, menserror)
+            tmenserror = ''
+            if !c1_id || c1_id.to_i <= 0 ||
+                Sivel2Gen::Caso.where(id: c1_id.to_i).count == 0
+              tmenserror << "Primera identificación de caso no válida '#{c1_id.to_s}'.\n"
+            end
+            if !c2_id || c2_id.to_i <= 0 ||
+                Sivel2Gen::Caso.where(id: c2_id.to_i).count == 0
+              tmenserror << "Segunda identificación de caso no válida '#{c2_id.to_s}'.\n"
+            end
+            if c1_id.to_i == c2_id.to_i
+              tmenserror << "Primera y segunda identificación son iguales, no unificando.\n"
+            end
+
+            if tmenserror != ""
+              menserror << tmenserror
+              return nil
+            end
+
+            c1 = Sivel2Gen::Caso.find([c1_id.to_i, c2_id.to_i].min)
+            c2 = Sivel2Gen::Caso.find([c1_id.to_i, c2_id.to_i].max)
+
+            eunif = Msip::Etiqueta.where(
+              nombre: Rails.configuration.x.jos19_etiquetaunificadas).take
+              if !eunif
+                tmenserror << "No se encontró etiqueta "\
+                  "#{Rails.configuration.x.jos19_etiquetaunificadas}.\n"
+              end
+
+              if tmenserror != ""
+                menserror << tmenserror
+                return nil
+              end
+
+              ep = Sivel2Gen::CasoEtiqueta.new(
+                caso_id: c1.id,
+                etiqueta_id: eunif.id,
+                usuario_id: current_usuario.id,
+                fecha: Date.today(),
+                observaciones: ""
+              )
+
+              Sivel2Sjr::ActividadCasosjr.where(casosjr_id: c2.id).each do |ac|
+                ac.casosjr_id = c1.id
+                ac.save
+                ep.observaciones << "Cambiado caso beneficiario en actividad #{ac.id}\n"
+              end
+
+              ep.observaciones = ep.observaciones[0..9999]
+              ep.save
+              cc = Sivel2Sjr::CasosController.new
+              c2rep = UnificarHelper.reporte_md_contenido_objeto("Caso #{c1.id}", cc.lista_params, c1, 0)
+              c2id = c2.id
+              if eliminar_caso(c2, tmenserror)
+                ep.observaciones << "Se unificó y eliminó el registro de caso #{c2id}\n" +
+                  ep.observaciones << c2rep
+              else
+                ep.observaciones << "No se logró eliminar el caso #{c2id}, pero si se unficó en el #{c1.id}\n" +
+                  tmenserror << "No se logró eliminar el caso #{c2id}\n"
+              end
+              ep.observaciones = ep.observaciones[0..9999]
+              begin
+                ep.save!
+              rescue Exception => e
+                puts e.to_s
+                debugger
+              end
+
+
+              if tmenserror != ""
+                menserror << tmenserror
+                return nil
+              end
+
+              return c1.id
+          end
+
+          # @param p1 Primera persona
+          # @param p2 Segunda persona
+          # @param ep Etiqueta para la persona que queda que se construye
+         def unificar_dos_personas_en_casos(
+           p1, p2, current_usuario, cadpersona, ep, menserror
+         )
+           loop do
+             cc1 = Sivel2Sjr::Casosjr.where(contacto_id: p1.id).pluck(:caso_id)
+             cc2 = Sivel2Sjr::Casosjr.where(contacto_id: p2.id).pluck(:caso_id)
+             if cc1.count > 0 and cc2.count > 0
+               cr = unificar_dos_casos(cc1[0], cc2[0], current_usuario, menserror)
+               if !cr.nil?
+                 ep.observaciones << "Unificados casos #{cc1[0]} y #{cc2[0]} en #{cr}\n"
+               else
+                 menserror << "Primer #{cadpersona} (#{p1.id} "\
+                   "#{p1.nombres.to_s} #{p1.apellidos.to_s}) es contacto "\
+                   "en caso #{cc1[0]} y segundo beneficiario (#{p2.id} "\
+                   "#{p2.nombres} #{p2.apellidos}) es contacto en caso "\
+                   "#{cc2[0]}. Se intentó sin éxito la unificación de "\
+                   "los dos casos.\n"
+                 return [menserror, nil]
+               end
+             end
+             break if cc1.count == 0 || cc2.count == 0;
+           end
+
+           cp2 = Sivel2Gen::Victima.where(persona_id: p2.id).pluck(:caso_id)
+           cp2.each do |cid|
+             Sivel2Gen::Victima.where(
+               caso_id: cid, persona_id: p2.id
+             ).each do |vic|
+               if Sivel2Gen::Victima.where(caso_id: cid, persona_id: p1.id).count == 0
+                 nv = vic.dup
+                 nv.persona_id = p1.id
+                 nv.save
+                 nvs = vic.victimasjr.dup
+                 if nvs
+                   nvs.victima_id = nv.id
+                   nvs.save
+                 end
+                 ep.observaciones << "Creada víctma en caso #{cid}\n"
+               end
+               ep.save
+               csjr = vic.caso.casosjr
+               if csjr.contacto_id == p2.id
+                 Sivel2Sjr::Casosjr.connection.execute <<-SQL
+                   UPDATE sivel2_sjr_casosjr SET
+                     contacto_id=#{p1.id}
+                     WHERE contacto_id=#{p2.id}
+                 SQL
+                 #          csjr.contacto_id = p1.id
+                 #          if !csjr.save
+                 #            puts csjr.errors
+                 #            debugger
+                 #          end
+                 ep.observaciones << "Cambiado contacto en caso #{cid}\n"
+               end
+               ep.save
+               Sivel2Gen::Acto.where(
+                 caso_id: cid, persona_id: p1.id
+               ).each do |ac|
+                 ac.persona_id = p1.id
+                 ac.save!
+                 ep.observaciones << "Cambiado acto en caso #{cid}\n"
+               end
+               ep.save
+               ep.observaciones << "Elimina #{cadpersona} "\
+                 "#{vic.persona_id} del caso #{cid}\n"
+               vic.destroy
+               ep.observaciones = ep.observaciones[0..4998]
+               ep.save
+             end
+           end
+
+           ::Detallefinanciero.joins(:persona).where(
+             'msip_persona.id' => p2.id
+           ).each do |bp|
+             bp.persona_id = p1.id
+             bp.save
+             ep.observaciones << "Cambiado detalle financiero #{bp.detallefinanciero_id}\n"
+           end
+           #detallefinanciero_persona
+         end
+
+
+
+          # Unificar la información de una segunda persona en una 
+          # primera y elimina la segunda
+          #
+          # @return [menserror, null] si hay error o ["", persona_id] si no
+          def unificar_dos_personas(
+            p1_id, p2_id, current_usuario, cadpersona="persona")
+            menserror = ''.dup
+            if !p1_id || p1_id.to_i <= 0 ||
+                Msip::Persona.where(id: p1_id.to_i).count == 0
+              menserror += "Primera identificación de #{cadpersona} no válida "\
+                "#{p1_id.to_s}.\n"
+            end
+            if !p2_id || p2_id.to_i <= 0 ||
+                Msip::Persona.where(id: p2_id.to_i).count == 0
+              menserror += "Segunda identificación de #{cadpersona} no válida "\
+                "#{p2_id.to_s}.\n"
+            end
+            if p1_id.to_i == p2_id.to_i
+              menserror += "Primera y segunda identificación son iguales, "\
+                "no se unifican.\n"
+            end
+            if menserror != ""
+              return [menserror, nil]
+            end
+
+            p1 = Msip::Persona.find([p1_id.to_i, p2_id.to_i].min)
+            p2 = Msip::Persona.find([p1_id.to_i, p2_id.to_i].max)
+
+            cp1 = Sivel2Gen::Victima.where(persona_id: p1.id).pluck(:caso_id)
+            cp2 = Sivel2Gen::Victima.where(persona_id: p2.id).pluck(:caso_id)
+            cc = cp1 & cp2
+            if cc.count == 1
+              menserror += "El caso #{cc.first} tiene ambos #{cadpersona}s "\
+                "como víctimas; por previción antes debe eliminar alguna "\
+                "de esas víctimas de ese caso.\n"
+            elsif cc.count > 1
+              menserror += "Los casos #{cc.inspect} tienen a ambos "\
+                "#{cadpersona} como víctimas; por previción antes en "\
+                "cada uno de esos casos debe eliminar alguna "\
+                "de las dos víctimas.\n"
+            end
+
+            ap1 = Cor1440Gen::Asistencia.where(persona_id: p1.id).
+              pluck(&:actividad_id)
+            ap2 = Cor1440Gen::Asistencia.where(persona_id: p2.id).
+              pluck(&:actividad_id)
+            ac = ap1 & ap2
+            if ac.count == 1
+              menserror += "La actividad #{ac.first} tiene ambos "\
+                "#{cadpersona}s como asistentes; por previción antes "\
+                "debe eliminar alguno de los asistentes duplicados "\
+                "de esa actividad.\n"
+            elsif ac.count > 1
+              menserror += "Las actividades #{ac.inspect} tienen a ambos "\
+                "#{cadperson}s como asistentes; por previción antes en "\
+                "cada una de esas actividades debe eliminar alguno "\
+                "de los dos asistentes.\n"
+            end
+
+            eunif = Msip::Etiqueta.where(
+              nombre: Rails.configuration.x.jos19_etiquetaunificadas).take
+              if !eunif
+                menserror += "No se encontró etiqueta "\
+                  "#{Rails.configuration.x.jos19_etiquetaunificadas}.\n"
+              end
+
+              if menserror != ""
+                return [menserror, nil]
+              end
+
+              ep = Msip::EtiquetaPersona.new(
+                persona_id: p1.id,
+                etiqueta_id: eunif.id,
+                usuario_id: current_usuario.id,
+                fecha: Date.today(),
+                observaciones: ""
+              )
+              [ :anionac, :mesnac, :dianac,
+                :numerodocumento, :tdocumento_id,
+                :departamento_id, :municipio_id,
+                :clase_id, :nacionalde, :pais_id
+              ].each do |c|
+                if !p1[c] && p2[c]
+                  p1[c] = p2[c]
+                  ep.observaciones << "#{c}->#{p2[c]}\n"
+                end
+              end
+              p1.save
+              ep.save
+
+              Msip::PersonaTrelacion.where(persona1: p2.id).each do |pt|
+                pt.persona1 = p1.id
+                pt.save
+                ep.observaciones << "Cambiada relacion con #{cadpersona} "\
+                  "#{pt.persona2}\n"
+              end
+              Msip::PersonaTrelacion.where(persona2: p2.id).each do |pt|
+                pt.persona2 = p1.id
+                pt.save
+                ep.observaciones << "Cambiada relacion con #{cadpersona} "\
+                  "#{pt.persona1}\n"
+              end
+
+              #msip_datosbio no debe estar lleno
+              Msip::OrgsocialPersona.where(persona_id: p2.id).each do |op|
+                op.persona_id = p1.id
+                op.save
+                ep.observaciones << "Cambiada organización social #{op.orgsocial_id}\n"
+              end
+
+              #mr519_gen_encuestapersona no debería estar llena
+              Msip::EtiquetaPersona.where(persona_id: p2.id).each do |ep2|
+                ep2.persona_id = p1.id
+                ep2.save
+                ep.observaciones << "Cambiada etiqueta #{ep.etiqueta.nombre}\n"
+              end
+
+              Cor1440Gen::Caracterizacionpersona.where(persona_id: p2.id).each do |cp|
+                cp.persona_id = p1.id
+                cp.save
+                ep.observaciones << "Cambiada caracterizacíon #{cp.id}\n"
+              end
+              # cor1440_gen_beneficiariopf no tiene id
+              lpf = Cor1440Gen::Beneficiariopf.where(persona_id: p2.id).
+                pluck(:proyectofinanciero_id)
+              lpf.each do |pfid|
+                if Cor1440Gen::Beneficiariopf.where(persona_id: p1.id, 
+                    proyectofinanciero_id: pfid).count == 0
+                  Cor1440Gen::Beneficiariopf.connection.execute <<-SQL
+                 INSERT INTO cor1440_gen_beneficiariopf 
+                   (persona_id, proyectofinanciero_id) 
+                   VALUES (#{p1.id}, #{pfid});
+                  SQL
+                  ep.observaciones << "Cambiado beneficiario en convenio financiado #{pfid}\n"
+                end
+                Cor1440Gen::Beneficiariopf.connection.execute <<-SQL
+               DELETE FROM cor1440_gen_beneficiariopf WHERE 
+                 persona_id=#{p2.id} AND
+                 proyectofinanciero_id=#{pfid};
+                SQL
+              end
+
+              unificar_dos_personas_en_casos(
+                p1, p2, current_usuario, cadpersona, ep, menserror
+              )
+
+              ep.observaciones = ep.observaciones[0..4998]
+              ep.save
+              p2.destroy
+              ep.observaciones << "Se unificó y eliminó el registro de beneficiario #{p2.id}\n"\
+                "* Nombres: #{p2.nombres.to_s}\n"\
+                "* Apellidos: #{p2.apellidos.to_s}\n"\
+                "* Tipo doc.: #{p2.tdocumento_id ? p2.tdocumento.sigla : ''}\n"\
+                "* Número de doc.: #{p2.numerodocumento.to_s}\n"\
+                "* Año nac.: #{p2.anionac.to_s}\n"\
+                "* Mes nac.: #{p2.mesnac.to_s}\n"\
+                "* Dia nac.: #{p2.dianac.to_s}\n"\
+                "* Sexo nac.: #{p2.sexo.to_s}\n"\
+                "* Pais nac.: #{p2.pais_id ? p2.pais.nombre : ''}\n"\
+                "* Departamento nac.: #{p2.departamento_id ? p2.departamento.nombre : ''}\n"\
+                "* Muncipio nac.: #{p2.municipio_id ? p2.municipio.nombre : ''}\n"\
+                "* Centro poblado nac.: #{p2.clase_id ? p2.clase.nombre : ''}\n"\
+                "* Nacional de: #{p2.nacionalde ? p2.nacional.nombre : ''}\n"\
+                "* Fecha creación: #{p2.created_at.to_s}\n"\
+                "* Fecha actualización: #{p2.updated_at.to_s}.\n"
+
+              ep.observaciones = ep.observaciones[0..4998]
+              ep.save
+
+              return ["", p1.id]
+          end
+
+
+
+          # @param c Sivel2Gen::Caso
+          # @param menserror Colchon para mensajes de error
+          # @return true y menserror no es modificado o false y se agrega problema a menserror
+          def eliminar_caso(c, menserror)
+            if !c || !c.id
+              menserror << "Caso no válido.\n"
+              return false
+            end
+            begin
+              #Sivel2Gen::Caso.connection.execute('BEGIN')
+              Sivel2Gen::Caso.connection.execute(
+                "DELETE FROM sivel2_sjr_categoria_desplazamiento
+           WHERE desplazamiento_id IN (SELECT id FROM sivel2_sjr_desplazamiento
+              WHERE id_caso=#{c.id});"
+              )
+              ['sivel2_sjr_ayudasjr_respuesta', 
+               'sivel2_sjr_ayudaestado_respuesta',
+               'sivel2_sjr_derecho_respuesta', 
+               'sivel2_sjr_aspsicosocial_respuesta', 
+               'sivel2_sjr_motivosjr_respuesta', 
+               'sivel2_sjr_progestado_respuesta'
+              ].each do |trr|
+                ord = "DELETE FROM #{trr}
+           WHERE id_respuesta IN (SELECT id FROM sivel2_sjr_respuesta 
+             WHERE id_caso=#{c.id});"
+                #puts "OJO ord='#{ord}'"
+                Sivel2Gen::Caso.connection.execute(ord)
+              end
+              Sivel2Gen::Caso.connection.execute(
+                "DELETE FROM sivel2_sjr_accionjuridica_respuesta 
+           WHERE respuesta_id IN (SELECT id FROM sivel2_sjr_respuesta 
+             WHERE id_caso=#{c.id});"
+              )
+
+              Sivel2Gen::Caso.connection.execute("DELETE FROM sivel2_sjr_actosjr
+        WHERE id_acto IN (SELECT id FROM sivel2_gen_acto
+          WHERE id_caso=#{c.id});")
+
+              Sivel2Gen::Caso.connection.execute("DELETE FROM sivel2_sjr_desplazamiento
+        WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("UPDATE sivel2_gen_caso
+        SET ubicacion_id=NULL
+          WHERE id=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("UPDATE sivel2_sjr_casosjr
+        SET id_llegada=NULL WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("UPDATE sivel2_sjr_casosjr
+        SET id_salida=NULL WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("UPDATE sivel2_sjr_casosjr
+        SET id_llegadam=NULL WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("UPDATE sivel2_sjr_casosjr
+        SET id_salidam=NULL WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute("DELETE FROM sip_ubicacion
+        WHERE id_caso=#{c.id};")
+              Sivel2Gen::Caso.connection.execute(
+                "DELETE FROM sivel2_sjr_actividad_casosjr
+        WHERE casosjr_id=#{c.id}")
+              Sivel2Gen::Caso.connection.execute(
+                "DELETE FROM sivel2_sjr_respuesta 
+        WHERE id_caso=#{c.id}")
+              cs = c.casosjr
+              if cs
+                cs.destroy
+              end
+              c.destroy
+              return true
+            rescue Exception => e
+              menserror << "Problema eliminando caso #{e}.\n"
+              return false
+            end
+
+            #    Sivel2Gen::Caso.connection.execute("DELETE FROM sivel2_gen_acto
+            #      WHERE id_caso=#{c.id};")
+            #    Sivel2Gen::Caso.connection.execute("DELETE FROM sivel2_gen_caso
+            #      WHERE id=#{c.id};")
+            #    Sivel2Gen::Caso.connection.execute('COMMIT;')
+          end
+
+
           def unificar
             if params[:unificarpersonas]
               id1 = params[:unificarpersonas][:id1].to_i
@@ -378,7 +800,7 @@ module Jos19
               return
             end
 
-            r = Jos19::UnificarHelper.unificar_dos_personas(
+            r = unificar_dos_personas(
               id1.dup, id2.dup, current_usuario.dup)
             m = r[0]
             p = r[1]
@@ -387,7 +809,7 @@ module Jos19
               redirect_to Rails.configuration.relative_url_root
               return
             end
-            redirect_to msip.persona_path(p1)
+            redirect_to msip.persona_path(p)
           end
 
 
