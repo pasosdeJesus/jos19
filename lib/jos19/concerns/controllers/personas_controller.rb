@@ -203,6 +203,11 @@ module Jos19
               end
               @validaciones << vc
             end
+            sinhom = ''
+            if ActiveRecord::Base.connection.table_exists?('msip_homonimo')
+              sinhom = "   AND (p1.id, p2.id) NOT IN "\
+                "     (SELECT  persona1_id, persona2_id FROM msip_homonimo)"
+            end
 
             rep= "SELECT p1.id AS id1, t1.sigla, p1.numerodocumento, "\
               "     p1.nombres AS nombres1, p1.apellidos AS apellidos1,"\
@@ -213,7 +218,8 @@ module Jos19
               "   JOIN msip_tdocumento AS t1 ON p1.tdocumento_id=t1.id "\
               "   JOIN msip_tdocumento AS t2 ON p2.tdocumento_id=t2.id " \
               "   WHERE soundexespm(p1.nombres)=soundexespm(p2.nombres) AND "\
-              "   soundexespm(p1.apellidos)=soundexespm(p2.apellidos) "\
+              "   soundexespm(p1.apellidos)=soundexespm(p2.apellidos) " + 
+              sinhom +
               "   ORDER BY p1.nombres, p1.apellidos, p2.nombres, p2.apellidos"
             @idrep = ActiveRecord::Base.connection.select_all(rep) 
 
@@ -437,7 +443,6 @@ module Jos19
                 ep.save!
               rescue Exception => e
                 puts e.to_s
-                debugger
               end
 
 
