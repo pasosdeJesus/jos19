@@ -455,60 +455,34 @@ module Jos19
          def unificar_dos_personas_en_casos(
            p1, p2, current_usuario, cadpersona, ep, menserror
          )
-           loop do
-             cc1 = Sivel2Sjr::Casosjr.where(contacto_id: p1.id).pluck(:caso_id)
-             cc2 = Sivel2Sjr::Casosjr.where(contacto_id: p2.id).pluck(:caso_id)
-             if cc1.count > 0 and cc2.count > 0
-               cr = unificar_dos_casos(cc1[0], cc2[0], current_usuario, menserror)
-               if !cr.nil?
-                 ep.observaciones << "Unificados casos #{cc1[0]} y #{cc2[0]} en #{cr}\n"
-               else
-                 menserror << "Primer #{cadpersona} (#{p1.id} "\
-                   "#{p1.nombres.to_s} #{p1.apellidos.to_s}) es contacto "\
-                   "en caso #{cc1[0]} y segundo beneficiario (#{p2.id} "\
-                   "#{p2.nombres} #{p2.apellidos}) es contacto en caso "\
-                   "#{cc2[0]}. Se intentó sin éxito la unificación de "\
-                   "los dos casos.\n"
-                 return [menserror, nil]
-               end
-             end
-             break if cc1.count == 0 || cc2.count == 0;
-           end
 
            cp2 = Sivel2Gen::Victima.where(persona_id: p2.id).pluck(:caso_id)
            cp2.each do |cid|
              Sivel2Gen::Victima.where(
                caso_id: cid, persona_id: p2.id
              ).each do |vic|
-               if Sivel2Gen::Victima.where(caso_id: cid, persona_id: p1.id).count == 0
+               if Sivel2Gen::Victima.where(
+                   caso_id: cid, persona_id: p1.id).count == 0
                  nv = vic.dup
                  nv.persona_id = p1.id
                  nv.save
-                 nvs = vic.victimasjr.dup
-                 if nvs
-                   nvs.victima_id = nv.id
-                   nvs.save
-                 end
                  ep.observaciones << "Creada víctma en caso #{cid}\n"
                end
                ep.save
-               csjr = vic.caso.casosjr
-               if csjr.contacto_id == p2.id
-                 Sivel2Sjr::Casosjr.connection.execute <<-SQL
-                   UPDATE sivel2_sjr_casosjr SET
-                     contacto_id=#{p1.id}
-                     WHERE contacto_id=#{p2.id}
-                 SQL
-                 #          csjr.contacto_id = p1.id
-                 #          if !csjr.save
-                 #            puts csjr.errors
-                 #            debugger
-                 #          end
-                 ep.observaciones << "Cambiado contacto en caso #{cid}\n"
-               end
-               ep.save
+               #cr = unificar_dos_casos(cc1[0], cc2[0], current_usuario, menserror)
+               #if !cr.nil?
+               #  ep.observaciones << "Unificados casos #{cc1[0]} y #{cc2[0]} en #{cr}\n"
+               #else
+               #  menserror << "Primer #{cadpersona} (#{p1.id} "\
+               #    "#{p1.nombres.to_s} #{p1.apellidos.to_s}) es contacto "\
+               #    "en caso #{cc1[0]} y segundo beneficiario (#{p2.id} "\
+               #    "#{p2.nombres} #{p2.apellidos}) es contacto en caso "\
+               #    "#{cc2[0]}. Se intentó sin éxito la unificación de "\
+               #    "los dos casos.\n"
+               #  return [menserror, nil]
+               #end
                Sivel2Gen::Acto.where(
-                 caso_id: cid, persona_id: p1.id
+                 caso_id: cid, persona_id: p2.id
                ).each do |ac|
                  ac.persona_id = p1.id
                  ac.save!
@@ -522,15 +496,6 @@ module Jos19
                ep.save
              end
            end
-
-           ::Detallefinanciero.joins(:persona).where(
-             'msip_persona.id' => p2.id
-           ).each do |bp|
-             bp.persona_id = p1.id
-             bp.save
-             ep.observaciones << "Cambiado detalle financiero #{bp.detallefinanciero_id}\n"
-           end
-           #detallefinanciero_persona
          end
 
 
