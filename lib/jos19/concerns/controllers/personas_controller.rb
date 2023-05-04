@@ -23,9 +23,25 @@ module Jos19
             atributos_show_jos19
           end
 
+          def atributos_index_jos19
+            atributos_show - [:familiares]
+          end
+
+          def atributos_index
+            a = atributos_index_jos19
+            a
+          end
+
           def atributos_form_jos19
-            atributos_form_cor1440_gen - 
-              [:caso_ids, :familiar_ids, :familiarvictima_ids]
+            a = atributos_form_cor1440_gen - [
+              :caso_ids, 
+              :familiar_ids, 
+              :familiares, 
+              :familiarvictima_ids
+            ] + [
+              :persona_trelacion1
+            ]
+            return a
           end
 
           def atributos_form
@@ -817,6 +833,19 @@ module Jos19
                 :observaciones,
                 :usuario_id,
                 :_destroy
+              ],
+              persona_trelacion1_attributes:  [
+                :id,
+                :trelacion_id,
+                :_destroy,
+                :personados_attributes => [
+                  :id,
+                  :nombres, 
+                  :apellidos,
+                  :sexo,
+                  :tdocumento_id,
+                  :numerodocumento,
+                ]
               ]
             ]
             l
