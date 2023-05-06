@@ -1,0 +1,12 @@
+<%= f.input :buspersona_tipodocumento,
+  collection: Msip::Tdocumento.all,
+  label_method: lambda{|k| k.sigla},
+  label_value: lambda{|k| k.id},
+  label: false,
+  include_blank: true,
+  selected: Msip::ModeloHelper.poromision(params, :buspersona_tipodocumento),
+  input_html: {
+    class: 'chosen-select',
+    'data-enviarautomatico' => ''
+  }
+  %>

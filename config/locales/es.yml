@@ -1,0 +1,13 @@
+es:
+  attributes:
+    fechacreacion: Creación
+    fechadeshabilitacion: Deshabilitación 
+  activerecord:
+    models:
+    attributes:
+      "jos19/consactividadcaso":
+        Consactividadcaso: Reporte actividad con caso
+        actividad_proyectofinanciero: Convenio financiado
+      "msip/persona":
+        actividadcasobeneficiario_ids: Actividades en las que está por un caso beneficiario
+
