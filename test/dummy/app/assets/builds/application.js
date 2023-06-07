@@ -1375,7 +1375,7 @@
           }
           return typeof obj === "object" || typeof obj === "function" ? class2type[toString.call(obj)] || "object" : typeof obj;
         }
-        var version = "3.6.4", jQuery2 = function(selector, context) {
+        var version = "3.7.0", rhtmlSuffix = /HTML$/i, jQuery2 = function(selector, context) {
           return new jQuery2.fn.init(selector, context);
         };
         jQuery2.fn = jQuery2.prototype = {
@@ -1535,6 +1535,20 @@
             }
             return obj;
           },
+          // Retrieve the text value of an array of DOM nodes
+          text: function(elem) {
+            var node, ret = "", i = 0, nodeType = elem.nodeType;
+            if (!nodeType) {
+              while (node = elem[i++]) {
+                ret += jQuery2.text(node);
+              }
+            } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+              return elem.textContent;
+            } else if (nodeType === 3 || nodeType === 4) {
+              return elem.nodeValue;
+            }
+            return ret;
+          },
           // results is for internal usage only
           makeArray: function(arr2, results) {
             var ret = results || [];
@@ -1552,6 +1566,10 @@
           },
           inArray: function(elem, arr2, i) {
             return arr2 == null ? -1 : indexOf2.call(arr2, elem, i);
+          },
+          isXMLDoc: function(elem) {
+            var namespace = elem && elem.namespaceURI, docElem = elem && (elem.ownerDocument || elem).documentElement;
+            return !rhtmlSuffix.test(namespace || docElem && docElem.nodeName || "HTML");
           },
           // Support: Android <=4.0 only, PhantomJS 1 only
           // push.apply(_, arraylike) throws on ancient WebKit
@@ -1616,1333 +1634,1177 @@
           }
           return type === "array" || length === 0 || typeof length === "number" && length > 0 && length - 1 in obj;
         }
-        var Sizzle = (
-          /*!
-           * Sizzle CSS Selector Engine v2.3.10
-           * https://sizzlejs.com/
-           *
-           * Copyright JS Foundation and other contributors
-           * Released under the MIT license
-           * https://js.foundation/
-           *
-           * Date: 2023-02-14
-           */
-          function(window3) {
-            var i, support2, Expr, getText, isXML, tokenize2, compile, select, outermostContext, sortInput, hasDuplicate, setDocument, document3, docElem, documentIsHTML, rbuggyQSA, rbuggyMatches, matches, contains2, expando = "sizzle" + 1 * /* @__PURE__ */ new Date(), preferredDoc = window3.document, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
-              if (a === b) {
-                hasDuplicate = true;
-              }
-              return 0;
-            }, hasOwn2 = {}.hasOwnProperty, arr2 = [], pop = arr2.pop, pushNative = arr2.push, push2 = arr2.push, slice2 = arr2.slice, indexOf3 = function(list, elem) {
-              var i2 = 0, len = list.length;
-              for (; i2 < len; i2++) {
-                if (list[i2] === elem) {
-                  return i2;
-                }
-              }
-              return -1;
-            }, booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped", whitespace2 = "[\\x20\\t\\r\\n\\f]", identifier = "(?:\\\\[\\da-fA-F]{1,6}" + whitespace2 + "?|\\\\[^\\r\\n\\f]|[\\w-]|[^\0-\\x7f])+", attributes = "\\[" + whitespace2 + "*(" + identifier + ")(?:" + whitespace2 + // Operator (capture 2)
-            "*([*^$|!~]?=)" + whitespace2 + // "Attribute values must be CSS identifiers [capture 5]
-            // or strings [capture 3 or capture 4]"
-            `*(?:'((?:\\\\.|[^\\\\'])*)'|"((?:\\\\.|[^\\\\"])*)"|(` + identifier + "))|)" + whitespace2 + "*\\]", pseudos = ":(" + identifier + `)(?:\\((('((?:\\\\.|[^\\\\'])*)'|"((?:\\\\.|[^\\\\"])*)")|((?:\\\\.|[^\\\\()[\\]]|` + attributes + ")*)|.*)\\)|)", rwhitespace = new RegExp(whitespace2 + "+", "g"), rtrim2 = new RegExp("^" + whitespace2 + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace2 + "+$", "g"), rcomma = new RegExp("^" + whitespace2 + "*," + whitespace2 + "*"), rleadingCombinator = new RegExp("^" + whitespace2 + "*([>+~]|" + whitespace2 + ")" + whitespace2 + "*"), rdescend = new RegExp(whitespace2 + "|>"), rpseudo = new RegExp(pseudos), ridentifier = new RegExp("^" + identifier + "$"), matchExpr = {
-              "ID": new RegExp("^#(" + identifier + ")"),
-              "CLASS": new RegExp("^\\.(" + identifier + ")"),
-              "TAG": new RegExp("^(" + identifier + "|[*])"),
-              "ATTR": new RegExp("^" + attributes),
-              "PSEUDO": new RegExp("^" + pseudos),
-              "CHILD": new RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" + whitespace2 + "*(even|odd|(([+-]|)(\\d*)n|)" + whitespace2 + "*(?:([+-]|)" + whitespace2 + "*(\\d+)|))" + whitespace2 + "*\\)|)", "i"),
-              "bool": new RegExp("^(?:" + booleans + ")$", "i"),
-              // For use in libraries implementing .is()
-              // We use this for POS matching in `select`
-              "needsContext": new RegExp("^" + whitespace2 + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" + whitespace2 + "*((?:-\\d)?\\d*)" + whitespace2 + "*\\)|)(?=[^-]|$)", "i")
-            }, rhtml2 = /HTML$/i, rinputs = /^(?:input|select|textarea|button)$/i, rheader = /^h\d$/i, rnative = /^[^{]+\{\s*\[native \w/, rquickExpr2 = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, rsibling = /[+~]/, runescape = new RegExp("\\\\[\\da-fA-F]{1,6}" + whitespace2 + "?|\\\\([^\\r\\n\\f])", "g"), funescape = function(escape, nonHex) {
-              var high = "0x" + escape.slice(1) - 65536;
-              return nonHex ? (
-                // Strip the backslash prefix from a non-hex escape sequence
-                nonHex
-              ) : (
-                // Replace a hexadecimal escape sequence with the encoded Unicode code point
-                // Support: IE <=11+
-                // For values outside the Basic Multilingual Plane (BMP), manually construct a
-                // surrogate pair
-                high < 0 ? String.fromCharCode(high + 65536) : String.fromCharCode(high >> 10 | 55296, high & 1023 | 56320)
-              );
-            }, rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g, fcssescape = function(ch, asCodePoint) {
-              if (asCodePoint) {
-                if (ch === "\0") {
-                  return "\uFFFD";
-                }
-                return ch.slice(0, -1) + "\\" + ch.charCodeAt(ch.length - 1).toString(16) + " ";
-              }
-              return "\\" + ch;
-            }, unloadHandler = function() {
-              setDocument();
-            }, inDisabledFieldset = addCombinator(
-              function(elem) {
-                return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
-              },
-              { dir: "parentNode", next: "legend" }
-            );
+        function nodeName(elem, name) {
+          return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+        }
+        var pop = arr.pop;
+        var sort = arr.sort;
+        var splice = arr.splice;
+        var whitespace = "[\\x20\\t\\r\\n\\f]";
+        var rtrimCSS = new RegExp(
+          "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$",
+          "g"
+        );
+        jQuery2.contains = function(a, b) {
+          var bup = b && b.parentNode;
+          return a === bup || !!(bup && bup.nodeType === 1 && // Support: IE 9 - 11+
+          // IE doesn't have `contains` on SVG.
+          (a.contains ? a.contains(bup) : a.compareDocumentPosition && a.compareDocumentPosition(bup) & 16));
+        };
+        var rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g;
+        function fcssescape(ch, asCodePoint) {
+          if (asCodePoint) {
+            if (ch === "\0") {
+              return "\uFFFD";
+            }
+            return ch.slice(0, -1) + "\\" + ch.charCodeAt(ch.length - 1).toString(16) + " ";
+          }
+          return "\\" + ch;
+        }
+        jQuery2.escapeSelector = function(sel) {
+          return (sel + "").replace(rcssescape, fcssescape);
+        };
+        var preferredDoc = document2, pushNative = push;
+        (function() {
+          var i, Expr, outermostContext, sortInput, hasDuplicate, push2 = pushNative, document3, documentElement2, documentIsHTML, rbuggyQSA, matches, expando = jQuery2.expando, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
+            if (a === b) {
+              hasDuplicate = true;
+            }
+            return 0;
+          }, booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped", identifier = "(?:\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\[^\\r\\n\\f]|[\\w-]|[^\0-\\x7f])+", attributes = "\\[" + whitespace + "*(" + identifier + ")(?:" + whitespace + // Operator (capture 2)
+          "*([*^$|!~]?=)" + whitespace + // "Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]"
+          `*(?:'((?:\\\\.|[^\\\\'])*)'|"((?:\\\\.|[^\\\\"])*)"|(` + identifier + "))|)" + whitespace + "*\\]", pseudos = ":(" + identifier + `)(?:\\((('((?:\\\\.|[^\\\\'])*)'|"((?:\\\\.|[^\\\\"])*)")|((?:\\\\.|[^\\\\()[\\]]|` + attributes + ")*)|.*)\\)|)", rwhitespace = new RegExp(whitespace + "+", "g"), rcomma = new RegExp("^" + whitespace + "*," + whitespace + "*"), rleadingCombinator = new RegExp("^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*"), rdescend = new RegExp(whitespace + "|>"), rpseudo = new RegExp(pseudos), ridentifier = new RegExp("^" + identifier + "$"), matchExpr = {
+            ID: new RegExp("^#(" + identifier + ")"),
+            CLASS: new RegExp("^\\.(" + identifier + ")"),
+            TAG: new RegExp("^(" + identifier + "|[*])"),
+            ATTR: new RegExp("^" + attributes),
+            PSEUDO: new RegExp("^" + pseudos),
+            CHILD: new RegExp(
+              "^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" + whitespace + "*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" + whitespace + "*(\\d+)|))" + whitespace + "*\\)|)",
+              "i"
+            ),
+            bool: new RegExp("^(?:" + booleans + ")$", "i"),
+            // For use in libraries implementing .is()
+            // We use this for POS matching in `select`
+            needsContext: new RegExp("^" + whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" + whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i")
+          }, rinputs = /^(?:input|select|textarea|button)$/i, rheader = /^h\d$/i, rquickExpr2 = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, rsibling = /[+~]/, runescape = new RegExp("\\\\[\\da-fA-F]{1,6}" + whitespace + "?|\\\\([^\\r\\n\\f])", "g"), funescape = function(escape, nonHex) {
+            var high = "0x" + escape.slice(1) - 65536;
+            if (nonHex) {
+              return nonHex;
+            }
+            return high < 0 ? String.fromCharCode(high + 65536) : String.fromCharCode(high >> 10 | 55296, high & 1023 | 56320);
+          }, unloadHandler = function() {
+            setDocument();
+          }, inDisabledFieldset = addCombinator(
+            function(elem) {
+              return elem.disabled === true && nodeName(elem, "fieldset");
+            },
+            { dir: "parentNode", next: "legend" }
+          );
+          function safeActiveElement() {
             try {
-              push2.apply(
-                arr2 = slice2.call(preferredDoc.childNodes),
-                preferredDoc.childNodes
-              );
-              arr2[preferredDoc.childNodes.length].nodeType;
-            } catch (e) {
-              push2 = {
-                apply: arr2.length ? (
-                  // Leverage slice if possible
-                  function(target, els) {
-                    pushNative.apply(target, slice2.call(els));
-                  }
-                ) : (
-                  // Support: IE<9
-                  // Otherwise append directly
-                  function(target, els) {
-                    var j = target.length, i2 = 0;
-                    while (target[j++] = els[i2++]) {
-                    }
-                    target.length = j - 1;
-                  }
-                )
-              };
+              return document3.activeElement;
+            } catch (err) {
             }
-            function Sizzle2(selector, context, results, seed) {
-              var m, i2, elem, nid, match, groups, newSelector, newContext = context && context.ownerDocument, nodeType = context ? context.nodeType : 9;
-              results = results || [];
-              if (typeof selector !== "string" || !selector || nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
-                return results;
+          }
+          try {
+            push2.apply(
+              arr = slice.call(preferredDoc.childNodes),
+              preferredDoc.childNodes
+            );
+            arr[preferredDoc.childNodes.length].nodeType;
+          } catch (e) {
+            push2 = {
+              apply: function(target, els) {
+                pushNative.apply(target, slice.call(els));
+              },
+              call: function(target) {
+                pushNative.apply(target, slice.call(arguments, 1));
               }
-              if (!seed) {
-                setDocument(context);
-                context = context || document3;
-                if (documentIsHTML) {
-                  if (nodeType !== 11 && (match = rquickExpr2.exec(selector))) {
-                    if (m = match[1]) {
-                      if (nodeType === 9) {
-                        if (elem = context.getElementById(m)) {
-                          if (elem.id === m) {
-                            results.push(elem);
-                            return results;
-                          }
-                        } else {
-                          return results;
-                        }
-                      } else {
-                        if (newContext && (elem = newContext.getElementById(m)) && contains2(context, elem) && elem.id === m) {
-                          results.push(elem);
-                          return results;
-                        }
-                      }
-                    } else if (match[2]) {
-                      push2.apply(results, context.getElementsByTagName(selector));
-                      return results;
-                    } else if ((m = match[3]) && support2.getElementsByClassName && context.getElementsByClassName) {
-                      push2.apply(results, context.getElementsByClassName(m));
-                      return results;
-                    }
-                  }
-                  if (support2.qsa && !nonnativeSelectorCache[selector + " "] && (!rbuggyQSA || !rbuggyQSA.test(selector)) && // Support: IE 8 only
-                  // Exclude object elements
-                  (nodeType !== 1 || context.nodeName.toLowerCase() !== "object")) {
-                    newSelector = selector;
-                    newContext = context;
-                    if (nodeType === 1 && (rdescend.test(selector) || rleadingCombinator.test(selector))) {
-                      newContext = rsibling.test(selector) && testContext(context.parentNode) || context;
-                      if (newContext !== context || !support2.scope) {
-                        if (nid = context.getAttribute("id")) {
-                          nid = nid.replace(rcssescape, fcssescape);
-                        } else {
-                          context.setAttribute("id", nid = expando);
-                        }
-                      }
-                      groups = tokenize2(selector);
-                      i2 = groups.length;
-                      while (i2--) {
-                        groups[i2] = (nid ? "#" + nid : ":scope") + " " + toSelector(groups[i2]);
-                      }
-                      newSelector = groups.join(",");
-                    }
-                    try {
-                      push2.apply(
-                        results,
-                        newContext.querySelectorAll(newSelector)
-                      );
-                      return results;
-                    } catch (qsaError) {
-                      nonnativeSelectorCache(selector, true);
-                    } finally {
-                      if (nid === expando) {
-                        context.removeAttribute("id");
-                      }
-                    }
-                  }
-                }
-              }
-              return select(selector.replace(rtrim2, "$1"), context, results, seed);
-            }
-            function createCache() {
-              var keys = [];
-              function cache2(key, value) {
-                if (keys.push(key + " ") > Expr.cacheLength) {
-                  delete cache2[keys.shift()];
-                }
-                return cache2[key + " "] = value;
-              }
-              return cache2;
-            }
-            function markFunction(fn2) {
-              fn2[expando] = true;
-              return fn2;
-            }
-            function assert(fn2) {
-              var el = document3.createElement("fieldset");
-              try {
-                return !!fn2(el);
-              } catch (e) {
-                return false;
-              } finally {
-                if (el.parentNode) {
-                  el.parentNode.removeChild(el);
-                }
-                el = null;
-              }
-            }
-            function addHandle(attrs, handler) {
-              var arr3 = attrs.split("|"), i2 = arr3.length;
-              while (i2--) {
-                Expr.attrHandle[arr3[i2]] = handler;
-              }
-            }
-            function siblingCheck(a, b) {
-              var cur = b && a, diff = cur && a.nodeType === 1 && b.nodeType === 1 && a.sourceIndex - b.sourceIndex;
-              if (diff) {
-                return diff;
-              }
-              if (cur) {
-                while (cur = cur.nextSibling) {
-                  if (cur === b) {
-                    return -1;
-                  }
-                }
-              }
-              return a ? 1 : -1;
-            }
-            function createInputPseudo(type) {
-              return function(elem) {
-                var name = elem.nodeName.toLowerCase();
-                return name === "input" && elem.type === type;
-              };
-            }
-            function createButtonPseudo(type) {
-              return function(elem) {
-                var name = elem.nodeName.toLowerCase();
-                return (name === "input" || name === "button") && elem.type === type;
-              };
-            }
-            function createDisabledPseudo(disabled) {
-              return function(elem) {
-                if ("form" in elem) {
-                  if (elem.parentNode && elem.disabled === false) {
-                    if ("label" in elem) {
-                      if ("label" in elem.parentNode) {
-                        return elem.parentNode.disabled === disabled;
-                      } else {
-                        return elem.disabled === disabled;
-                      }
-                    }
-                    return elem.isDisabled === disabled || // Where there is no isDisabled, check manually
-                    /* jshint -W018 */
-                    elem.isDisabled !== !disabled && inDisabledFieldset(elem) === disabled;
-                  }
-                  return elem.disabled === disabled;
-                } else if ("label" in elem) {
-                  return elem.disabled === disabled;
-                }
-                return false;
-              };
-            }
-            function createPositionalPseudo(fn2) {
-              return markFunction(function(argument) {
-                argument = +argument;
-                return markFunction(function(seed, matches2) {
-                  var j, matchIndexes = fn2([], seed.length, argument), i2 = matchIndexes.length;
-                  while (i2--) {
-                    if (seed[j = matchIndexes[i2]]) {
-                      seed[j] = !(matches2[j] = seed[j]);
-                    }
-                  }
-                });
-              });
-            }
-            function testContext(context) {
-              return context && typeof context.getElementsByTagName !== "undefined" && context;
-            }
-            support2 = Sizzle2.support = {};
-            isXML = Sizzle2.isXML = function(elem) {
-              var namespace = elem && elem.namespaceURI, docElem2 = elem && (elem.ownerDocument || elem).documentElement;
-              return !rhtml2.test(namespace || docElem2 && docElem2.nodeName || "HTML");
             };
-            setDocument = Sizzle2.setDocument = function(node) {
-              var hasCompare, subWindow, doc = node ? node.ownerDocument || node : preferredDoc;
-              if (doc == document3 || doc.nodeType !== 9 || !doc.documentElement) {
-                return document3;
-              }
-              document3 = doc;
-              docElem = document3.documentElement;
-              documentIsHTML = !isXML(document3);
-              if (preferredDoc != document3 && (subWindow = document3.defaultView) && subWindow.top !== subWindow) {
-                if (subWindow.addEventListener) {
-                  subWindow.addEventListener("unload", unloadHandler, false);
-                } else if (subWindow.attachEvent) {
-                  subWindow.attachEvent("onunload", unloadHandler);
-                }
-              }
-              support2.scope = assert(function(el) {
-                docElem.appendChild(el).appendChild(document3.createElement("div"));
-                return typeof el.querySelectorAll !== "undefined" && !el.querySelectorAll(":scope fieldset div").length;
-              });
-              support2.cssHas = assert(function() {
-                try {
-                  document3.querySelector(":has(*,:jqfake)");
-                  return false;
-                } catch (e) {
-                  return true;
-                }
-              });
-              support2.attributes = assert(function(el) {
-                el.className = "i";
-                return !el.getAttribute("className");
-              });
-              support2.getElementsByTagName = assert(function(el) {
-                el.appendChild(document3.createComment(""));
-                return !el.getElementsByTagName("*").length;
-              });
-              support2.getElementsByClassName = rnative.test(document3.getElementsByClassName);
-              support2.getById = assert(function(el) {
-                docElem.appendChild(el).id = expando;
-                return !document3.getElementsByName || !document3.getElementsByName(expando).length;
-              });
-              if (support2.getById) {
-                Expr.filter["ID"] = function(id) {
-                  var attrId = id.replace(runescape, funescape);
-                  return function(elem) {
-                    return elem.getAttribute("id") === attrId;
-                  };
-                };
-                Expr.find["ID"] = function(id, context) {
-                  if (typeof context.getElementById !== "undefined" && documentIsHTML) {
-                    var elem = context.getElementById(id);
-                    return elem ? [elem] : [];
+          }
+          function find(selector, context, results, seed) {
+            var m, i2, elem, nid, match, groups, newSelector, newContext = context && context.ownerDocument, nodeType = context ? context.nodeType : 9;
+            results = results || [];
+            if (typeof selector !== "string" || !selector || nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
+              return results;
+            }
+            if (!seed) {
+              setDocument(context);
+              context = context || document3;
+              if (documentIsHTML) {
+                if (nodeType !== 11 && (match = rquickExpr2.exec(selector))) {
+                  if (m = match[1]) {
+                    if (nodeType === 9) {
+                      if (elem = context.getElementById(m)) {
+                        if (elem.id === m) {
+                          push2.call(results, elem);
+                          return results;
+                        }
+                      } else {
+                        return results;
+                      }
+                    } else {
+                      if (newContext && (elem = newContext.getElementById(m)) && find.contains(context, elem) && elem.id === m) {
+                        push2.call(results, elem);
+                        return results;
+                      }
+                    }
+                  } else if (match[2]) {
+                    push2.apply(results, context.getElementsByTagName(selector));
+                    return results;
+                  } else if ((m = match[3]) && context.getElementsByClassName) {
+                    push2.apply(results, context.getElementsByClassName(m));
+                    return results;
                   }
+                }
+                if (!nonnativeSelectorCache[selector + " "] && (!rbuggyQSA || !rbuggyQSA.test(selector))) {
+                  newSelector = selector;
+                  newContext = context;
+                  if (nodeType === 1 && (rdescend.test(selector) || rleadingCombinator.test(selector))) {
+                    newContext = rsibling.test(selector) && testContext(context.parentNode) || context;
+                    if (newContext != context || !support.scope) {
+                      if (nid = context.getAttribute("id")) {
+                        nid = jQuery2.escapeSelector(nid);
+                      } else {
+                        context.setAttribute("id", nid = expando);
+                      }
+                    }
+                    groups = tokenize2(selector);
+                    i2 = groups.length;
+                    while (i2--) {
+                      groups[i2] = (nid ? "#" + nid : ":scope") + " " + toSelector(groups[i2]);
+                    }
+                    newSelector = groups.join(",");
+                  }
+                  try {
+                    push2.apply(
+                      results,
+                      newContext.querySelectorAll(newSelector)
+                    );
+                    return results;
+                  } catch (qsaError) {
+                    nonnativeSelectorCache(selector, true);
+                  } finally {
+                    if (nid === expando) {
+                      context.removeAttribute("id");
+                    }
+                  }
+                }
+              }
+            }
+            return select(selector.replace(rtrimCSS, "$1"), context, results, seed);
+          }
+          function createCache() {
+            var keys = [];
+            function cache2(key, value) {
+              if (keys.push(key + " ") > Expr.cacheLength) {
+                delete cache2[keys.shift()];
+              }
+              return cache2[key + " "] = value;
+            }
+            return cache2;
+          }
+          function markFunction(fn2) {
+            fn2[expando] = true;
+            return fn2;
+          }
+          function assert(fn2) {
+            var el = document3.createElement("fieldset");
+            try {
+              return !!fn2(el);
+            } catch (e) {
+              return false;
+            } finally {
+              if (el.parentNode) {
+                el.parentNode.removeChild(el);
+              }
+              el = null;
+            }
+          }
+          function createInputPseudo(type) {
+            return function(elem) {
+              return nodeName(elem, "input") && elem.type === type;
+            };
+          }
+          function createButtonPseudo(type) {
+            return function(elem) {
+              return (nodeName(elem, "input") || nodeName(elem, "button")) && elem.type === type;
+            };
+          }
+          function createDisabledPseudo(disabled) {
+            return function(elem) {
+              if ("form" in elem) {
+                if (elem.parentNode && elem.disabled === false) {
+                  if ("label" in elem) {
+                    if ("label" in elem.parentNode) {
+                      return elem.parentNode.disabled === disabled;
+                    } else {
+                      return elem.disabled === disabled;
+                    }
+                  }
+                  return elem.isDisabled === disabled || // Where there is no isDisabled, check manually
+                  elem.isDisabled !== !disabled && inDisabledFieldset(elem) === disabled;
+                }
+                return elem.disabled === disabled;
+              } else if ("label" in elem) {
+                return elem.disabled === disabled;
+              }
+              return false;
+            };
+          }
+          function createPositionalPseudo(fn2) {
+            return markFunction(function(argument) {
+              argument = +argument;
+              return markFunction(function(seed, matches2) {
+                var j, matchIndexes = fn2([], seed.length, argument), i2 = matchIndexes.length;
+                while (i2--) {
+                  if (seed[j = matchIndexes[i2]]) {
+                    seed[j] = !(matches2[j] = seed[j]);
+                  }
+                }
+              });
+            });
+          }
+          function testContext(context) {
+            return context && typeof context.getElementsByTagName !== "undefined" && context;
+          }
+          function setDocument(node) {
+            var subWindow, doc = node ? node.ownerDocument || node : preferredDoc;
+            if (doc == document3 || doc.nodeType !== 9 || !doc.documentElement) {
+              return document3;
+            }
+            document3 = doc;
+            documentElement2 = document3.documentElement;
+            documentIsHTML = !jQuery2.isXMLDoc(document3);
+            matches = documentElement2.matches || documentElement2.webkitMatchesSelector || documentElement2.msMatchesSelector;
+            if (preferredDoc != document3 && (subWindow = document3.defaultView) && subWindow.top !== subWindow) {
+              subWindow.addEventListener("unload", unloadHandler);
+            }
+            support.getById = assert(function(el) {
+              documentElement2.appendChild(el).id = jQuery2.expando;
+              return !document3.getElementsByName || !document3.getElementsByName(jQuery2.expando).length;
+            });
+            support.disconnectedMatch = assert(function(el) {
+              return matches.call(el, "*");
+            });
+            support.scope = assert(function() {
+              return document3.querySelectorAll(":scope");
+            });
+            support.cssHas = assert(function() {
+              try {
+                document3.querySelector(":has(*,:jqfake)");
+                return false;
+              } catch (e) {
+                return true;
+              }
+            });
+            if (support.getById) {
+              Expr.filter.ID = function(id) {
+                var attrId = id.replace(runescape, funescape);
+                return function(elem) {
+                  return elem.getAttribute("id") === attrId;
                 };
-              } else {
-                Expr.filter["ID"] = function(id) {
-                  var attrId = id.replace(runescape, funescape);
-                  return function(elem) {
-                    var node2 = typeof elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
-                    return node2 && node2.value === attrId;
-                  };
+              };
+              Expr.find.ID = function(id, context) {
+                if (typeof context.getElementById !== "undefined" && documentIsHTML) {
+                  var elem = context.getElementById(id);
+                  return elem ? [elem] : [];
+                }
+              };
+            } else {
+              Expr.filter.ID = function(id) {
+                var attrId = id.replace(runescape, funescape);
+                return function(elem) {
+                  var node2 = typeof elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
+                  return node2 && node2.value === attrId;
                 };
-                Expr.find["ID"] = function(id, context) {
-                  if (typeof context.getElementById !== "undefined" && documentIsHTML) {
-                    var node2, i2, elems, elem = context.getElementById(id);
-                    if (elem) {
+              };
+              Expr.find.ID = function(id, context) {
+                if (typeof context.getElementById !== "undefined" && documentIsHTML) {
+                  var node2, i2, elems, elem = context.getElementById(id);
+                  if (elem) {
+                    node2 = elem.getAttributeNode("id");
+                    if (node2 && node2.value === id) {
+                      return [elem];
+                    }
+                    elems = context.getElementsByName(id);
+                    i2 = 0;
+                    while (elem = elems[i2++]) {
                       node2 = elem.getAttributeNode("id");
                       if (node2 && node2.value === id) {
                         return [elem];
                       }
-                      elems = context.getElementsByName(id);
-                      i2 = 0;
-                      while (elem = elems[i2++]) {
-                        node2 = elem.getAttributeNode("id");
-                        if (node2 && node2.value === id) {
-                          return [elem];
+                    }
+                  }
+                  return [];
+                }
+              };
+            }
+            Expr.find.TAG = function(tag, context) {
+              if (typeof context.getElementsByTagName !== "undefined") {
+                return context.getElementsByTagName(tag);
+              } else {
+                return context.querySelectorAll(tag);
+              }
+            };
+            Expr.find.CLASS = function(className, context) {
+              if (typeof context.getElementsByClassName !== "undefined" && documentIsHTML) {
+                return context.getElementsByClassName(className);
+              }
+            };
+            rbuggyQSA = [];
+            assert(function(el) {
+              var input;
+              documentElement2.appendChild(el).innerHTML = "<a id='" + expando + "' href='' disabled='disabled'></a><select id='" + expando + "-\r\\' disabled='disabled'><option selected=''></option></select>";
+              if (!el.querySelectorAll("[selected]").length) {
+                rbuggyQSA.push("\\[" + whitespace + "*(?:value|" + booleans + ")");
+              }
+              if (!el.querySelectorAll("[id~=" + expando + "-]").length) {
+                rbuggyQSA.push("~=");
+              }
+              if (!el.querySelectorAll("a#" + expando + "+*").length) {
+                rbuggyQSA.push(".#.+[+~]");
+              }
+              if (!el.querySelectorAll(":checked").length) {
+                rbuggyQSA.push(":checked");
+              }
+              input = document3.createElement("input");
+              input.setAttribute("type", "hidden");
+              el.appendChild(input).setAttribute("name", "D");
+              documentElement2.appendChild(el).disabled = true;
+              if (el.querySelectorAll(":disabled").length !== 2) {
+                rbuggyQSA.push(":enabled", ":disabled");
+              }
+              input = document3.createElement("input");
+              input.setAttribute("name", "");
+              el.appendChild(input);
+              if (!el.querySelectorAll("[name='']").length) {
+                rbuggyQSA.push("\\[" + whitespace + "*name" + whitespace + "*=" + whitespace + `*(?:''|"")`);
+              }
+            });
+            if (!support.cssHas) {
+              rbuggyQSA.push(":has");
+            }
+            rbuggyQSA = rbuggyQSA.length && new RegExp(rbuggyQSA.join("|"));
+            sortOrder = function(a, b) {
+              if (a === b) {
+                hasDuplicate = true;
+                return 0;
+              }
+              var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
+              if (compare) {
+                return compare;
+              }
+              compare = (a.ownerDocument || a) == (b.ownerDocument || b) ? a.compareDocumentPosition(b) : (
+                // Otherwise we know they are disconnected
+                1
+              );
+              if (compare & 1 || !support.sortDetached && b.compareDocumentPosition(a) === compare) {
+                if (a === document3 || a.ownerDocument == preferredDoc && find.contains(preferredDoc, a)) {
+                  return -1;
+                }
+                if (b === document3 || b.ownerDocument == preferredDoc && find.contains(preferredDoc, b)) {
+                  return 1;
+                }
+                return sortInput ? indexOf2.call(sortInput, a) - indexOf2.call(sortInput, b) : 0;
+              }
+              return compare & 4 ? -1 : 1;
+            };
+            return document3;
+          }
+          find.matches = function(expr, elements) {
+            return find(expr, null, null, elements);
+          };
+          find.matchesSelector = function(elem, expr) {
+            setDocument(elem);
+            if (documentIsHTML && !nonnativeSelectorCache[expr + " "] && (!rbuggyQSA || !rbuggyQSA.test(expr))) {
+              try {
+                var ret = matches.call(elem, expr);
+                if (ret || support.disconnectedMatch || // As well, disconnected nodes are said to be in a document
+                // fragment in IE 9
+                elem.document && elem.document.nodeType !== 11) {
+                  return ret;
+                }
+              } catch (e) {
+                nonnativeSelectorCache(expr, true);
+              }
+            }
+            return find(expr, document3, null, [elem]).length > 0;
+          };
+          find.contains = function(context, elem) {
+            if ((context.ownerDocument || context) != document3) {
+              setDocument(context);
+            }
+            return jQuery2.contains(context, elem);
+          };
+          find.attr = function(elem, name) {
+            if ((elem.ownerDocument || elem) != document3) {
+              setDocument(elem);
+            }
+            var fn2 = Expr.attrHandle[name.toLowerCase()], val = fn2 && hasOwn.call(Expr.attrHandle, name.toLowerCase()) ? fn2(elem, name, !documentIsHTML) : void 0;
+            if (val !== void 0) {
+              return val;
+            }
+            return elem.getAttribute(name);
+          };
+          find.error = function(msg) {
+            throw new Error("Syntax error, unrecognized expression: " + msg);
+          };
+          jQuery2.uniqueSort = function(results) {
+            var elem, duplicates = [], j = 0, i2 = 0;
+            hasDuplicate = !support.sortStable;
+            sortInput = !support.sortStable && slice.call(results, 0);
+            sort.call(results, sortOrder);
+            if (hasDuplicate) {
+              while (elem = results[i2++]) {
+                if (elem === results[i2]) {
+                  j = duplicates.push(i2);
+                }
+              }
+              while (j--) {
+                splice.call(results, duplicates[j], 1);
+              }
+            }
+            sortInput = null;
+            return results;
+          };
+          jQuery2.fn.uniqueSort = function() {
+            return this.pushStack(jQuery2.uniqueSort(slice.apply(this)));
+          };
+          Expr = jQuery2.expr = {
+            // Can be adjusted by the user
+            cacheLength: 50,
+            createPseudo: markFunction,
+            match: matchExpr,
+            attrHandle: {},
+            find: {},
+            relative: {
+              ">": { dir: "parentNode", first: true },
+              " ": { dir: "parentNode" },
+              "+": { dir: "previousSibling", first: true },
+              "~": { dir: "previousSibling" }
+            },
+            preFilter: {
+              ATTR: function(match) {
+                match[1] = match[1].replace(runescape, funescape);
+                match[3] = (match[3] || match[4] || match[5] || "").replace(runescape, funescape);
+                if (match[2] === "~=") {
+                  match[3] = " " + match[3] + " ";
+                }
+                return match.slice(0, 4);
+              },
+              CHILD: function(match) {
+                match[1] = match[1].toLowerCase();
+                if (match[1].slice(0, 3) === "nth") {
+                  if (!match[3]) {
+                    find.error(match[0]);
+                  }
+                  match[4] = +(match[4] ? match[5] + (match[6] || 1) : 2 * (match[3] === "even" || match[3] === "odd"));
+                  match[5] = +(match[7] + match[8] || match[3] === "odd");
+                } else if (match[3]) {
+                  find.error(match[0]);
+                }
+                return match;
+              },
+              PSEUDO: function(match) {
+                var excess, unquoted = !match[6] && match[2];
+                if (matchExpr.CHILD.test(match[0])) {
+                  return null;
+                }
+                if (match[3]) {
+                  match[2] = match[4] || match[5] || "";
+                } else if (unquoted && rpseudo.test(unquoted) && // Get excess from tokenize (recursively)
+                (excess = tokenize2(unquoted, true)) && // advance to the next closing parenthesis
+                (excess = unquoted.indexOf(")", unquoted.length - excess) - unquoted.length)) {
+                  match[0] = match[0].slice(0, excess);
+                  match[2] = unquoted.slice(0, excess);
+                }
+                return match.slice(0, 3);
+              }
+            },
+            filter: {
+              TAG: function(nodeNameSelector) {
+                var expectedNodeName = nodeNameSelector.replace(runescape, funescape).toLowerCase();
+                return nodeNameSelector === "*" ? function() {
+                  return true;
+                } : function(elem) {
+                  return nodeName(elem, expectedNodeName);
+                };
+              },
+              CLASS: function(className) {
+                var pattern = classCache[className + " "];
+                return pattern || (pattern = new RegExp("(^|" + whitespace + ")" + className + "(" + whitespace + "|$)")) && classCache(className, function(elem) {
+                  return pattern.test(
+                    typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== "undefined" && elem.getAttribute("class") || ""
+                  );
+                });
+              },
+              ATTR: function(name, operator, check) {
+                return function(elem) {
+                  var result = find.attr(elem, name);
+                  if (result == null) {
+                    return operator === "!=";
+                  }
+                  if (!operator) {
+                    return true;
+                  }
+                  result += "";
+                  if (operator === "=") {
+                    return result === check;
+                  }
+                  if (operator === "!=") {
+                    return result !== check;
+                  }
+                  if (operator === "^=") {
+                    return check && result.indexOf(check) === 0;
+                  }
+                  if (operator === "*=") {
+                    return check && result.indexOf(check) > -1;
+                  }
+                  if (operator === "$=") {
+                    return check && result.slice(-check.length) === check;
+                  }
+                  if (operator === "~=") {
+                    return (" " + result.replace(rwhitespace, " ") + " ").indexOf(check) > -1;
+                  }
+                  if (operator === "|=") {
+                    return result === check || result.slice(0, check.length + 1) === check + "-";
+                  }
+                  return false;
+                };
+              },
+              CHILD: function(type, what, _argument, first, last) {
+                var simple = type.slice(0, 3) !== "nth", forward = type.slice(-4) !== "last", ofType = what === "of-type";
+                return first === 1 && last === 0 ? (
+                  // Shortcut for :nth-*(n)
+                  function(elem) {
+                    return !!elem.parentNode;
+                  }
+                ) : function(elem, _context, xml) {
+                  var cache2, outerCache, node, nodeIndex, start4, dir2 = simple !== forward ? "nextSibling" : "previousSibling", parent = elem.parentNode, name = ofType && elem.nodeName.toLowerCase(), useCache = !xml && !ofType, diff = false;
+                  if (parent) {
+                    if (simple) {
+                      while (dir2) {
+                        node = elem;
+                        while (node = node[dir2]) {
+                          if (ofType ? nodeName(node, name) : node.nodeType === 1) {
+                            return false;
+                          }
+                        }
+                        start4 = dir2 = type === "only" && !start4 && "nextSibling";
+                      }
+                      return true;
+                    }
+                    start4 = [forward ? parent.firstChild : parent.lastChild];
+                    if (forward && useCache) {
+                      outerCache = parent[expando] || (parent[expando] = {});
+                      cache2 = outerCache[type] || [];
+                      nodeIndex = cache2[0] === dirruns && cache2[1];
+                      diff = nodeIndex && cache2[2];
+                      node = nodeIndex && parent.childNodes[nodeIndex];
+                      while (node = ++nodeIndex && node && node[dir2] || // Fallback to seeking `elem` from the start
+                      (diff = nodeIndex = 0) || start4.pop()) {
+                        if (node.nodeType === 1 && ++diff && node === elem) {
+                          outerCache[type] = [dirruns, nodeIndex, diff];
+                          break;
+                        }
+                      }
+                    } else {
+                      if (useCache) {
+                        outerCache = elem[expando] || (elem[expando] = {});
+                        cache2 = outerCache[type] || [];
+                        nodeIndex = cache2[0] === dirruns && cache2[1];
+                        diff = nodeIndex;
+                      }
+                      if (diff === false) {
+                        while (node = ++nodeIndex && node && node[dir2] || (diff = nodeIndex = 0) || start4.pop()) {
+                          if ((ofType ? nodeName(node, name) : node.nodeType === 1) && ++diff) {
+                            if (useCache) {
+                              outerCache = node[expando] || (node[expando] = {});
+                              outerCache[type] = [dirruns, diff];
+                            }
+                            if (node === elem) {
+                              break;
+                            }
+                          }
                         }
                       }
                     }
-                    return [];
+                    diff -= last;
+                    return diff === first || diff % first === 0 && diff / first >= 0;
                   }
                 };
-              }
-              Expr.find["TAG"] = support2.getElementsByTagName ? function(tag, context) {
-                if (typeof context.getElementsByTagName !== "undefined") {
-                  return context.getElementsByTagName(tag);
-                } else if (support2.qsa) {
-                  return context.querySelectorAll(tag);
-                }
-              } : function(tag, context) {
-                var elem, tmp = [], i2 = 0, results = context.getElementsByTagName(tag);
-                if (tag === "*") {
-                  while (elem = results[i2++]) {
-                    if (elem.nodeType === 1) {
-                      tmp.push(elem);
-                    }
-                  }
-                  return tmp;
-                }
-                return results;
-              };
-              Expr.find["CLASS"] = support2.getElementsByClassName && function(className, context) {
-                if (typeof context.getElementsByClassName !== "undefined" && documentIsHTML) {
-                  return context.getElementsByClassName(className);
-                }
-              };
-              rbuggyMatches = [];
-              rbuggyQSA = [];
-              if (support2.qsa = rnative.test(document3.querySelectorAll)) {
-                assert(function(el) {
-                  var input;
-                  docElem.appendChild(el).innerHTML = "<a id='" + expando + "'></a><select id='" + expando + "-\r\\' msallowcapture=''><option selected=''></option></select>";
-                  if (el.querySelectorAll("[msallowcapture^='']").length) {
-                    rbuggyQSA.push("[*^$]=" + whitespace2 + `*(?:''|"")`);
-                  }
-                  if (!el.querySelectorAll("[selected]").length) {
-                    rbuggyQSA.push("\\[" + whitespace2 + "*(?:value|" + booleans + ")");
-                  }
-                  if (!el.querySelectorAll("[id~=" + expando + "-]").length) {
-                    rbuggyQSA.push("~=");
-                  }
-                  input = document3.createElement("input");
-                  input.setAttribute("name", "");
-                  el.appendChild(input);
-                  if (!el.querySelectorAll("[name='']").length) {
-                    rbuggyQSA.push("\\[" + whitespace2 + "*name" + whitespace2 + "*=" + whitespace2 + `*(?:''|"")`);
-                  }
-                  if (!el.querySelectorAll(":checked").length) {
-                    rbuggyQSA.push(":checked");
-                  }
-                  if (!el.querySelectorAll("a#" + expando + "+*").length) {
-                    rbuggyQSA.push(".#.+[+~]");
-                  }
-                  el.querySelectorAll("\\\f");
-                  rbuggyQSA.push("[\\r\\n\\f]");
-                });
-                assert(function(el) {
-                  el.innerHTML = "<a href='' disabled='disabled'></a><select disabled='disabled'><option/></select>";
-                  var input = document3.createElement("input");
-                  input.setAttribute("type", "hidden");
-                  el.appendChild(input).setAttribute("name", "D");
-                  if (el.querySelectorAll("[name=d]").length) {
-                    rbuggyQSA.push("name" + whitespace2 + "*[*^$|!~]?=");
-                  }
-                  if (el.querySelectorAll(":enabled").length !== 2) {
-                    rbuggyQSA.push(":enabled", ":disabled");
-                  }
-                  docElem.appendChild(el).disabled = true;
-                  if (el.querySelectorAll(":disabled").length !== 2) {
-                    rbuggyQSA.push(":enabled", ":disabled");
-                  }
-                  el.querySelectorAll("*,:x");
-                  rbuggyQSA.push(",.*:");
-                });
-              }
-              if (support2.matchesSelector = rnative.test(matches = docElem.matches || docElem.webkitMatchesSelector || docElem.mozMatchesSelector || docElem.oMatchesSelector || docElem.msMatchesSelector)) {
-                assert(function(el) {
-                  support2.disconnectedMatch = matches.call(el, "*");
-                  matches.call(el, "[s!='']:x");
-                  rbuggyMatches.push("!=", pseudos);
-                });
-              }
-              if (!support2.cssHas) {
-                rbuggyQSA.push(":has");
-              }
-              rbuggyQSA = rbuggyQSA.length && new RegExp(rbuggyQSA.join("|"));
-              rbuggyMatches = rbuggyMatches.length && new RegExp(rbuggyMatches.join("|"));
-              hasCompare = rnative.test(docElem.compareDocumentPosition);
-              contains2 = hasCompare || rnative.test(docElem.contains) ? function(a, b) {
-                var adown = a.nodeType === 9 && a.documentElement || a, bup = b && b.parentNode;
-                return a === bup || !!(bup && bup.nodeType === 1 && (adown.contains ? adown.contains(bup) : a.compareDocumentPosition && a.compareDocumentPosition(bup) & 16));
-              } : function(a, b) {
-                if (b) {
-                  while (b = b.parentNode) {
-                    if (b === a) {
-                      return true;
-                    }
-                  }
-                }
-                return false;
-              };
-              sortOrder = hasCompare ? function(a, b) {
-                if (a === b) {
-                  hasDuplicate = true;
-                  return 0;
-                }
-                var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
-                if (compare) {
-                  return compare;
-                }
-                compare = (a.ownerDocument || a) == (b.ownerDocument || b) ? a.compareDocumentPosition(b) : (
-                  // Otherwise we know they are disconnected
-                  1
-                );
-                if (compare & 1 || !support2.sortDetached && b.compareDocumentPosition(a) === compare) {
-                  if (a == document3 || a.ownerDocument == preferredDoc && contains2(preferredDoc, a)) {
-                    return -1;
-                  }
-                  if (b == document3 || b.ownerDocument == preferredDoc && contains2(preferredDoc, b)) {
-                    return 1;
-                  }
-                  return sortInput ? indexOf3(sortInput, a) - indexOf3(sortInput, b) : 0;
-                }
-                return compare & 4 ? -1 : 1;
-              } : function(a, b) {
-                if (a === b) {
-                  hasDuplicate = true;
-                  return 0;
-                }
-                var cur, i2 = 0, aup = a.parentNode, bup = b.parentNode, ap = [a], bp = [b];
-                if (!aup || !bup) {
-                  return a == document3 ? -1 : b == document3 ? 1 : (
-                    /* eslint-enable eqeqeq */
-                    aup ? -1 : bup ? 1 : sortInput ? indexOf3(sortInput, a) - indexOf3(sortInput, b) : 0
-                  );
-                } else if (aup === bup) {
-                  return siblingCheck(a, b);
-                }
-                cur = a;
-                while (cur = cur.parentNode) {
-                  ap.unshift(cur);
-                }
-                cur = b;
-                while (cur = cur.parentNode) {
-                  bp.unshift(cur);
-                }
-                while (ap[i2] === bp[i2]) {
-                  i2++;
-                }
-                return i2 ? (
-                  // Do a sibling check if the nodes have a common ancestor
-                  siblingCheck(ap[i2], bp[i2])
-                ) : (
-                  // Otherwise nodes in our document sort first
-                  // Support: IE 11+, Edge 17 - 18+
-                  // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
-                  // two documents; shallow comparisons work.
-                  /* eslint-disable eqeqeq */
-                  ap[i2] == preferredDoc ? -1 : bp[i2] == preferredDoc ? 1 : (
-                    /* eslint-enable eqeqeq */
-                    0
-                  )
-                );
-              };
-              return document3;
-            };
-            Sizzle2.matches = function(expr, elements) {
-              return Sizzle2(expr, null, null, elements);
-            };
-            Sizzle2.matchesSelector = function(elem, expr) {
-              setDocument(elem);
-              if (support2.matchesSelector && documentIsHTML && !nonnativeSelectorCache[expr + " "] && (!rbuggyMatches || !rbuggyMatches.test(expr)) && (!rbuggyQSA || !rbuggyQSA.test(expr))) {
-                try {
-                  var ret = matches.call(elem, expr);
-                  if (ret || support2.disconnectedMatch || // As well, disconnected nodes are said to be in a document
-                  // fragment in IE 9
-                  elem.document && elem.document.nodeType !== 11) {
-                    return ret;
-                  }
-                } catch (e) {
-                  nonnativeSelectorCache(expr, true);
-                }
-              }
-              return Sizzle2(expr, document3, null, [elem]).length > 0;
-            };
-            Sizzle2.contains = function(context, elem) {
-              if ((context.ownerDocument || context) != document3) {
-                setDocument(context);
-              }
-              return contains2(context, elem);
-            };
-            Sizzle2.attr = function(elem, name) {
-              if ((elem.ownerDocument || elem) != document3) {
-                setDocument(elem);
-              }
-              var fn2 = Expr.attrHandle[name.toLowerCase()], val = fn2 && hasOwn2.call(Expr.attrHandle, name.toLowerCase()) ? fn2(elem, name, !documentIsHTML) : void 0;
-              return val !== void 0 ? val : support2.attributes || !documentIsHTML ? elem.getAttribute(name) : (val = elem.getAttributeNode(name)) && val.specified ? val.value : null;
-            };
-            Sizzle2.escape = function(sel) {
-              return (sel + "").replace(rcssescape, fcssescape);
-            };
-            Sizzle2.error = function(msg) {
-              throw new Error("Syntax error, unrecognized expression: " + msg);
-            };
-            Sizzle2.uniqueSort = function(results) {
-              var elem, duplicates = [], j = 0, i2 = 0;
-              hasDuplicate = !support2.detectDuplicates;
-              sortInput = !support2.sortStable && results.slice(0);
-              results.sort(sortOrder);
-              if (hasDuplicate) {
-                while (elem = results[i2++]) {
-                  if (elem === results[i2]) {
-                    j = duplicates.push(i2);
-                  }
-                }
-                while (j--) {
-                  results.splice(duplicates[j], 1);
-                }
-              }
-              sortInput = null;
-              return results;
-            };
-            getText = Sizzle2.getText = function(elem) {
-              var node, ret = "", i2 = 0, nodeType = elem.nodeType;
-              if (!nodeType) {
-                while (node = elem[i2++]) {
-                  ret += getText(node);
-                }
-              } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
-                if (typeof elem.textContent === "string") {
-                  return elem.textContent;
-                } else {
-                  for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
-                    ret += getText(elem);
-                  }
-                }
-              } else if (nodeType === 3 || nodeType === 4) {
-                return elem.nodeValue;
-              }
-              return ret;
-            };
-            Expr = Sizzle2.selectors = {
-              // Can be adjusted by the user
-              cacheLength: 50,
-              createPseudo: markFunction,
-              match: matchExpr,
-              attrHandle: {},
-              find: {},
-              relative: {
-                ">": { dir: "parentNode", first: true },
-                " ": { dir: "parentNode" },
-                "+": { dir: "previousSibling", first: true },
-                "~": { dir: "previousSibling" }
               },
-              preFilter: {
-                "ATTR": function(match) {
-                  match[1] = match[1].replace(runescape, funescape);
-                  match[3] = (match[3] || match[4] || match[5] || "").replace(runescape, funescape);
-                  if (match[2] === "~=") {
-                    match[3] = " " + match[3] + " ";
-                  }
-                  return match.slice(0, 4);
-                },
-                "CHILD": function(match) {
-                  match[1] = match[1].toLowerCase();
-                  if (match[1].slice(0, 3) === "nth") {
-                    if (!match[3]) {
-                      Sizzle2.error(match[0]);
-                    }
-                    match[4] = +(match[4] ? match[5] + (match[6] || 1) : 2 * (match[3] === "even" || match[3] === "odd"));
-                    match[5] = +(match[7] + match[8] || match[3] === "odd");
-                  } else if (match[3]) {
-                    Sizzle2.error(match[0]);
-                  }
-                  return match;
-                },
-                "PSEUDO": function(match) {
-                  var excess, unquoted = !match[6] && match[2];
-                  if (matchExpr["CHILD"].test(match[0])) {
-                    return null;
-                  }
-                  if (match[3]) {
-                    match[2] = match[4] || match[5] || "";
-                  } else if (unquoted && rpseudo.test(unquoted) && // Get excess from tokenize (recursively)
-                  (excess = tokenize2(unquoted, true)) && // advance to the next closing parenthesis
-                  (excess = unquoted.indexOf(")", unquoted.length - excess) - unquoted.length)) {
-                    match[0] = match[0].slice(0, excess);
-                    match[2] = unquoted.slice(0, excess);
-                  }
-                  return match.slice(0, 3);
+              PSEUDO: function(pseudo, argument) {
+                var args, fn2 = Expr.pseudos[pseudo] || Expr.setFilters[pseudo.toLowerCase()] || find.error("unsupported pseudo: " + pseudo);
+                if (fn2[expando]) {
+                  return fn2(argument);
                 }
-              },
-              filter: {
-                "TAG": function(nodeNameSelector) {
-                  var nodeName2 = nodeNameSelector.replace(runescape, funescape).toLowerCase();
-                  return nodeNameSelector === "*" ? function() {
-                    return true;
-                  } : function(elem) {
-                    return elem.nodeName && elem.nodeName.toLowerCase() === nodeName2;
-                  };
-                },
-                "CLASS": function(className) {
-                  var pattern = classCache[className + " "];
-                  return pattern || (pattern = new RegExp("(^|" + whitespace2 + ")" + className + "(" + whitespace2 + "|$)")) && classCache(
-                    className,
-                    function(elem) {
-                      return pattern.test(
-                        typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== "undefined" && elem.getAttribute("class") || ""
-                      );
-                    }
-                  );
-                },
-                "ATTR": function(name, operator, check) {
-                  return function(elem) {
-                    var result = Sizzle2.attr(elem, name);
-                    if (result == null) {
-                      return operator === "!=";
-                    }
-                    if (!operator) {
-                      return true;
-                    }
-                    result += "";
-                    return operator === "=" ? result === check : operator === "!=" ? result !== check : operator === "^=" ? check && result.indexOf(check) === 0 : operator === "*=" ? check && result.indexOf(check) > -1 : operator === "$=" ? check && result.slice(-check.length) === check : operator === "~=" ? (" " + result.replace(rwhitespace, " ") + " ").indexOf(check) > -1 : operator === "|=" ? result === check || result.slice(0, check.length + 1) === check + "-" : false;
-                  };
-                },
-                "CHILD": function(type, what, _argument, first, last) {
-                  var simple = type.slice(0, 3) !== "nth", forward = type.slice(-4) !== "last", ofType = what === "of-type";
-                  return first === 1 && last === 0 ? (
-                    // Shortcut for :nth-*(n)
-                    function(elem) {
-                      return !!elem.parentNode;
-                    }
-                  ) : function(elem, _context, xml) {
-                    var cache2, uniqueCache, outerCache, node, nodeIndex, start4, dir2 = simple !== forward ? "nextSibling" : "previousSibling", parent = elem.parentNode, name = ofType && elem.nodeName.toLowerCase(), useCache = !xml && !ofType, diff = false;
-                    if (parent) {
-                      if (simple) {
-                        while (dir2) {
-                          node = elem;
-                          while (node = node[dir2]) {
-                            if (ofType ? node.nodeName.toLowerCase() === name : node.nodeType === 1) {
-                              return false;
-                            }
-                          }
-                          start4 = dir2 = type === "only" && !start4 && "nextSibling";
-                        }
-                        return true;
-                      }
-                      start4 = [forward ? parent.firstChild : parent.lastChild];
-                      if (forward && useCache) {
-                        node = parent;
-                        outerCache = node[expando] || (node[expando] = {});
-                        uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
-                        cache2 = uniqueCache[type] || [];
-                        nodeIndex = cache2[0] === dirruns && cache2[1];
-                        diff = nodeIndex && cache2[2];
-                        node = nodeIndex && parent.childNodes[nodeIndex];
-                        while (node = ++nodeIndex && node && node[dir2] || // Fallback to seeking `elem` from the start
-                        (diff = nodeIndex = 0) || start4.pop()) {
-                          if (node.nodeType === 1 && ++diff && node === elem) {
-                            uniqueCache[type] = [dirruns, nodeIndex, diff];
-                            break;
-                          }
-                        }
-                      } else {
-                        if (useCache) {
-                          node = elem;
-                          outerCache = node[expando] || (node[expando] = {});
-                          uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
-                          cache2 = uniqueCache[type] || [];
-                          nodeIndex = cache2[0] === dirruns && cache2[1];
-                          diff = nodeIndex;
-                        }
-                        if (diff === false) {
-                          while (node = ++nodeIndex && node && node[dir2] || (diff = nodeIndex = 0) || start4.pop()) {
-                            if ((ofType ? node.nodeName.toLowerCase() === name : node.nodeType === 1) && ++diff) {
-                              if (useCache) {
-                                outerCache = node[expando] || (node[expando] = {});
-                                uniqueCache = outerCache[node.uniqueID] || (outerCache[node.uniqueID] = {});
-                                uniqueCache[type] = [dirruns, diff];
-                              }
-                              if (node === elem) {
-                                break;
-                              }
-                            }
-                          }
-                        }
-                      }
-                      diff -= last;
-                      return diff === first || diff % first === 0 && diff / first >= 0;
-                    }
-                  };
-                },
-                "PSEUDO": function(pseudo, argument) {
-                  var args, fn2 = Expr.pseudos[pseudo] || Expr.setFilters[pseudo.toLowerCase()] || Sizzle2.error("unsupported pseudo: " + pseudo);
-                  if (fn2[expando]) {
-                    return fn2(argument);
-                  }
-                  if (fn2.length > 1) {
-                    args = [pseudo, pseudo, "", argument];
-                    return Expr.setFilters.hasOwnProperty(pseudo.toLowerCase()) ? markFunction(function(seed, matches2) {
-                      var idx, matched = fn2(seed, argument), i2 = matched.length;
-                      while (i2--) {
-                        idx = indexOf3(seed, matched[i2]);
-                        seed[idx] = !(matches2[idx] = matched[i2]);
-                      }
-                    }) : function(elem) {
-                      return fn2(elem, 0, args);
-                    };
-                  }
-                  return fn2;
-                }
-              },
-              pseudos: {
-                // Potentially complex pseudos
-                "not": markFunction(function(selector) {
-                  var input = [], results = [], matcher = compile(selector.replace(rtrim2, "$1"));
-                  return matcher[expando] ? markFunction(function(seed, matches2, _context, xml) {
-                    var elem, unmatched = matcher(seed, null, xml, []), i2 = seed.length;
+                if (fn2.length > 1) {
+                  args = [pseudo, pseudo, "", argument];
+                  return Expr.setFilters.hasOwnProperty(pseudo.toLowerCase()) ? markFunction(function(seed, matches2) {
+                    var idx, matched = fn2(seed, argument), i2 = matched.length;
                     while (i2--) {
-                      if (elem = unmatched[i2]) {
-                        seed[i2] = !(matches2[i2] = elem);
-                      }
+                      idx = indexOf2.call(seed, matched[i2]);
+                      seed[idx] = !(matches2[idx] = matched[i2]);
                     }
-                  }) : function(elem, _context, xml) {
-                    input[0] = elem;
-                    matcher(input, null, xml, results);
-                    input[0] = null;
-                    return !results.pop();
+                  }) : function(elem) {
+                    return fn2(elem, 0, args);
                   };
-                }),
-                "has": markFunction(function(selector) {
-                  return function(elem) {
-                    return Sizzle2(selector, elem).length > 0;
-                  };
-                }),
-                "contains": markFunction(function(text) {
-                  text = text.replace(runescape, funescape);
-                  return function(elem) {
-                    return (elem.textContent || getText(elem)).indexOf(text) > -1;
-                  };
-                }),
-                // "Whether an element is represented by a :lang() selector
-                // is based solely on the element's language value
-                // being equal to the identifier C,
-                // or beginning with the identifier C immediately followed by "-".
-                // The matching of C against the element's language value is performed case-insensitively.
-                // The identifier C does not have to be a valid language name."
-                // http://www.w3.org/TR/selectors/#lang-pseudo
-                "lang": markFunction(function(lang) {
-                  if (!ridentifier.test(lang || "")) {
-                    Sizzle2.error("unsupported lang: " + lang);
-                  }
-                  lang = lang.replace(runescape, funescape).toLowerCase();
-                  return function(elem) {
-                    var elemLang;
-                    do {
-                      if (elemLang = documentIsHTML ? elem.lang : elem.getAttribute("xml:lang") || elem.getAttribute("lang")) {
-                        elemLang = elemLang.toLowerCase();
-                        return elemLang === lang || elemLang.indexOf(lang + "-") === 0;
-                      }
-                    } while ((elem = elem.parentNode) && elem.nodeType === 1);
-                    return false;
-                  };
-                }),
-                // Miscellaneous
-                "target": function(elem) {
-                  var hash3 = window3.location && window3.location.hash;
-                  return hash3 && hash3.slice(1) === elem.id;
-                },
-                "root": function(elem) {
-                  return elem === docElem;
-                },
-                "focus": function(elem) {
-                  return elem === document3.activeElement && (!document3.hasFocus || document3.hasFocus()) && !!(elem.type || elem.href || ~elem.tabIndex);
-                },
-                // Boolean properties
-                "enabled": createDisabledPseudo(false),
-                "disabled": createDisabledPseudo(true),
-                "checked": function(elem) {
-                  var nodeName2 = elem.nodeName.toLowerCase();
-                  return nodeName2 === "input" && !!elem.checked || nodeName2 === "option" && !!elem.selected;
-                },
-                "selected": function(elem) {
-                  if (elem.parentNode) {
-                    elem.parentNode.selectedIndex;
-                  }
-                  return elem.selected === true;
-                },
-                // Contents
-                "empty": function(elem) {
-                  for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
-                    if (elem.nodeType < 6) {
-                      return false;
+                }
+                return fn2;
+              }
+            },
+            pseudos: {
+              // Potentially complex pseudos
+              not: markFunction(function(selector) {
+                var input = [], results = [], matcher = compile(selector.replace(rtrimCSS, "$1"));
+                return matcher[expando] ? markFunction(function(seed, matches2, _context, xml) {
+                  var elem, unmatched = matcher(seed, null, xml, []), i2 = seed.length;
+                  while (i2--) {
+                    if (elem = unmatched[i2]) {
+                      seed[i2] = !(matches2[i2] = elem);
                     }
                   }
-                  return true;
-                },
-                "parent": function(elem) {
-                  return !Expr.pseudos["empty"](elem);
-                },
-                // Element/input types
-                "header": function(elem) {
-                  return rheader.test(elem.nodeName);
-                },
-                "input": function(elem) {
-                  return rinputs.test(elem.nodeName);
-                },
-                "button": function(elem) {
-                  var name = elem.nodeName.toLowerCase();
-                  return name === "input" && elem.type === "button" || name === "button";
-                },
-                "text": function(elem) {
-                  var attr;
-                  return elem.nodeName.toLowerCase() === "input" && elem.type === "text" && // Support: IE <10 only
-                  // New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
-                  ((attr = elem.getAttribute("type")) == null || attr.toLowerCase() === "text");
-                },
-                // Position-in-collection
-                "first": createPositionalPseudo(function() {
-                  return [0];
-                }),
-                "last": createPositionalPseudo(function(_matchIndexes, length) {
-                  return [length - 1];
-                }),
-                "eq": createPositionalPseudo(function(_matchIndexes, length, argument) {
-                  return [argument < 0 ? argument + length : argument];
-                }),
-                "even": createPositionalPseudo(function(matchIndexes, length) {
-                  var i2 = 0;
-                  for (; i2 < length; i2 += 2) {
-                    matchIndexes.push(i2);
-                  }
-                  return matchIndexes;
-                }),
-                "odd": createPositionalPseudo(function(matchIndexes, length) {
-                  var i2 = 1;
-                  for (; i2 < length; i2 += 2) {
-                    matchIndexes.push(i2);
-                  }
-                  return matchIndexes;
-                }),
-                "lt": createPositionalPseudo(function(matchIndexes, length, argument) {
-                  var i2 = argument < 0 ? argument + length : argument > length ? length : argument;
-                  for (; --i2 >= 0; ) {
-                    matchIndexes.push(i2);
-                  }
-                  return matchIndexes;
-                }),
-                "gt": createPositionalPseudo(function(matchIndexes, length, argument) {
-                  var i2 = argument < 0 ? argument + length : argument;
-                  for (; ++i2 < length; ) {
-                    matchIndexes.push(i2);
-                  }
-                  return matchIndexes;
-                })
-              }
-            };
-            Expr.pseudos["nth"] = Expr.pseudos["eq"];
-            for (i in { radio: true, checkbox: true, file: true, password: true, image: true }) {
-              Expr.pseudos[i] = createInputPseudo(i);
-            }
-            for (i in { submit: true, reset: true }) {
-              Expr.pseudos[i] = createButtonPseudo(i);
-            }
-            function setFilters() {
-            }
-            setFilters.prototype = Expr.filters = Expr.pseudos;
-            Expr.setFilters = new setFilters();
-            tokenize2 = Sizzle2.tokenize = function(selector, parseOnly) {
-              var matched, match, tokens, type, soFar, groups, preFilters, cached = tokenCache[selector + " "];
-              if (cached) {
-                return parseOnly ? 0 : cached.slice(0);
-              }
-              soFar = selector;
-              groups = [];
-              preFilters = Expr.preFilter;
-              while (soFar) {
-                if (!matched || (match = rcomma.exec(soFar))) {
-                  if (match) {
-                    soFar = soFar.slice(match[0].length) || soFar;
-                  }
-                  groups.push(tokens = []);
+                }) : function(elem, _context, xml) {
+                  input[0] = elem;
+                  matcher(input, null, xml, results);
+                  input[0] = null;
+                  return !results.pop();
+                };
+              }),
+              has: markFunction(function(selector) {
+                return function(elem) {
+                  return find(selector, elem).length > 0;
+                };
+              }),
+              contains: markFunction(function(text) {
+                text = text.replace(runescape, funescape);
+                return function(elem) {
+                  return (elem.textContent || jQuery2.text(elem)).indexOf(text) > -1;
+                };
+              }),
+              // "Whether an element is represented by a :lang() selector
+              // is based solely on the element's language value
+              // being equal to the identifier C,
+              // or beginning with the identifier C immediately followed by "-".
+              // The matching of C against the element's language value is performed case-insensitively.
+              // The identifier C does not have to be a valid language name."
+              // https://www.w3.org/TR/selectors/#lang-pseudo
+              lang: markFunction(function(lang) {
+                if (!ridentifier.test(lang || "")) {
+                  find.error("unsupported lang: " + lang);
                 }
-                matched = false;
-                if (match = rleadingCombinator.exec(soFar)) {
-                  matched = match.shift();
-                  tokens.push({
-                    value: matched,
-                    // Cast descendant combinators to space
-                    type: match[0].replace(rtrim2, " ")
-                  });
-                  soFar = soFar.slice(matched.length);
-                }
-                for (type in Expr.filter) {
-                  if ((match = matchExpr[type].exec(soFar)) && (!preFilters[type] || (match = preFilters[type](match)))) {
-                    matched = match.shift();
-                    tokens.push({
-                      value: matched,
-                      type,
-                      matches: match
-                    });
-                    soFar = soFar.slice(matched.length);
-                  }
-                }
-                if (!matched) {
-                  break;
-                }
-              }
-              return parseOnly ? soFar.length : soFar ? Sizzle2.error(selector) : (
-                // Cache the tokens
-                tokenCache(selector, groups).slice(0)
-              );
-            };
-            function toSelector(tokens) {
-              var i2 = 0, len = tokens.length, selector = "";
-              for (; i2 < len; i2++) {
-                selector += tokens[i2].value;
-              }
-              return selector;
-            }
-            function addCombinator(matcher, combinator, base) {
-              var dir2 = combinator.dir, skip = combinator.next, key = skip || dir2, checkNonElements = base && key === "parentNode", doneName = done++;
-              return combinator.first ? (
-                // Check against closest ancestor/preceding element
-                function(elem, context, xml) {
-                  while (elem = elem[dir2]) {
-                    if (elem.nodeType === 1 || checkNonElements) {
-                      return matcher(elem, context, xml);
+                lang = lang.replace(runescape, funescape).toLowerCase();
+                return function(elem) {
+                  var elemLang;
+                  do {
+                    if (elemLang = documentIsHTML ? elem.lang : elem.getAttribute("xml:lang") || elem.getAttribute("lang")) {
+                      elemLang = elemLang.toLowerCase();
+                      return elemLang === lang || elemLang.indexOf(lang + "-") === 0;
                     }
-                  }
+                  } while ((elem = elem.parentNode) && elem.nodeType === 1);
                   return false;
+                };
+              }),
+              // Miscellaneous
+              target: function(elem) {
+                var hash3 = window2.location && window2.location.hash;
+                return hash3 && hash3.slice(1) === elem.id;
+              },
+              root: function(elem) {
+                return elem === documentElement2;
+              },
+              focus: function(elem) {
+                return elem === safeActiveElement() && document3.hasFocus() && !!(elem.type || elem.href || ~elem.tabIndex);
+              },
+              // Boolean properties
+              enabled: createDisabledPseudo(false),
+              disabled: createDisabledPseudo(true),
+              checked: function(elem) {
+                return nodeName(elem, "input") && !!elem.checked || nodeName(elem, "option") && !!elem.selected;
+              },
+              selected: function(elem) {
+                if (elem.parentNode) {
+                  elem.parentNode.selectedIndex;
                 }
-              ) : (
-                // Check against all ancestor/preceding elements
-                function(elem, context, xml) {
-                  var oldCache, uniqueCache, outerCache, newCache = [dirruns, doneName];
-                  if (xml) {
-                    while (elem = elem[dir2]) {
-                      if (elem.nodeType === 1 || checkNonElements) {
-                        if (matcher(elem, context, xml)) {
-                          return true;
-                        }
-                      }
-                    }
-                  } else {
-                    while (elem = elem[dir2]) {
-                      if (elem.nodeType === 1 || checkNonElements) {
-                        outerCache = elem[expando] || (elem[expando] = {});
-                        uniqueCache = outerCache[elem.uniqueID] || (outerCache[elem.uniqueID] = {});
-                        if (skip && skip === elem.nodeName.toLowerCase()) {
-                          elem = elem[dir2] || elem;
-                        } else if ((oldCache = uniqueCache[key]) && oldCache[0] === dirruns && oldCache[1] === doneName) {
-                          return newCache[2] = oldCache[2];
-                        } else {
-                          uniqueCache[key] = newCache;
-                          if (newCache[2] = matcher(elem, context, xml)) {
-                            return true;
-                          }
-                        }
-                      }
-                    }
-                  }
-                  return false;
-                }
-              );
-            }
-            function elementMatcher(matchers) {
-              return matchers.length > 1 ? function(elem, context, xml) {
-                var i2 = matchers.length;
-                while (i2--) {
-                  if (!matchers[i2](elem, context, xml)) {
+                return elem.selected === true;
+              },
+              // Contents
+              empty: function(elem) {
+                for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                  if (elem.nodeType < 6) {
                     return false;
                   }
                 }
                 return true;
-              } : matchers[0];
+              },
+              parent: function(elem) {
+                return !Expr.pseudos.empty(elem);
+              },
+              // Element/input types
+              header: function(elem) {
+                return rheader.test(elem.nodeName);
+              },
+              input: function(elem) {
+                return rinputs.test(elem.nodeName);
+              },
+              button: function(elem) {
+                return nodeName(elem, "input") && elem.type === "button" || nodeName(elem, "button");
+              },
+              text: function(elem) {
+                var attr;
+                return nodeName(elem, "input") && elem.type === "text" && // Support: IE <10 only
+                // New HTML5 attribute values (e.g., "search") appear
+                // with elem.type === "text"
+                ((attr = elem.getAttribute("type")) == null || attr.toLowerCase() === "text");
+              },
+              // Position-in-collection
+              first: createPositionalPseudo(function() {
+                return [0];
+              }),
+              last: createPositionalPseudo(function(_matchIndexes, length) {
+                return [length - 1];
+              }),
+              eq: createPositionalPseudo(function(_matchIndexes, length, argument) {
+                return [argument < 0 ? argument + length : argument];
+              }),
+              even: createPositionalPseudo(function(matchIndexes, length) {
+                var i2 = 0;
+                for (; i2 < length; i2 += 2) {
+                  matchIndexes.push(i2);
+                }
+                return matchIndexes;
+              }),
+              odd: createPositionalPseudo(function(matchIndexes, length) {
+                var i2 = 1;
+                for (; i2 < length; i2 += 2) {
+                  matchIndexes.push(i2);
+                }
+                return matchIndexes;
+              }),
+              lt: createPositionalPseudo(function(matchIndexes, length, argument) {
+                var i2;
+                if (argument < 0) {
+                  i2 = argument + length;
+                } else if (argument > length) {
+                  i2 = length;
+                } else {
+                  i2 = argument;
+                }
+                for (; --i2 >= 0; ) {
+                  matchIndexes.push(i2);
+                }
+                return matchIndexes;
+              }),
+              gt: createPositionalPseudo(function(matchIndexes, length, argument) {
+                var i2 = argument < 0 ? argument + length : argument;
+                for (; ++i2 < length; ) {
+                  matchIndexes.push(i2);
+                }
+                return matchIndexes;
+              })
             }
-            function multipleContexts(selector, contexts, results) {
-              var i2 = 0, len = contexts.length;
-              for (; i2 < len; i2++) {
-                Sizzle2(selector, contexts[i2], results);
+          };
+          Expr.pseudos.nth = Expr.pseudos.eq;
+          for (i in { radio: true, checkbox: true, file: true, password: true, image: true }) {
+            Expr.pseudos[i] = createInputPseudo(i);
+          }
+          for (i in { submit: true, reset: true }) {
+            Expr.pseudos[i] = createButtonPseudo(i);
+          }
+          function setFilters() {
+          }
+          setFilters.prototype = Expr.filters = Expr.pseudos;
+          Expr.setFilters = new setFilters();
+          function tokenize2(selector, parseOnly) {
+            var matched, match, tokens, type, soFar, groups, preFilters, cached = tokenCache[selector + " "];
+            if (cached) {
+              return parseOnly ? 0 : cached.slice(0);
+            }
+            soFar = selector;
+            groups = [];
+            preFilters = Expr.preFilter;
+            while (soFar) {
+              if (!matched || (match = rcomma.exec(soFar))) {
+                if (match) {
+                  soFar = soFar.slice(match[0].length) || soFar;
+                }
+                groups.push(tokens = []);
               }
-              return results;
+              matched = false;
+              if (match = rleadingCombinator.exec(soFar)) {
+                matched = match.shift();
+                tokens.push({
+                  value: matched,
+                  // Cast descendant combinators to space
+                  type: match[0].replace(rtrimCSS, " ")
+                });
+                soFar = soFar.slice(matched.length);
+              }
+              for (type in Expr.filter) {
+                if ((match = matchExpr[type].exec(soFar)) && (!preFilters[type] || (match = preFilters[type](match)))) {
+                  matched = match.shift();
+                  tokens.push({
+                    value: matched,
+                    type,
+                    matches: match
+                  });
+                  soFar = soFar.slice(matched.length);
+                }
+              }
+              if (!matched) {
+                break;
+              }
             }
-            function condense(unmatched, map, filter, context, xml) {
-              var elem, newUnmatched = [], i2 = 0, len = unmatched.length, mapped = map != null;
-              for (; i2 < len; i2++) {
-                if (elem = unmatched[i2]) {
-                  if (!filter || filter(elem, context, xml)) {
-                    newUnmatched.push(elem);
-                    if (mapped) {
-                      map.push(i2);
-                    }
+            if (parseOnly) {
+              return soFar.length;
+            }
+            return soFar ? find.error(selector) : (
+              // Cache the tokens
+              tokenCache(selector, groups).slice(0)
+            );
+          }
+          function toSelector(tokens) {
+            var i2 = 0, len = tokens.length, selector = "";
+            for (; i2 < len; i2++) {
+              selector += tokens[i2].value;
+            }
+            return selector;
+          }
+          function addCombinator(matcher, combinator, base) {
+            var dir2 = combinator.dir, skip = combinator.next, key = skip || dir2, checkNonElements = base && key === "parentNode", doneName = done++;
+            return combinator.first ? (
+              // Check against closest ancestor/preceding element
+              function(elem, context, xml) {
+                while (elem = elem[dir2]) {
+                  if (elem.nodeType === 1 || checkNonElements) {
+                    return matcher(elem, context, xml);
                   }
                 }
+                return false;
               }
-              return newUnmatched;
-            }
-            function setMatcher(preFilter, selector, matcher, postFilter, postFinder, postSelector) {
-              if (postFilter && !postFilter[expando]) {
-                postFilter = setMatcher(postFilter);
-              }
-              if (postFinder && !postFinder[expando]) {
-                postFinder = setMatcher(postFinder, postSelector);
-              }
-              return markFunction(function(seed, results, context, xml) {
-                var temp, i2, elem, preMap = [], postMap = [], preexisting = results.length, elems = seed || multipleContexts(
-                  selector || "*",
-                  context.nodeType ? [context] : context,
-                  []
-                ), matcherIn = preFilter && (seed || !selector) ? condense(elems, preMap, preFilter, context, xml) : elems, matcherOut = matcher ? (
-                  // If we have a postFinder, or filtered seed, or non-seed postFilter or preexisting results,
-                  postFinder || (seed ? preFilter : preexisting || postFilter) ? (
-                    // ...intermediate processing is necessary
-                    []
-                  ) : (
-                    // ...otherwise use results directly
-                    results
-                  )
-                ) : matcherIn;
-                if (matcher) {
-                  matcher(matcherIn, matcherOut, context, xml);
-                }
-                if (postFilter) {
-                  temp = condense(matcherOut, postMap);
-                  postFilter(temp, [], context, xml);
-                  i2 = temp.length;
-                  while (i2--) {
-                    if (elem = temp[i2]) {
-                      matcherOut[postMap[i2]] = !(matcherIn[postMap[i2]] = elem);
+            ) : (
+              // Check against all ancestor/preceding elements
+              function(elem, context, xml) {
+                var oldCache, outerCache, newCache = [dirruns, doneName];
+                if (xml) {
+                  while (elem = elem[dir2]) {
+                    if (elem.nodeType === 1 || checkNonElements) {
+                      if (matcher(elem, context, xml)) {
+                        return true;
+                      }
                     }
                   }
-                }
-                if (seed) {
-                  if (postFinder || preFilter) {
-                    if (postFinder) {
-                      temp = [];
-                      i2 = matcherOut.length;
-                      while (i2--) {
-                        if (elem = matcherOut[i2]) {
-                          temp.push(matcherIn[i2] = elem);
+                } else {
+                  while (elem = elem[dir2]) {
+                    if (elem.nodeType === 1 || checkNonElements) {
+                      outerCache = elem[expando] || (elem[expando] = {});
+                      if (skip && nodeName(elem, skip)) {
+                        elem = elem[dir2] || elem;
+                      } else if ((oldCache = outerCache[key]) && oldCache[0] === dirruns && oldCache[1] === doneName) {
+                        return newCache[2] = oldCache[2];
+                      } else {
+                        outerCache[key] = newCache;
+                        if (newCache[2] = matcher(elem, context, xml)) {
+                          return true;
                         }
                       }
-                      postFinder(null, matcherOut = [], temp, xml);
                     }
+                  }
+                }
+                return false;
+              }
+            );
+          }
+          function elementMatcher(matchers) {
+            return matchers.length > 1 ? function(elem, context, xml) {
+              var i2 = matchers.length;
+              while (i2--) {
+                if (!matchers[i2](elem, context, xml)) {
+                  return false;
+                }
+              }
+              return true;
+            } : matchers[0];
+          }
+          function multipleContexts(selector, contexts, results) {
+            var i2 = 0, len = contexts.length;
+            for (; i2 < len; i2++) {
+              find(selector, contexts[i2], results);
+            }
+            return results;
+          }
+          function condense(unmatched, map, filter, context, xml) {
+            var elem, newUnmatched = [], i2 = 0, len = unmatched.length, mapped = map != null;
+            for (; i2 < len; i2++) {
+              if (elem = unmatched[i2]) {
+                if (!filter || filter(elem, context, xml)) {
+                  newUnmatched.push(elem);
+                  if (mapped) {
+                    map.push(i2);
+                  }
+                }
+              }
+            }
+            return newUnmatched;
+          }
+          function setMatcher(preFilter, selector, matcher, postFilter, postFinder, postSelector) {
+            if (postFilter && !postFilter[expando]) {
+              postFilter = setMatcher(postFilter);
+            }
+            if (postFinder && !postFinder[expando]) {
+              postFinder = setMatcher(postFinder, postSelector);
+            }
+            return markFunction(function(seed, results, context, xml) {
+              var temp, i2, elem, matcherOut, preMap = [], postMap = [], preexisting = results.length, elems = seed || multipleContexts(
+                selector || "*",
+                context.nodeType ? [context] : context,
+                []
+              ), matcherIn = preFilter && (seed || !selector) ? condense(elems, preMap, preFilter, context, xml) : elems;
+              if (matcher) {
+                matcherOut = postFinder || (seed ? preFilter : preexisting || postFilter) ? (
+                  // ...intermediate processing is necessary
+                  []
+                ) : (
+                  // ...otherwise use results directly
+                  results
+                );
+                matcher(matcherIn, matcherOut, context, xml);
+              } else {
+                matcherOut = matcherIn;
+              }
+              if (postFilter) {
+                temp = condense(matcherOut, postMap);
+                postFilter(temp, [], context, xml);
+                i2 = temp.length;
+                while (i2--) {
+                  if (elem = temp[i2]) {
+                    matcherOut[postMap[i2]] = !(matcherIn[postMap[i2]] = elem);
+                  }
+                }
+              }
+              if (seed) {
+                if (postFinder || preFilter) {
+                  if (postFinder) {
+                    temp = [];
                     i2 = matcherOut.length;
                     while (i2--) {
-                      if ((elem = matcherOut[i2]) && (temp = postFinder ? indexOf3(seed, elem) : preMap[i2]) > -1) {
-                        seed[temp] = !(results[temp] = elem);
+                      if (elem = matcherOut[i2]) {
+                        temp.push(matcherIn[i2] = elem);
                       }
                     }
+                    postFinder(null, matcherOut = [], temp, xml);
                   }
-                } else {
-                  matcherOut = condense(
-                    matcherOut === results ? matcherOut.splice(preexisting, matcherOut.length) : matcherOut
-                  );
-                  if (postFinder) {
-                    postFinder(null, results, matcherOut, xml);
-                  } else {
-                    push2.apply(results, matcherOut);
-                  }
-                }
-              });
-            }
-            function matcherFromTokens(tokens) {
-              var checkContext, matcher, j, len = tokens.length, leadingRelative = Expr.relative[tokens[0].type], implicitRelative = leadingRelative || Expr.relative[" "], i2 = leadingRelative ? 1 : 0, matchContext = addCombinator(function(elem) {
-                return elem === checkContext;
-              }, implicitRelative, true), matchAnyContext = addCombinator(function(elem) {
-                return indexOf3(checkContext, elem) > -1;
-              }, implicitRelative, true), matchers = [function(elem, context, xml) {
-                var ret = !leadingRelative && (xml || context !== outermostContext) || ((checkContext = context).nodeType ? matchContext(elem, context, xml) : matchAnyContext(elem, context, xml));
-                checkContext = null;
-                return ret;
-              }];
-              for (; i2 < len; i2++) {
-                if (matcher = Expr.relative[tokens[i2].type]) {
-                  matchers = [addCombinator(elementMatcher(matchers), matcher)];
-                } else {
-                  matcher = Expr.filter[tokens[i2].type].apply(null, tokens[i2].matches);
-                  if (matcher[expando]) {
-                    j = ++i2;
-                    for (; j < len; j++) {
-                      if (Expr.relative[tokens[j].type]) {
-                        break;
-                      }
-                    }
-                    return setMatcher(
-                      i2 > 1 && elementMatcher(matchers),
-                      i2 > 1 && toSelector(
-                        // If the preceding token was a descendant combinator, insert an implicit any-element `*`
-                        tokens.slice(0, i2 - 1).concat({ value: tokens[i2 - 2].type === " " ? "*" : "" })
-                      ).replace(rtrim2, "$1"),
-                      matcher,
-                      i2 < j && matcherFromTokens(tokens.slice(i2, j)),
-                      j < len && matcherFromTokens(tokens = tokens.slice(j)),
-                      j < len && toSelector(tokens)
-                    );
-                  }
-                  matchers.push(matcher);
-                }
-              }
-              return elementMatcher(matchers);
-            }
-            function matcherFromGroupMatchers(elementMatchers, setMatchers) {
-              var bySet = setMatchers.length > 0, byElement = elementMatchers.length > 0, superMatcher = function(seed, context, xml, results, outermost) {
-                var elem, j, matcher, matchedCount = 0, i2 = "0", unmatched = seed && [], setMatched = [], contextBackup = outermostContext, elems = seed || byElement && Expr.find["TAG"]("*", outermost), dirrunsUnique = dirruns += contextBackup == null ? 1 : Math.random() || 0.1, len = elems.length;
-                if (outermost) {
-                  outermostContext = context == document3 || context || outermost;
-                }
-                for (; i2 !== len && (elem = elems[i2]) != null; i2++) {
-                  if (byElement && elem) {
-                    j = 0;
-                    if (!context && elem.ownerDocument != document3) {
-                      setDocument(elem);
-                      xml = !documentIsHTML;
-                    }
-                    while (matcher = elementMatchers[j++]) {
-                      if (matcher(elem, context || document3, xml)) {
-                        results.push(elem);
-                        break;
-                      }
-                    }
-                    if (outermost) {
-                      dirruns = dirrunsUnique;
-                    }
-                  }
-                  if (bySet) {
-                    if (elem = !matcher && elem) {
-                      matchedCount--;
-                    }
-                    if (seed) {
-                      unmatched.push(elem);
+                  i2 = matcherOut.length;
+                  while (i2--) {
+                    if ((elem = matcherOut[i2]) && (temp = postFinder ? indexOf2.call(seed, elem) : preMap[i2]) > -1) {
+                      seed[temp] = !(results[temp] = elem);
                     }
                   }
                 }
-                matchedCount += i2;
-                if (bySet && i2 !== matchedCount) {
-                  j = 0;
-                  while (matcher = setMatchers[j++]) {
-                    matcher(unmatched, setMatched, context, xml);
-                  }
-                  if (seed) {
-                    if (matchedCount > 0) {
-                      while (i2--) {
-                        if (!(unmatched[i2] || setMatched[i2])) {
-                          setMatched[i2] = pop.call(results);
-                        }
-                      }
-                    }
-                    setMatched = condense(setMatched);
-                  }
-                  push2.apply(results, setMatched);
-                  if (outermost && !seed && setMatched.length > 0 && matchedCount + setMatchers.length > 1) {
-                    Sizzle2.uniqueSort(results);
-                  }
-                }
-                if (outermost) {
-                  dirruns = dirrunsUnique;
-                  outermostContext = contextBackup;
-                }
-                return unmatched;
-              };
-              return bySet ? markFunction(superMatcher) : superMatcher;
-            }
-            compile = Sizzle2.compile = function(selector, match) {
-              var i2, setMatchers = [], elementMatchers = [], cached = compilerCache[selector + " "];
-              if (!cached) {
-                if (!match) {
-                  match = tokenize2(selector);
-                }
-                i2 = match.length;
-                while (i2--) {
-                  cached = matcherFromTokens(match[i2]);
-                  if (cached[expando]) {
-                    setMatchers.push(cached);
-                  } else {
-                    elementMatchers.push(cached);
-                  }
-                }
-                cached = compilerCache(
-                  selector,
-                  matcherFromGroupMatchers(elementMatchers, setMatchers)
+              } else {
+                matcherOut = condense(
+                  matcherOut === results ? matcherOut.splice(preexisting, matcherOut.length) : matcherOut
                 );
-                cached.selector = selector;
-              }
-              return cached;
-            };
-            select = Sizzle2.select = function(selector, context, results, seed) {
-              var i2, tokens, token, type, find, compiled = typeof selector === "function" && selector, match = !seed && tokenize2(selector = compiled.selector || selector);
-              results = results || [];
-              if (match.length === 1) {
-                tokens = match[0] = match[0].slice(0);
-                if (tokens.length > 2 && (token = tokens[0]).type === "ID" && context.nodeType === 9 && documentIsHTML && Expr.relative[tokens[1].type]) {
-                  context = (Expr.find["ID"](token.matches[0].replace(runescape, funescape), context) || [])[0];
-                  if (!context) {
-                    return results;
-                  } else if (compiled) {
-                    context = context.parentNode;
-                  }
-                  selector = selector.slice(tokens.shift().value.length);
+                if (postFinder) {
+                  postFinder(null, results, matcherOut, xml);
+                } else {
+                  push2.apply(results, matcherOut);
                 }
-                i2 = matchExpr["needsContext"].test(selector) ? 0 : tokens.length;
-                while (i2--) {
-                  token = tokens[i2];
-                  if (Expr.relative[type = token.type]) {
-                    break;
-                  }
-                  if (find = Expr.find[type]) {
-                    if (seed = find(
-                      token.matches[0].replace(runescape, funescape),
-                      rsibling.test(tokens[0].type) && testContext(context.parentNode) || context
-                    )) {
-                      tokens.splice(i2, 1);
-                      selector = seed.length && toSelector(tokens);
-                      if (!selector) {
-                        push2.apply(results, seed);
-                        return results;
-                      }
+              }
+            });
+          }
+          function matcherFromTokens(tokens) {
+            var checkContext, matcher, j, len = tokens.length, leadingRelative = Expr.relative[tokens[0].type], implicitRelative = leadingRelative || Expr.relative[" "], i2 = leadingRelative ? 1 : 0, matchContext = addCombinator(function(elem) {
+              return elem === checkContext;
+            }, implicitRelative, true), matchAnyContext = addCombinator(function(elem) {
+              return indexOf2.call(checkContext, elem) > -1;
+            }, implicitRelative, true), matchers = [function(elem, context, xml) {
+              var ret = !leadingRelative && (xml || context != outermostContext) || ((checkContext = context).nodeType ? matchContext(elem, context, xml) : matchAnyContext(elem, context, xml));
+              checkContext = null;
+              return ret;
+            }];
+            for (; i2 < len; i2++) {
+              if (matcher = Expr.relative[tokens[i2].type]) {
+                matchers = [addCombinator(elementMatcher(matchers), matcher)];
+              } else {
+                matcher = Expr.filter[tokens[i2].type].apply(null, tokens[i2].matches);
+                if (matcher[expando]) {
+                  j = ++i2;
+                  for (; j < len; j++) {
+                    if (Expr.relative[tokens[j].type]) {
                       break;
                     }
                   }
+                  return setMatcher(
+                    i2 > 1 && elementMatcher(matchers),
+                    i2 > 1 && toSelector(
+                      // If the preceding token was a descendant combinator, insert an implicit any-element `*`
+                      tokens.slice(0, i2 - 1).concat({ value: tokens[i2 - 2].type === " " ? "*" : "" })
+                    ).replace(rtrimCSS, "$1"),
+                    matcher,
+                    i2 < j && matcherFromTokens(tokens.slice(i2, j)),
+                    j < len && matcherFromTokens(tokens = tokens.slice(j)),
+                    j < len && toSelector(tokens)
+                  );
+                }
+                matchers.push(matcher);
+              }
+            }
+            return elementMatcher(matchers);
+          }
+          function matcherFromGroupMatchers(elementMatchers, setMatchers) {
+            var bySet = setMatchers.length > 0, byElement = elementMatchers.length > 0, superMatcher = function(seed, context, xml, results, outermost) {
+              var elem, j, matcher, matchedCount = 0, i2 = "0", unmatched = seed && [], setMatched = [], contextBackup = outermostContext, elems = seed || byElement && Expr.find.TAG("*", outermost), dirrunsUnique = dirruns += contextBackup == null ? 1 : Math.random() || 0.1, len = elems.length;
+              if (outermost) {
+                outermostContext = context == document3 || context || outermost;
+              }
+              for (; i2 !== len && (elem = elems[i2]) != null; i2++) {
+                if (byElement && elem) {
+                  j = 0;
+                  if (!context && elem.ownerDocument != document3) {
+                    setDocument(elem);
+                    xml = !documentIsHTML;
+                  }
+                  while (matcher = elementMatchers[j++]) {
+                    if (matcher(elem, context || document3, xml)) {
+                      push2.call(results, elem);
+                      break;
+                    }
+                  }
+                  if (outermost) {
+                    dirruns = dirrunsUnique;
+                  }
+                }
+                if (bySet) {
+                  if (elem = !matcher && elem) {
+                    matchedCount--;
+                  }
+                  if (seed) {
+                    unmatched.push(elem);
+                  }
                 }
               }
-              (compiled || compile(selector, match))(
-                seed,
-                context,
-                !documentIsHTML,
-                results,
-                !context || rsibling.test(selector) && testContext(context.parentNode) || context
-              );
-              return results;
+              matchedCount += i2;
+              if (bySet && i2 !== matchedCount) {
+                j = 0;
+                while (matcher = setMatchers[j++]) {
+                  matcher(unmatched, setMatched, context, xml);
+                }
+                if (seed) {
+                  if (matchedCount > 0) {
+                    while (i2--) {
+                      if (!(unmatched[i2] || setMatched[i2])) {
+                        setMatched[i2] = pop.call(results);
+                      }
+                    }
+                  }
+                  setMatched = condense(setMatched);
+                }
+                push2.apply(results, setMatched);
+                if (outermost && !seed && setMatched.length > 0 && matchedCount + setMatchers.length > 1) {
+                  jQuery2.uniqueSort(results);
+                }
+              }
+              if (outermost) {
+                dirruns = dirrunsUnique;
+                outermostContext = contextBackup;
+              }
+              return unmatched;
             };
-            support2.sortStable = expando.split("").sort(sortOrder).join("") === expando;
-            support2.detectDuplicates = !!hasDuplicate;
-            setDocument();
-            support2.sortDetached = assert(function(el) {
-              return el.compareDocumentPosition(document3.createElement("fieldset")) & 1;
-            });
-            if (!assert(function(el) {
-              el.innerHTML = "<a href='#'></a>";
-              return el.firstChild.getAttribute("href") === "#";
-            })) {
-              addHandle("type|href|height|width", function(elem, name, isXML2) {
-                if (!isXML2) {
-                  return elem.getAttribute(name, name.toLowerCase() === "type" ? 1 : 2);
+            return bySet ? markFunction(superMatcher) : superMatcher;
+          }
+          function compile(selector, match) {
+            var i2, setMatchers = [], elementMatchers = [], cached = compilerCache[selector + " "];
+            if (!cached) {
+              if (!match) {
+                match = tokenize2(selector);
+              }
+              i2 = match.length;
+              while (i2--) {
+                cached = matcherFromTokens(match[i2]);
+                if (cached[expando]) {
+                  setMatchers.push(cached);
+                } else {
+                  elementMatchers.push(cached);
                 }
-              });
+              }
+              cached = compilerCache(
+                selector,
+                matcherFromGroupMatchers(elementMatchers, setMatchers)
+              );
+              cached.selector = selector;
             }
-            if (!support2.attributes || !assert(function(el) {
-              el.innerHTML = "<input/>";
-              el.firstChild.setAttribute("value", "");
-              return el.firstChild.getAttribute("value") === "";
-            })) {
-              addHandle("value", function(elem, _name, isXML2) {
-                if (!isXML2 && elem.nodeName.toLowerCase() === "input") {
-                  return elem.defaultValue;
+            return cached;
+          }
+          function select(selector, context, results, seed) {
+            var i2, tokens, token, type, find2, compiled = typeof selector === "function" && selector, match = !seed && tokenize2(selector = compiled.selector || selector);
+            results = results || [];
+            if (match.length === 1) {
+              tokens = match[0] = match[0].slice(0);
+              if (tokens.length > 2 && (token = tokens[0]).type === "ID" && context.nodeType === 9 && documentIsHTML && Expr.relative[tokens[1].type]) {
+                context = (Expr.find.ID(
+                  token.matches[0].replace(runescape, funescape),
+                  context
+                ) || [])[0];
+                if (!context) {
+                  return results;
+                } else if (compiled) {
+                  context = context.parentNode;
                 }
-              });
-            }
-            if (!assert(function(el) {
-              return el.getAttribute("disabled") == null;
-            })) {
-              addHandle(booleans, function(elem, name, isXML2) {
-                var val;
-                if (!isXML2) {
-                  return elem[name] === true ? name.toLowerCase() : (val = elem.getAttributeNode(name)) && val.specified ? val.value : null;
+                selector = selector.slice(tokens.shift().value.length);
+              }
+              i2 = matchExpr.needsContext.test(selector) ? 0 : tokens.length;
+              while (i2--) {
+                token = tokens[i2];
+                if (Expr.relative[type = token.type]) {
+                  break;
                 }
-              });
+                if (find2 = Expr.find[type]) {
+                  if (seed = find2(
+                    token.matches[0].replace(runescape, funescape),
+                    rsibling.test(tokens[0].type) && testContext(context.parentNode) || context
+                  )) {
+                    tokens.splice(i2, 1);
+                    selector = seed.length && toSelector(tokens);
+                    if (!selector) {
+                      push2.apply(results, seed);
+                      return results;
+                    }
+                    break;
+                  }
+                }
+              }
             }
-            return Sizzle2;
-          }(window2)
-        );
-        jQuery2.find = Sizzle;
-        jQuery2.expr = Sizzle.selectors;
-        jQuery2.expr[":"] = jQuery2.expr.pseudos;
-        jQuery2.uniqueSort = jQuery2.unique = Sizzle.uniqueSort;
-        jQuery2.text = Sizzle.getText;
-        jQuery2.isXMLDoc = Sizzle.isXML;
-        jQuery2.contains = Sizzle.contains;
-        jQuery2.escapeSelector = Sizzle.escape;
+            (compiled || compile(selector, match))(
+              seed,
+              context,
+              !documentIsHTML,
+              results,
+              !context || rsibling.test(selector) && testContext(context.parentNode) || context
+            );
+            return results;
+          }
+          support.sortStable = expando.split("").sort(sortOrder).join("") === expando;
+          setDocument();
+          support.sortDetached = assert(function(el) {
+            return el.compareDocumentPosition(document3.createElement("fieldset")) & 1;
+          });
+          jQuery2.find = find;
+          jQuery2.expr[":"] = jQuery2.expr.pseudos;
+          jQuery2.unique = jQuery2.uniqueSort;
+          find.compile = compile;
+          find.select = select;
+          find.setDocument = setDocument;
+          find.escape = jQuery2.escapeSelector;
+          find.getText = jQuery2.text;
+          find.isXML = jQuery2.isXMLDoc;
+          find.selectors = jQuery2.expr;
+          find.support = jQuery2.support;
+          find.uniqueSort = jQuery2.uniqueSort;
+        })();
         var dir = function(elem, dir2, until) {
           var matched = [], truncate = until !== void 0;
           while ((elem = elem[dir2]) && elem.nodeType !== 9) {
@@ -2965,9 +2827,6 @@
           return matched;
         };
         var rneedsContext = jQuery2.expr.match.needsContext;
-        function nodeName(elem, name) {
-          return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
-        }
         var rsingleTag = /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i;
         function winnow(elements, qualifier, not) {
           if (isFunction(qualifier)) {
@@ -3114,7 +2973,7 @@
               for (; i < l; i++) {
                 for (cur = this[i]; cur && cur !== context; cur = cur.parentNode) {
                   if (cur.nodeType < 11 && (targets ? targets.index(cur) > -1 : (
-                    // Don't pass non-elements to Sizzle
+                    // Don't pass non-elements to jQuery#find
                     cur.nodeType === 1 && jQuery2.find.matchesSelector(cur, selectors)
                   ))) {
                     matched.push(cur);
@@ -3487,7 +3346,7 @@
                         if (jQuery2.Deferred.exceptionHook) {
                           jQuery2.Deferred.exceptionHook(
                             e,
-                            process2.stackTrace
+                            process2.error
                           );
                         }
                         if (depth + 1 >= maxDepth) {
@@ -3502,8 +3361,10 @@
                     if (depth) {
                       process2();
                     } else {
-                      if (jQuery2.Deferred.getStackHook) {
-                        process2.stackTrace = jQuery2.Deferred.getStackHook();
+                      if (jQuery2.Deferred.getErrorHook) {
+                        process2.error = jQuery2.Deferred.getErrorHook();
+                      } else if (jQuery2.Deferred.getStackHook) {
+                        process2.error = jQuery2.Deferred.getStackHook();
                       }
                       window2.setTimeout(process2);
                     }
@@ -3602,9 +3463,13 @@
           }
         });
         var rerrorNames = /^(Eval|Internal|Range|Reference|Syntax|Type|URI)Error$/;
-        jQuery2.Deferred.exceptionHook = function(error2, stack) {
+        jQuery2.Deferred.exceptionHook = function(error2, asyncError) {
           if (window2.console && window2.console.warn && error2 && rerrorNames.test(error2.name)) {
-            window2.console.warn("jQuery.Deferred exception: " + error2.message, error2.stack, stack);
+            window2.console.warn(
+              "jQuery.Deferred exception: " + error2.message,
+              error2.stack,
+              asyncError
+            );
           }
         };
         jQuery2.readyException = function(error2) {
@@ -4211,15 +4076,6 @@
         function returnFalse() {
           return false;
         }
-        function expectSync(elem, type) {
-          return elem === safeActiveElement() === (type === "focus");
-        }
-        function safeActiveElement() {
-          try {
-            return document2.activeElement;
-          } catch (err) {
-          }
-        }
         function on(elem, types, selector, data, fn2, one) {
           var origFn, type;
           if (typeof types === "object") {
@@ -4485,7 +4341,7 @@
               setup: function(data) {
                 var el = this || data;
                 if (rcheckableType.test(el.type) && el.click && nodeName(el, "input")) {
-                  leverageNative(el, "click", returnTrue);
+                  leverageNative(el, "click", true);
                 }
                 return false;
               },
@@ -4512,8 +4368,8 @@
             }
           }
         };
-        function leverageNative(el, type, expectSync2) {
-          if (!expectSync2) {
+        function leverageNative(el, type, isSetup) {
+          if (!isSetup) {
             if (dataPriv.get(el, type) === void 0) {
               jQuery2.event.add(el, type, returnTrue);
             }
@@ -4523,38 +4379,30 @@
           jQuery2.event.add(el, type, {
             namespace: false,
             handler: function(event) {
-              var notAsync, result, saved = dataPriv.get(this, type);
+              var result, saved = dataPriv.get(this, type);
               if (event.isTrigger & 1 && this[type]) {
-                if (!saved.length) {
+                if (!saved) {
                   saved = slice.call(arguments);
                   dataPriv.set(this, type, saved);
-                  notAsync = expectSync2(this, type);
                   this[type]();
                   result = dataPriv.get(this, type);
-                  if (saved !== result || notAsync) {
-                    dataPriv.set(this, type, false);
-                  } else {
-                    result = {};
-                  }
+                  dataPriv.set(this, type, false);
                   if (saved !== result) {
                     event.stopImmediatePropagation();
                     event.preventDefault();
-                    return result && result.value;
+                    return result;
                   }
                 } else if ((jQuery2.event.special[type] || {}).delegateType) {
                   event.stopPropagation();
                 }
-              } else if (saved.length) {
-                dataPriv.set(this, type, {
-                  value: jQuery2.event.trigger(
-                    // Support: IE <=9 - 11+
-                    // Extend with the prototype to reset the above stopImmediatePropagation()
-                    jQuery2.extend(saved[0], jQuery2.Event.prototype),
-                    saved.slice(1),
-                    this
-                  )
-                });
-                event.stopImmediatePropagation();
+              } else if (saved) {
+                dataPriv.set(this, type, jQuery2.event.trigger(
+                  saved[0],
+                  saved.slice(1),
+                  this
+                ));
+                event.stopPropagation();
+                event.isImmediatePropagationStopped = returnTrue;
               }
             }
           });
@@ -4648,15 +4496,55 @@
           which: true
         }, jQuery2.event.addProp);
         jQuery2.each({ focus: "focusin", blur: "focusout" }, function(type, delegateType) {
+          function focusMappedHandler(nativeEvent) {
+            if (document2.documentMode) {
+              var handle = dataPriv.get(this, "handle"), event = jQuery2.event.fix(nativeEvent);
+              event.type = nativeEvent.type === "focusin" ? "focus" : "blur";
+              event.isSimulated = true;
+              handle(nativeEvent);
+              if (event.target === event.currentTarget) {
+                handle(event);
+              }
+            } else {
+              jQuery2.event.simulate(
+                delegateType,
+                nativeEvent.target,
+                jQuery2.event.fix(nativeEvent)
+              );
+            }
+          }
           jQuery2.event.special[type] = {
             // Utilize native event if possible so blur/focus sequence is correct
             setup: function() {
-              leverageNative(this, type, expectSync);
-              return false;
+              var attaches;
+              leverageNative(this, type, true);
+              if (document2.documentMode) {
+                attaches = dataPriv.get(this, delegateType);
+                if (!attaches) {
+                  this.addEventListener(delegateType, focusMappedHandler);
+                }
+                dataPriv.set(this, delegateType, (attaches || 0) + 1);
+              } else {
+                return false;
+              }
             },
             trigger: function() {
               leverageNative(this, type);
               return true;
+            },
+            teardown: function() {
+              var attaches;
+              if (document2.documentMode) {
+                attaches = dataPriv.get(this, delegateType) - 1;
+                if (!attaches) {
+                  this.removeEventListener(delegateType, focusMappedHandler);
+                  dataPriv.remove(this, delegateType);
+                } else {
+                  dataPriv.set(this, delegateType, attaches);
+                }
+              } else {
+                return false;
+              }
             },
             // Suppress native focus or blur if we're currently inside
             // a leveraged native-event stack
@@ -4664,6 +4552,32 @@
               return dataPriv.get(event.target, type);
             },
             delegateType
+          };
+          jQuery2.event.special[delegateType] = {
+            setup: function() {
+              var doc = this.ownerDocument || this.document || this, dataHolder = document2.documentMode ? this : doc, attaches = dataPriv.get(dataHolder, delegateType);
+              if (!attaches) {
+                if (document2.documentMode) {
+                  this.addEventListener(delegateType, focusMappedHandler);
+                } else {
+                  doc.addEventListener(type, focusMappedHandler, true);
+                }
+              }
+              dataPriv.set(dataHolder, delegateType, (attaches || 0) + 1);
+            },
+            teardown: function() {
+              var doc = this.ownerDocument || this.document || this, dataHolder = document2.documentMode ? this : doc, attaches = dataPriv.get(dataHolder, delegateType) - 1;
+              if (!attaches) {
+                if (document2.documentMode) {
+                  this.removeEventListener(delegateType, focusMappedHandler);
+                } else {
+                  doc.removeEventListener(type, focusMappedHandler, true);
+                }
+                dataPriv.remove(dataHolder, delegateType);
+              } else {
+                dataPriv.set(dataHolder, delegateType, attaches);
+              }
+            }
           };
         });
         jQuery2.each({
@@ -5033,11 +4947,6 @@
           return ret;
         };
         var rboxStyle = new RegExp(cssExpand.join("|"), "i");
-        var whitespace = "[\\x20\\t\\r\\n\\f]";
-        var rtrimCSS = new RegExp(
-          "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$",
-          "g"
-        );
         (function() {
           function computeStyleTests() {
             if (!div) {
@@ -5188,13 +5097,13 @@
           ) : value;
         }
         function boxModelAdjustment(elem, dimension, box, isBorderBox, styles, computedVal) {
-          var i = dimension === "width" ? 1 : 0, extra = 0, delta = 0;
+          var i = dimension === "width" ? 1 : 0, extra = 0, delta = 0, marginDelta = 0;
           if (box === (isBorderBox ? "border" : "content")) {
             return 0;
           }
           for (; i < 4; i += 2) {
             if (box === "margin") {
-              delta += jQuery2.css(elem, box + cssExpand[i], true, styles);
+              marginDelta += jQuery2.css(elem, box + cssExpand[i], true, styles);
             }
             if (!isBorderBox) {
               delta += jQuery2.css(elem, "padding" + cssExpand[i], true, styles);
@@ -5219,7 +5128,7 @@
               // Use an explicit zero to avoid NaN (gh-3964)
             )) || 0;
           }
-          return delta;
+          return delta + marginDelta;
         }
         function getWidthOrHeight(elem, dimension, extra) {
           var styles = getStyles(elem), boxSizingNeeded = !support.boxSizingReliable() || extra, isBorderBox = boxSizingNeeded && jQuery2.css(elem, "boxSizing", false, styles) === "border-box", valueIsBorderBox = isBorderBox, val = curCSS(elem, dimension, styles), offsetProp = "offset" + dimension[0].toUpperCase() + dimension.slice(1);
@@ -5271,26 +5180,34 @@
           },
           // Don't automatically add "px" to these possibly-unitless properties
           cssNumber: {
-            "animationIterationCount": true,
-            "columnCount": true,
-            "fillOpacity": true,
-            "flexGrow": true,
-            "flexShrink": true,
-            "fontWeight": true,
-            "gridArea": true,
-            "gridColumn": true,
-            "gridColumnEnd": true,
-            "gridColumnStart": true,
-            "gridRow": true,
-            "gridRowEnd": true,
-            "gridRowStart": true,
-            "lineHeight": true,
-            "opacity": true,
-            "order": true,
-            "orphans": true,
-            "widows": true,
-            "zIndex": true,
-            "zoom": true
+            animationIterationCount: true,
+            aspectRatio: true,
+            borderImageSlice: true,
+            columnCount: true,
+            flexGrow: true,
+            flexShrink: true,
+            fontWeight: true,
+            gridArea: true,
+            gridColumn: true,
+            gridColumnEnd: true,
+            gridColumnStart: true,
+            gridRow: true,
+            gridRowEnd: true,
+            gridRowStart: true,
+            lineHeight: true,
+            opacity: true,
+            order: true,
+            orphans: true,
+            scale: true,
+            widows: true,
+            zIndex: true,
+            zoom: true,
+            // SVG-related
+            fillOpacity: true,
+            floodOpacity: true,
+            stopOpacity: true,
+            strokeMiterlimit: true,
+            strokeOpacity: true
           },
           // Add in properties whose names you wish to fix before
           // setting or getting the value
@@ -6411,7 +6328,26 @@
             };
           }
         });
-        support.focusin = "onfocusin" in window2;
+        var location2 = window2.location;
+        var nonce = { guid: Date.now() };
+        var rquery = /\?/;
+        jQuery2.parseXML = function(data) {
+          var xml, parserErrorElem;
+          if (!data || typeof data !== "string") {
+            return null;
+          }
+          try {
+            xml = new window2.DOMParser().parseFromString(data, "text/xml");
+          } catch (e) {
+          }
+          parserErrorElem = xml && xml.getElementsByTagName("parsererror")[0];
+          if (!xml || parserErrorElem) {
+            jQuery2.error("Invalid XML: " + (parserErrorElem ? jQuery2.map(parserErrorElem.childNodes, function(el) {
+              return el.textContent;
+            }).join("\n") : data));
+          }
+          return xml;
+        };
         var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/, stopPropagationCallback = function(e) {
           e.stopPropagation();
         };
@@ -6525,51 +6461,6 @@
             }
           }
         });
-        if (!support.focusin) {
-          jQuery2.each({ focus: "focusin", blur: "focusout" }, function(orig, fix) {
-            var handler = function(event) {
-              jQuery2.event.simulate(fix, event.target, jQuery2.event.fix(event));
-            };
-            jQuery2.event.special[fix] = {
-              setup: function() {
-                var doc = this.ownerDocument || this.document || this, attaches = dataPriv.access(doc, fix);
-                if (!attaches) {
-                  doc.addEventListener(orig, handler, true);
-                }
-                dataPriv.access(doc, fix, (attaches || 0) + 1);
-              },
-              teardown: function() {
-                var doc = this.ownerDocument || this.document || this, attaches = dataPriv.access(doc, fix) - 1;
-                if (!attaches) {
-                  doc.removeEventListener(orig, handler, true);
-                  dataPriv.remove(doc, fix);
-                } else {
-                  dataPriv.access(doc, fix, attaches);
-                }
-              }
-            };
-          });
-        }
-        var location2 = window2.location;
-        var nonce = { guid: Date.now() };
-        var rquery = /\?/;
-        jQuery2.parseXML = function(data) {
-          var xml, parserErrorElem;
-          if (!data || typeof data !== "string") {
-            return null;
-          }
-          try {
-            xml = new window2.DOMParser().parseFromString(data, "text/xml");
-          } catch (e) {
-          }
-          parserErrorElem = xml && xml.getElementsByTagName("parsererror")[0];
-          if (!xml || parserErrorElem) {
-            jQuery2.error("Invalid XML: " + (parserErrorElem ? jQuery2.map(parserErrorElem.childNodes, function(el) {
-              return el.textContent;
-            }).join("\n") : data));
-          }
-          return xml;
-        };
         var rbracket = /\[\]$/, rCRLF = /\r?\n/g, rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i, rsubmittable = /^(?:input|select|textarea|keygen)/i;
         function buildParams(prefix, obj, traditional, add2) {
           var name;
@@ -9076,7 +8967,7 @@
             replace: function(new_array) {
               if (!new_array)
                 return;
-              if (!$.isArray(new_array))
+              if (!Array.isArray(new_array))
                 new_array = [new_array];
               this.clear();
               this.push.apply(this, new_array);
@@ -9109,9 +9000,14 @@
           this.isInput = this.element.is("input");
           this.inputField = this.isInput ? this.element : this.element.find("input");
           this.component = this.element.hasClass("date") ? this.element.find(".add-on, .input-group-addon, .input-group-append, .input-group-prepend, .btn") : false;
-          if (this.component && this.component.length === 0)
+          if (this.component && this.component.length === 0) {
             this.component = false;
-          this.isInline = !this.component && this.element.is("div");
+          }
+          if (this.o.isInline === null) {
+            this.isInline = !this.component && !this.isInput;
+          } else {
+            this.isInline = this.o.isInline;
+          }
           this.picker = $(DPGlobal.template);
           if (this._check_template(this.o.templates.leftArrow)) {
             this.picker.find(".prev").html(this.o.templates.leftArrow);
@@ -9163,7 +9059,7 @@
             return view;
           },
           _resolveDaysOfWeek: function(daysOfWeek) {
-            if (!$.isArray(daysOfWeek))
+            if (!Array.isArray(daysOfWeek))
               daysOfWeek = daysOfWeek.split(/[,\s]*/);
             return $.map(daysOfWeek, Number);
           },
@@ -9203,13 +9099,13 @@
             o.multidateSeparator = String(o.multidateSeparator);
             o.weekStart %= 7;
             o.weekEnd = (o.weekStart + 6) % 7;
-            var format2 = DPGlobal.parseFormat(o.format);
+            var format = DPGlobal.parseFormat(o.format);
             if (o.startDate !== -Infinity) {
               if (!!o.startDate) {
                 if (o.startDate instanceof Date)
                   o.startDate = this._local_to_utc(this._zero_time(o.startDate));
                 else
-                  o.startDate = DPGlobal.parseDate(o.startDate, format2, o.language, o.assumeNearbyYear);
+                  o.startDate = DPGlobal.parseDate(o.startDate, format, o.language, o.assumeNearbyYear);
               } else {
                 o.startDate = -Infinity;
               }
@@ -9219,7 +9115,7 @@
                 if (o.endDate instanceof Date)
                   o.endDate = this._local_to_utc(this._zero_time(o.endDate));
                 else
-                  o.endDate = DPGlobal.parseDate(o.endDate, format2, o.language, o.assumeNearbyYear);
+                  o.endDate = DPGlobal.parseDate(o.endDate, format, o.language, o.assumeNearbyYear);
               } else {
                 o.endDate = Infinity;
               }
@@ -9227,11 +9123,11 @@
             o.daysOfWeekDisabled = this._resolveDaysOfWeek(o.daysOfWeekDisabled || []);
             o.daysOfWeekHighlighted = this._resolveDaysOfWeek(o.daysOfWeekHighlighted || []);
             o.datesDisabled = o.datesDisabled || [];
-            if (!$.isArray(o.datesDisabled)) {
+            if (!Array.isArray(o.datesDisabled)) {
               o.datesDisabled = o.datesDisabled.split(",");
             }
             o.datesDisabled = $.map(o.datesDisabled, function(d) {
-              return DPGlobal.parseDate(d, format2, o.language, o.assumeNearbyYear);
+              return DPGlobal.parseDate(d, format, o.language, o.assumeNearbyYear);
             });
             var plc = String(o.orientation).toLowerCase().split(/\s+/g), _plc = o.orientation.toLowerCase();
             plc = $.grep(plc, function(word) {
@@ -9262,7 +9158,7 @@
               o.orientation.y = _plc[0] || "auto";
             }
             if (o.defaultViewDate instanceof Date || typeof o.defaultViewDate === "string") {
-              o.defaultViewDate = DPGlobal.parseDate(o.defaultViewDate, format2, o.language, o.assumeNearbyYear);
+              o.defaultViewDate = DPGlobal.parseDate(o.defaultViewDate, format, o.language, o.assumeNearbyYear);
             } else if (o.defaultViewDate) {
               var year = o.defaultViewDate.year || (/* @__PURE__ */ new Date()).getFullYear();
               var month = o.defaultViewDate.month || 0;
@@ -9394,17 +9290,17 @@
               date: local_date,
               viewMode: this.viewMode,
               dates: $.map(this.dates, this._utc_to_local),
-              format: $.proxy(function(ix, format2) {
+              format: $.proxy(function(ix, format) {
                 if (arguments.length === 0) {
                   ix = this.dates.length - 1;
-                  format2 = this.o.format;
+                  format = this.o.format;
                 } else if (typeof ix === "string") {
-                  format2 = ix;
+                  format = ix;
                   ix = this.dates.length - 1;
                 }
-                format2 = format2 || this.o.format;
+                format = format || this.o.format;
                 var date2 = this.dates.get(ix);
-                return DPGlobal.formatDate(date2, format2, this.o.language);
+                return DPGlobal.formatDate(date2, format, this.o.language);
               }, this)
             });
           },
@@ -9498,21 +9394,21 @@
           },
           clearDates: function() {
             this.inputField.val("");
-            this.update();
             this._trigger("changeDate");
+            this.update();
             if (this.o.autoclose) {
               this.hide();
             }
           },
           setDates: function() {
-            var args = $.isArray(arguments[0]) ? arguments[0] : arguments;
+            var args = Array.isArray(arguments[0]) ? arguments[0] : arguments;
             this.update.apply(this, args);
             this._trigger("changeDate");
             this.setValue();
             return this;
           },
           setUTCDates: function() {
-            var args = $.isArray(arguments[0]) ? arguments[0] : arguments;
+            var args = Array.isArray(arguments[0]) ? arguments[0] : arguments;
             this.setDates.apply(this, $.map(args, this._utc_to_local));
             return this;
           },
@@ -9524,12 +9420,12 @@
             this.inputField.val(formatted);
             return this;
           },
-          getFormattedDate: function(format2) {
-            if (format2 === undefined2)
-              format2 = this.o.format;
+          getFormattedDate: function(format) {
+            if (format === undefined2)
+              format = this.o.format;
             var lang = this.o.language;
             return $.map(this.dates, function(d) {
-              return DPGlobal.formatDate(d, format2, lang);
+              return DPGlobal.formatDate(d, format, lang);
             }).join(this.o.multidateSeparator);
           },
           getStartDate: function() {
@@ -9860,7 +9756,7 @@
                 if (before.content)
                   content = before.content;
               }
-              if ($.isFunction($.uniqueSort)) {
+              if (typeof $.uniqueSort === "function") {
                 clsName = $.uniqueSort(clsName);
               } else {
                 clsName = $.unique(clsName);
@@ -10272,11 +10168,11 @@
                 p.setUTCDate(new_date);
             });
             if (new_date < this.dates[j]) {
-              while (j >= 0 && new_date < this.dates[j]) {
+              while (j >= 0 && new_date < this.dates[j] && (this.pickers[j].element.val() || "").length > 0) {
                 this.pickers[j--].setUTCDate(new_date);
               }
             } else if (new_date > this.dates[k]) {
-              while (k < l && new_date > this.dates[k]) {
+              while (k < l && new_date > this.dates[k] && (this.pickers[k].element.val() || "").length > 0) {
                 this.pickers[k++].setUTCDate(new_date);
               }
             }
@@ -10367,6 +10263,7 @@
           endDate: Infinity,
           forceParse: true,
           format: "mm/dd/yyyy",
+          isInline: null,
           keepEmptyValues: false,
           keyboardNavigation: true,
           language: "en",
@@ -10447,24 +10344,24 @@
           ],
           validParts: /dd?|DD?|mm?|MM?|yy(?:yy)?/g,
           nonpunctuation: /[^ -\/:-@\u5e74\u6708\u65e5\[-`{-~\t\n\r]+/g,
-          parseFormat: function(format2) {
-            if (typeof format2.toValue === "function" && typeof format2.toDisplay === "function")
-              return format2;
-            var separators = format2.replace(this.validParts, "\0").split("\0"), parts = format2.match(this.validParts);
+          parseFormat: function(format) {
+            if (typeof format.toValue === "function" && typeof format.toDisplay === "function")
+              return format;
+            var separators = format.replace(this.validParts, "\0").split("\0"), parts = format.match(this.validParts);
             if (!separators || !separators.length || !parts || parts.length === 0) {
               throw new Error("Invalid date format.");
             }
             return { separators, parts };
           },
-          parseDate: function(date, format2, language, assumeNearby) {
+          parseDate: function(date, format, language, assumeNearby) {
             if (!date)
               return undefined2;
             if (date instanceof Date)
               return date;
-            if (typeof format2 === "string")
-              format2 = DPGlobal.parseFormat(format2);
-            if (format2.toValue)
-              return format2.toValue(date, format2, language);
+            if (typeof format === "string")
+              format = DPGlobal.parseFormat(format);
+            if (format.toValue)
+              return format.toValue(date, format, language);
             var fn_map = {
               d: "moveDay",
               m: "moveMonth",
@@ -10525,7 +10422,7 @@
             setters_map["M"] = setters_map["MM"] = setters_map["mm"] = setters_map["m"];
             setters_map["dd"] = setters_map["d"];
             date = UTCToday();
-            var fparts = format2.parts.slice();
+            var fparts = format.parts.slice();
             if (parts.length !== fparts.length) {
               fparts = $(fparts).filter(function(i2, p) {
                 return $.inArray(p, setters_order) !== -1;
@@ -10567,13 +10464,13 @@
             }
             return date;
           },
-          formatDate: function(date, format2, language) {
+          formatDate: function(date, format, language) {
             if (!date)
               return "";
-            if (typeof format2 === "string")
-              format2 = DPGlobal.parseFormat(format2);
-            if (format2.toDisplay)
-              return format2.toDisplay(date, format2, language);
+            if (typeof format === "string")
+              format = DPGlobal.parseFormat(format);
+            if (format.toDisplay)
+              return format.toDisplay(date, format, language);
             var val = {
               d: date.getUTCDate(),
               D: dates[language].daysShort[date.getUTCDay()],
@@ -10587,11 +10484,11 @@
             val.dd = (val.d < 10 ? "0" : "") + val.d;
             val.mm = (val.m < 10 ? "0" : "") + val.m;
             date = [];
-            var seps = $.extend([], format2.separators);
-            for (var i = 0, cnt = format2.parts.length; i <= cnt; i++) {
+            var seps = $.extend([], format.separators);
+            for (var i = 0, cnt = format.parts.length; i <= cnt; i++) {
               if (seps.length)
                 date.push(seps.shift());
-              date.push(val[format2.parts[i]]);
+              date.push(val[format.parts[i]]);
             }
             return date.join("");
           },
@@ -10605,7 +10502,7 @@
           $.fn.datepicker = old;
           return this;
         };
-        $.fn.datepicker.version = "1.9.0";
+        $.fn.datepicker.version = "1.10.0";
         $.fn.datepicker.deprecated = function(msg) {
           var console2 = window.console;
           if (console2 && console2.warn) {
@@ -15088,15 +14985,7 @@
         return;
       }
     }
-    if (true) {
-      if (!isHTMLElement(arrowElement)) {
-        console.error(['Popper: "arrow" element must be an HTMLElement (not an SVGElement).', "To use an SVG arrow, wrap it in an HTMLElement that will be used as", "the arrow."].join(" "));
-      }
-    }
     if (!contains(state.elements.popper, arrowElement)) {
-      if (true) {
-        console.error(['Popper: "arrow" modifier\'s `element` must be a child of the popper', "element."].join(" "));
-      }
       return;
     }
     state.elements.arrow = arrowElement;
@@ -15201,14 +15090,6 @@
   function computeStyles2(_ref5) {
     var state = _ref5.state, options = _ref5.options;
     var _options$gpuAccelerat = options.gpuAcceleration, gpuAcceleration = _options$gpuAccelerat === void 0 ? true : _options$gpuAccelerat, _options$adaptive = options.adaptive, adaptive = _options$adaptive === void 0 ? true : _options$adaptive, _options$roundOffsets = options.roundOffsets, roundOffsets = _options$roundOffsets === void 0 ? true : _options$roundOffsets;
-    if (true) {
-      var transitionProperty = getComputedStyle3(state.elements.popper).transitionProperty || "";
-      if (adaptive && ["transform", "top", "right", "bottom", "left"].some(function(property) {
-        return transitionProperty.indexOf(property) >= 0;
-      })) {
-        console.warn(["Popper: Detected CSS transitions on at least one of the following", 'CSS properties: "transform", "top", "right", "bottom", "left".', "\n\n", 'Disable the "computeStyles" modifier\'s `adaptive` option to allow', "for smooth transitions, or remove these properties from the CSS", "transition declaration on the popper element if only transitioning", "opacity or background-color for example.", "\n\n", "We recommend using the popper element as a wrapper around an inner", "element that can have any CSS property transitioned for animations."].join(" "));
-      }
-    }
     var commonStyles = {
       placement: getBasePlacement(state.placement),
       variation: getVariation(state.placement),
@@ -15568,9 +15449,6 @@
     });
     if (allowedPlacements.length === 0) {
       allowedPlacements = placements3;
-      if (true) {
-        console.error(["Popper: The `allowedAutoPlacements` option did not allow any", "placements. Ensure the `placement` option matches the variation", "of the allowed placements.", 'For example, "auto" cannot be used to allow "bottom-start".', 'Use "auto-start" instead.'].join(" "));
-      }
     }
     var overflows = allowedPlacements.reduce(function(acc, placement2) {
       acc[placement2] = detectOverflow(state, {
@@ -16015,92 +15893,6 @@
     };
   }
 
-  // node_modules/@popperjs/core/lib/utils/format.js
-  function format(str) {
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-    return [].concat(args).reduce(function(p, c) {
-      return p.replace(/%s/, c);
-    }, str);
-  }
-
-  // node_modules/@popperjs/core/lib/utils/validateModifiers.js
-  var INVALID_MODIFIER_ERROR = 'Popper: modifier "%s" provided an invalid %s property, expected %s but got %s';
-  var MISSING_DEPENDENCY_ERROR = 'Popper: modifier "%s" requires "%s", but "%s" modifier is not available';
-  var VALID_PROPERTIES = ["name", "enabled", "phase", "fn", "effect", "requires", "options"];
-  function validateModifiers(modifiers) {
-    modifiers.forEach(function(modifier) {
-      [].concat(Object.keys(modifier), VALID_PROPERTIES).filter(function(value, index, self2) {
-        return self2.indexOf(value) === index;
-      }).forEach(function(key) {
-        switch (key) {
-          case "name":
-            if (typeof modifier.name !== "string") {
-              console.error(format(INVALID_MODIFIER_ERROR, String(modifier.name), '"name"', '"string"', '"' + String(modifier.name) + '"'));
-            }
-            break;
-          case "enabled":
-            if (typeof modifier.enabled !== "boolean") {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"enabled"', '"boolean"', '"' + String(modifier.enabled) + '"'));
-            }
-            break;
-          case "phase":
-            if (modifierPhases.indexOf(modifier.phase) < 0) {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"phase"', "either " + modifierPhases.join(", "), '"' + String(modifier.phase) + '"'));
-            }
-            break;
-          case "fn":
-            if (typeof modifier.fn !== "function") {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"fn"', '"function"', '"' + String(modifier.fn) + '"'));
-            }
-            break;
-          case "effect":
-            if (modifier.effect != null && typeof modifier.effect !== "function") {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"effect"', '"function"', '"' + String(modifier.fn) + '"'));
-            }
-            break;
-          case "requires":
-            if (modifier.requires != null && !Array.isArray(modifier.requires)) {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"requires"', '"array"', '"' + String(modifier.requires) + '"'));
-            }
-            break;
-          case "requiresIfExists":
-            if (!Array.isArray(modifier.requiresIfExists)) {
-              console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"requiresIfExists"', '"array"', '"' + String(modifier.requiresIfExists) + '"'));
-            }
-            break;
-          case "options":
-          case "data":
-            break;
-          default:
-            console.error('PopperJS: an invalid property has been provided to the "' + modifier.name + '" modifier, valid properties are ' + VALID_PROPERTIES.map(function(s) {
-              return '"' + s + '"';
-            }).join(", ") + '; but "' + key + '" was provided.');
-        }
-        modifier.requires && modifier.requires.forEach(function(requirement) {
-          if (modifiers.find(function(mod) {
-            return mod.name === requirement;
-          }) == null) {
-            console.error(format(MISSING_DEPENDENCY_ERROR, String(modifier.name), requirement, requirement));
-          }
-        });
-      });
-    });
-  }
-
-  // node_modules/@popperjs/core/lib/utils/uniqueBy.js
-  function uniqueBy(arr, fn2) {
-    var identifiers = /* @__PURE__ */ new Set();
-    return arr.filter(function(item) {
-      var identifier = fn2(item);
-      if (!identifiers.has(identifier)) {
-        identifiers.add(identifier);
-        return true;
-      }
-    });
-  }
-
   // node_modules/@popperjs/core/lib/utils/mergeByName.js
   function mergeByName(modifiers) {
     var merged = modifiers.reduce(function(merged2, current) {
@@ -16117,8 +15909,6 @@
   }
 
   // node_modules/@popperjs/core/lib/createPopper.js
-  var INVALID_ELEMENT_ERROR = "Popper: Invalid reference or popper argument provided. They must be either a DOM element or virtual element.";
-  var INFINITE_LOOP_ERROR = "Popper: An infinite loop in the modifiers cycle has been detected! The cycle has been interrupted to prevent a browser crash.";
   var DEFAULT_OPTIONS = {
     placement: "bottom",
     modifiers: [],
@@ -16169,28 +15959,6 @@
           state.orderedModifiers = orderedModifiers.filter(function(m) {
             return m.enabled;
           });
-          if (true) {
-            var modifiers = uniqueBy([].concat(orderedModifiers, state.options.modifiers), function(_ref) {
-              var name = _ref.name;
-              return name;
-            });
-            validateModifiers(modifiers);
-            if (getBasePlacement(state.options.placement) === auto) {
-              var flipModifier = state.orderedModifiers.find(function(_ref2) {
-                var name = _ref2.name;
-                return name === "flip";
-              });
-              if (!flipModifier) {
-                console.error(['Popper: "auto" placements require the "flip" modifier be', "present and enabled to work."].join(" "));
-              }
-            }
-            var _getComputedStyle = getComputedStyle3(popper2), marginTop = _getComputedStyle.marginTop, marginRight = _getComputedStyle.marginRight, marginBottom = _getComputedStyle.marginBottom, marginLeft = _getComputedStyle.marginLeft;
-            if ([marginTop, marginRight, marginBottom, marginLeft].some(function(margin) {
-              return parseFloat(margin);
-            })) {
-              console.warn(['Popper: CSS "margin" styles cannot be used to apply padding', "between the popper and its reference element or boundary.", "To replicate margin, use the `offset` modifier, as well as", "the `padding` option in the `preventOverflow` and `flip`", "modifiers."].join(" "));
-            }
-          }
           runModifierEffects();
           return instance.update();
         },
@@ -16205,9 +15973,6 @@
           }
           var _state$elements = state.elements, reference3 = _state$elements.reference, popper3 = _state$elements.popper;
           if (!areValidElements(reference3, popper3)) {
-            if (true) {
-              console.error(INVALID_ELEMENT_ERROR);
-            }
             return;
           }
           state.rects = {
@@ -16219,15 +15984,7 @@
           state.orderedModifiers.forEach(function(modifier) {
             return state.modifiersData[modifier.name] = Object.assign({}, modifier.data);
           });
-          var __debug_loops__ = 0;
           for (var index = 0; index < state.orderedModifiers.length; index++) {
-            if (true) {
-              __debug_loops__ += 1;
-              if (__debug_loops__ > 100) {
-                console.error(INFINITE_LOOP_ERROR);
-                break;
-              }
-            }
             if (state.reset === true) {
               state.reset = false;
               index = -1;
@@ -16258,9 +16015,6 @@
         }
       };
       if (!areValidElements(reference2, popper2)) {
-        if (true) {
-          console.error(INVALID_ELEMENT_ERROR);
-        }
         return instance;
       }
       instance.setOptions(options).then(function(state2) {
@@ -16269,8 +16023,8 @@
         }
       });
       function runModifierEffects() {
-        state.orderedModifiers.forEach(function(_ref3) {
-          var name = _ref3.name, _ref3$options = _ref3.options, options2 = _ref3$options === void 0 ? {} : _ref3$options, effect4 = _ref3.effect;
+        state.orderedModifiers.forEach(function(_ref) {
+          var name = _ref.name, _ref$options = _ref.options, options2 = _ref$options === void 0 ? {} : _ref$options, effect4 = _ref.effect;
           if (typeof effect4 === "function") {
             var cleanupFn = effect4({
               state,
@@ -16308,9 +16062,45 @@
   });
 
   // node_modules/bootstrap/dist/js/bootstrap.esm.js
+  var elementMap = /* @__PURE__ */ new Map();
+  var Data = {
+    set(element, key, instance) {
+      if (!elementMap.has(element)) {
+        elementMap.set(element, /* @__PURE__ */ new Map());
+      }
+      const instanceMap = elementMap.get(element);
+      if (!instanceMap.has(key) && instanceMap.size !== 0) {
+        console.error(`Bootstrap doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
+        return;
+      }
+      instanceMap.set(key, instance);
+    },
+    get(element, key) {
+      if (elementMap.has(element)) {
+        return elementMap.get(element).get(key) || null;
+      }
+      return null;
+    },
+    remove(element, key) {
+      if (!elementMap.has(element)) {
+        return;
+      }
+      const instanceMap = elementMap.get(element);
+      instanceMap.delete(key);
+      if (instanceMap.size === 0) {
+        elementMap.delete(element);
+      }
+    }
+  };
   var MAX_UID = 1e6;
   var MILLISECONDS_MULTIPLIER = 1e3;
   var TRANSITION_END = "transitionend";
+  var parseSelector = (selector) => {
+    if (selector && window.CSS && window.CSS.escape) {
+      selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
+    }
+    return selector;
+  };
   var toType = (object) => {
     if (object === null || object === void 0) {
       return `${object}`;
@@ -16322,31 +16112,6 @@
       prefix += Math.floor(Math.random() * MAX_UID);
     } while (document.getElementById(prefix));
     return prefix;
-  };
-  var getSelector = (element) => {
-    let selector = element.getAttribute("data-bs-target");
-    if (!selector || selector === "#") {
-      let hrefAttribute = element.getAttribute("href");
-      if (!hrefAttribute || !hrefAttribute.includes("#") && !hrefAttribute.startsWith(".")) {
-        return null;
-      }
-      if (hrefAttribute.includes("#") && !hrefAttribute.startsWith("#")) {
-        hrefAttribute = `#${hrefAttribute.split("#")[1]}`;
-      }
-      selector = hrefAttribute && hrefAttribute !== "#" ? hrefAttribute.trim() : null;
-    }
-    return selector;
-  };
-  var getSelectorFromElement = (element) => {
-    const selector = getSelector(element);
-    if (selector) {
-      return document.querySelector(selector) ? selector : null;
-    }
-    return null;
-  };
-  var getElementFromSelector = (element) => {
-    const selector = getSelector(element);
-    return selector ? document.querySelector(selector) : null;
   };
   var getTransitionDurationFromElement = (element) => {
     if (!element) {
@@ -16382,7 +16147,7 @@
       return object.jquery ? object[0] : object;
     }
     if (typeof object === "string" && object.length > 0) {
-      return document.querySelector(object);
+      return document.querySelector(parseSelector(object));
     }
     return null;
   };
@@ -16476,10 +16241,8 @@
       }
     });
   };
-  var execute = (callback) => {
-    if (typeof callback === "function") {
-      callback();
-    }
+  var execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
+    return typeof possibleCallback === "function" ? possibleCallback(...args) : defaultValue;
   };
   var executeAfterTransition = (callback, transitionElement, waitForTransition = true) => {
     if (!waitForTransition) {
@@ -16622,9 +16385,8 @@
   }
   function removeNamespacedHandlers(element, events, typeEvent, namespace) {
     const storeElementEvent = events[typeEvent] || {};
-    for (const handlerKey of Object.keys(storeElementEvent)) {
+    for (const [handlerKey, event] of Object.entries(storeElementEvent)) {
       if (handlerKey.includes(namespace)) {
-        const event = storeElementEvent[handlerKey];
         removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
       }
     }
@@ -16661,10 +16423,9 @@
           removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
         }
       }
-      for (const keyHandlers of Object.keys(storeElementEvent)) {
+      for (const [keyHandlers, event] of Object.entries(storeElementEvent)) {
         const handlerKey = keyHandlers.replace(stripUidRegex, "");
         if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
-          const event = storeElementEvent[keyHandlers];
           removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
         }
       }
@@ -16687,11 +16448,10 @@
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
       }
-      let evt = new Event(event, {
+      const evt = hydrateObj(new Event(event, {
         bubbles,
         cancelable: true
-      });
-      evt = hydrateObj(evt, args);
+      }), args);
       if (defaultPrevented) {
         evt.preventDefault();
       }
@@ -16704,8 +16464,8 @@
       return evt;
     }
   };
-  function hydrateObj(obj, meta) {
-    for (const [key, value] of Object.entries(meta || {})) {
+  function hydrateObj(obj, meta = {}) {
+    for (const [key, value] of Object.entries(meta)) {
       try {
         obj[key] = value;
       } catch (_unused) {
@@ -16719,36 +16479,6 @@
     }
     return obj;
   }
-  var elementMap = /* @__PURE__ */ new Map();
-  var Data = {
-    set(element, key, instance) {
-      if (!elementMap.has(element)) {
-        elementMap.set(element, /* @__PURE__ */ new Map());
-      }
-      const instanceMap = elementMap.get(element);
-      if (!instanceMap.has(key) && instanceMap.size !== 0) {
-        console.error(`Bootstrap doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
-        return;
-      }
-      instanceMap.set(key, instance);
-    },
-    get(element, key) {
-      if (elementMap.has(element)) {
-        return elementMap.get(element).get(key) || null;
-      }
-      return null;
-    },
-    remove(element, key) {
-      if (!elementMap.has(element)) {
-        return;
-      }
-      const instanceMap = elementMap.get(element);
-      instanceMap.delete(key);
-      if (instanceMap.size === 0) {
-        elementMap.delete(element);
-      }
-    }
-  };
   function normalizeData(value) {
     if (value === "true") {
       return true;
@@ -16828,8 +16558,7 @@
       };
     }
     _typeCheckConfig(config, configTypes = this.constructor.DefaultType) {
-      for (const property of Object.keys(configTypes)) {
-        const expectedTypes = configTypes[property];
+      for (const [property, expectedTypes] of Object.entries(configTypes)) {
         const value = config[property];
         const valueType = isElement2(value) ? "element" : toType(value);
         if (!new RegExp(expectedTypes).test(valueType)) {
@@ -16838,7 +16567,7 @@
       }
     }
   };
-  var VERSION = "5.2.3";
+  var VERSION = "5.3.0";
   var BaseComponent = class extends Config {
     constructor(element, config) {
       super();
@@ -16887,6 +16616,80 @@
       return `${name}${this.EVENT_KEY}`;
     }
   };
+  var getSelector = (element) => {
+    let selector = element.getAttribute("data-bs-target");
+    if (!selector || selector === "#") {
+      let hrefAttribute = element.getAttribute("href");
+      if (!hrefAttribute || !hrefAttribute.includes("#") && !hrefAttribute.startsWith(".")) {
+        return null;
+      }
+      if (hrefAttribute.includes("#") && !hrefAttribute.startsWith("#")) {
+        hrefAttribute = `#${hrefAttribute.split("#")[1]}`;
+      }
+      selector = hrefAttribute && hrefAttribute !== "#" ? hrefAttribute.trim() : null;
+    }
+    return parseSelector(selector);
+  };
+  var SelectorEngine = {
+    find(selector, element = document.documentElement) {
+      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
+    },
+    findOne(selector, element = document.documentElement) {
+      return Element.prototype.querySelector.call(element, selector);
+    },
+    children(element, selector) {
+      return [].concat(...element.children).filter((child) => child.matches(selector));
+    },
+    parents(element, selector) {
+      const parents = [];
+      let ancestor = element.parentNode.closest(selector);
+      while (ancestor) {
+        parents.push(ancestor);
+        ancestor = ancestor.parentNode.closest(selector);
+      }
+      return parents;
+    },
+    prev(element, selector) {
+      let previous = element.previousElementSibling;
+      while (previous) {
+        if (previous.matches(selector)) {
+          return [previous];
+        }
+        previous = previous.previousElementSibling;
+      }
+      return [];
+    },
+    // TODO: this is now unused; remove later along with prev()
+    next(element, selector) {
+      let next = element.nextElementSibling;
+      while (next) {
+        if (next.matches(selector)) {
+          return [next];
+        }
+        next = next.nextElementSibling;
+      }
+      return [];
+    },
+    focusableChildren(element) {
+      const focusables = ["a", "button", "input", "textarea", "select", "details", "[tabindex]", '[contenteditable="true"]'].map((selector) => `${selector}:not([tabindex^="-"])`).join(",");
+      return this.find(focusables, element).filter((el) => !isDisabled(el) && isVisible(el));
+    },
+    getSelectorFromElement(element) {
+      const selector = getSelector(element);
+      if (selector) {
+        return SelectorEngine.findOne(selector) ? selector : null;
+      }
+      return null;
+    },
+    getElementFromSelector(element) {
+      const selector = getSelector(element);
+      return selector ? SelectorEngine.findOne(selector) : null;
+    },
+    getMultipleElementsFromSelector(element) {
+      const selector = getSelector(element);
+      return selector ? SelectorEngine.find(selector) : [];
+    }
+  };
   var enableDismissTrigger = (component, method = "hide") => {
     const clickEvent = `click.dismiss${component.EVENT_KEY}`;
     const name = component.NAME;
@@ -16897,7 +16700,7 @@
       if (isDisabled(this)) {
         return;
       }
-      const target = getElementFromSelector(this) || this.closest(`.${name}`);
+      const target = SelectorEngine.getElementFromSelector(this) || this.closest(`.${name}`);
       const instance = component.getOrCreateInstance(target);
       instance[method]();
     });
@@ -16979,51 +16782,6 @@
     data.toggle();
   });
   defineJQueryPlugin(Button);
-  var SelectorEngine = {
-    find(selector, element = document.documentElement) {
-      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
-    },
-    findOne(selector, element = document.documentElement) {
-      return Element.prototype.querySelector.call(element, selector);
-    },
-    children(element, selector) {
-      return [].concat(...element.children).filter((child) => child.matches(selector));
-    },
-    parents(element, selector) {
-      const parents = [];
-      let ancestor = element.parentNode.closest(selector);
-      while (ancestor) {
-        parents.push(ancestor);
-        ancestor = ancestor.parentNode.closest(selector);
-      }
-      return parents;
-    },
-    prev(element, selector) {
-      let previous = element.previousElementSibling;
-      while (previous) {
-        if (previous.matches(selector)) {
-          return [previous];
-        }
-        previous = previous.previousElementSibling;
-      }
-      return [];
-    },
-    // TODO: this is now unused; remove later along with prev()
-    next(element, selector) {
-      let next = element.nextElementSibling;
-      while (next) {
-        if (next.matches(selector)) {
-          return [next];
-        }
-        next = next.nextElementSibling;
-      }
-      return [];
-    },
-    focusableChildren(element) {
-      const focusables = ["a", "button", "input", "textarea", "select", "details", "[tabindex]", '[contenteditable="true"]'].map((selector) => `${selector}:not([tabindex^="-"])`).join(",");
-      return this.find(focusables, element).filter((el) => !isDisabled(el) && isVisible(el));
-    }
-  };
   var NAME$d = "swipe";
   var EVENT_KEY$9 = ".bs.swipe";
   var EVENT_TOUCHSTART = `touchstart${EVENT_KEY$9}`;
@@ -17421,7 +17179,7 @@
     }
   };
   EventHandler.on(document, EVENT_CLICK_DATA_API$5, SELECTOR_DATA_SLIDE, function(event) {
-    const target = getElementFromSelector(this);
+    const target = SelectorEngine.getElementFromSelector(this);
     if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
       return;
     }
@@ -17482,7 +17240,7 @@
       this._triggerArray = [];
       const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$4);
       for (const elem of toggleList) {
-        const selector = getSelectorFromElement(elem);
+        const selector = SelectorEngine.getSelectorFromElement(elem);
         const filterElement = SelectorEngine.find(selector).filter((foundElement) => foundElement === this._element);
         if (selector !== null && filterElement.length) {
           this._triggerArray.push(elem);
@@ -17566,7 +17324,7 @@
       this._element.classList.add(CLASS_NAME_COLLAPSING);
       this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$7);
       for (const trigger of this._triggerArray) {
-        const element = getElementFromSelector(trigger);
+        const element = SelectorEngine.getElementFromSelector(trigger);
         if (element && !this._isShown(element)) {
           this._addAriaAndCollapsedClass([trigger], false);
         }
@@ -17599,7 +17357,7 @@
       }
       const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$4);
       for (const element of children) {
-        const selected = getElementFromSelector(element);
+        const selected = SelectorEngine.getElementFromSelector(element);
         if (selected) {
           this._addAriaAndCollapsedClass([element], this._isShown(selected));
         }
@@ -17639,9 +17397,7 @@
     if (event.target.tagName === "A" || event.delegateTarget && event.delegateTarget.tagName === "A") {
       event.preventDefault();
     }
-    const selector = getSelectorFromElement(this);
-    const selectorElements = SelectorEngine.find(selector);
-    for (const element of selectorElements) {
+    for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
       Collapse.getOrCreateInstance(element, {
         toggle: false
       }).toggle();
@@ -17870,7 +17626,7 @@
       }
       return {
         ...defaultBsPopperConfig,
-        ...typeof this._config.popperConfig === "function" ? this._config.popperConfig(defaultBsPopperConfig) : this._config.popperConfig
+        ...execute(this._config.popperConfig, [defaultBsPopperConfig])
       };
     }
     _selectMenuItem({
@@ -17958,80 +17714,6 @@
     Dropdown.getOrCreateInstance(this).toggle();
   });
   defineJQueryPlugin(Dropdown);
-  var SELECTOR_FIXED_CONTENT = ".fixed-top, .fixed-bottom, .is-fixed, .sticky-top";
-  var SELECTOR_STICKY_CONTENT = ".sticky-top";
-  var PROPERTY_PADDING = "padding-right";
-  var PROPERTY_MARGIN = "margin-right";
-  var ScrollBarHelper = class {
-    constructor() {
-      this._element = document.body;
-    }
-    // Public
-    getWidth() {
-      const documentWidth = document.documentElement.clientWidth;
-      return Math.abs(window.innerWidth - documentWidth);
-    }
-    hide() {
-      const width = this.getWidth();
-      this._disableOverFlow();
-      this._setElementAttributes(this._element, PROPERTY_PADDING, (calculatedValue) => calculatedValue + width);
-      this._setElementAttributes(SELECTOR_FIXED_CONTENT, PROPERTY_PADDING, (calculatedValue) => calculatedValue + width);
-      this._setElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN, (calculatedValue) => calculatedValue - width);
-    }
-    reset() {
-      this._resetElementAttributes(this._element, "overflow");
-      this._resetElementAttributes(this._element, PROPERTY_PADDING);
-      this._resetElementAttributes(SELECTOR_FIXED_CONTENT, PROPERTY_PADDING);
-      this._resetElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN);
-    }
-    isOverflowing() {
-      return this.getWidth() > 0;
-    }
-    // Private
-    _disableOverFlow() {
-      this._saveInitialAttribute(this._element, "overflow");
-      this._element.style.overflow = "hidden";
-    }
-    _setElementAttributes(selector, styleProperty, callback) {
-      const scrollbarWidth = this.getWidth();
-      const manipulationCallBack = (element) => {
-        if (element !== this._element && window.innerWidth > element.clientWidth + scrollbarWidth) {
-          return;
-        }
-        this._saveInitialAttribute(element, styleProperty);
-        const calculatedValue = window.getComputedStyle(element).getPropertyValue(styleProperty);
-        element.style.setProperty(styleProperty, `${callback(Number.parseFloat(calculatedValue))}px`);
-      };
-      this._applyManipulationCallback(selector, manipulationCallBack);
-    }
-    _saveInitialAttribute(element, styleProperty) {
-      const actualValue = element.style.getPropertyValue(styleProperty);
-      if (actualValue) {
-        Manipulator.setDataAttribute(element, styleProperty, actualValue);
-      }
-    }
-    _resetElementAttributes(selector, styleProperty) {
-      const manipulationCallBack = (element) => {
-        const value = Manipulator.getDataAttribute(element, styleProperty);
-        if (value === null) {
-          element.style.removeProperty(styleProperty);
-          return;
-        }
-        Manipulator.removeDataAttribute(element, styleProperty);
-        element.style.setProperty(styleProperty, value);
-      };
-      this._applyManipulationCallback(selector, manipulationCallBack);
-    }
-    _applyManipulationCallback(selector, callBack) {
-      if (isElement2(selector)) {
-        callBack(selector);
-        return;
-      }
-      for (const sel of SelectorEngine.find(selector, this._element)) {
-        callBack(sel);
-      }
-    }
-  };
   var NAME$9 = "backdrop";
   var CLASS_NAME_FADE$4 = "fade";
   var CLASS_NAME_SHOW$5 = "show";
@@ -18213,6 +17895,80 @@
       this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
     }
   };
+  var SELECTOR_FIXED_CONTENT = ".fixed-top, .fixed-bottom, .is-fixed, .sticky-top";
+  var SELECTOR_STICKY_CONTENT = ".sticky-top";
+  var PROPERTY_PADDING = "padding-right";
+  var PROPERTY_MARGIN = "margin-right";
+  var ScrollBarHelper = class {
+    constructor() {
+      this._element = document.body;
+    }
+    // Public
+    getWidth() {
+      const documentWidth = document.documentElement.clientWidth;
+      return Math.abs(window.innerWidth - documentWidth);
+    }
+    hide() {
+      const width = this.getWidth();
+      this._disableOverFlow();
+      this._setElementAttributes(this._element, PROPERTY_PADDING, (calculatedValue) => calculatedValue + width);
+      this._setElementAttributes(SELECTOR_FIXED_CONTENT, PROPERTY_PADDING, (calculatedValue) => calculatedValue + width);
+      this._setElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN, (calculatedValue) => calculatedValue - width);
+    }
+    reset() {
+      this._resetElementAttributes(this._element, "overflow");
+      this._resetElementAttributes(this._element, PROPERTY_PADDING);
+      this._resetElementAttributes(SELECTOR_FIXED_CONTENT, PROPERTY_PADDING);
+      this._resetElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN);
+    }
+    isOverflowing() {
+      return this.getWidth() > 0;
+    }
+    // Private
+    _disableOverFlow() {
+      this._saveInitialAttribute(this._element, "overflow");
+      this._element.style.overflow = "hidden";
+    }
+    _setElementAttributes(selector, styleProperty, callback) {
+      const scrollbarWidth = this.getWidth();
+      const manipulationCallBack = (element) => {
+        if (element !== this._element && window.innerWidth > element.clientWidth + scrollbarWidth) {
+          return;
+        }
+        this._saveInitialAttribute(element, styleProperty);
+        const calculatedValue = window.getComputedStyle(element).getPropertyValue(styleProperty);
+        element.style.setProperty(styleProperty, `${callback(Number.parseFloat(calculatedValue))}px`);
+      };
+      this._applyManipulationCallback(selector, manipulationCallBack);
+    }
+    _saveInitialAttribute(element, styleProperty) {
+      const actualValue = element.style.getPropertyValue(styleProperty);
+      if (actualValue) {
+        Manipulator.setDataAttribute(element, styleProperty, actualValue);
+      }
+    }
+    _resetElementAttributes(selector, styleProperty) {
+      const manipulationCallBack = (element) => {
+        const value = Manipulator.getDataAttribute(element, styleProperty);
+        if (value === null) {
+          element.style.removeProperty(styleProperty);
+          return;
+        }
+        Manipulator.removeDataAttribute(element, styleProperty);
+        element.style.setProperty(styleProperty, value);
+      };
+      this._applyManipulationCallback(selector, manipulationCallBack);
+    }
+    _applyManipulationCallback(selector, callBack) {
+      if (isElement2(selector)) {
+        callBack(selector);
+        return;
+      }
+      for (const sel of SelectorEngine.find(selector, this._element)) {
+        callBack(sel);
+      }
+    }
+  };
   var NAME$7 = "modal";
   var DATA_KEY$4 = "bs.modal";
   var EVENT_KEY$4 = `.${DATA_KEY$4}`;
@@ -18303,9 +18059,8 @@
       this._queueCallback(() => this._hideModal(), this._element, this._isAnimated());
     }
     dispose() {
-      for (const htmlElement of [window, this._dialog]) {
-        EventHandler.off(htmlElement, EVENT_KEY$4);
-      }
+      EventHandler.off(window, EVENT_KEY$4);
+      EventHandler.off(this._dialog, EVENT_KEY$4);
       this._backdrop.dispose();
       this._focustrap.deactivate();
       super.dispose();
@@ -18358,7 +18113,6 @@
           return;
         }
         if (this._config.keyboard) {
-          event.preventDefault();
           this.hide();
           return;
         }
@@ -18457,7 +18211,7 @@
     }
   };
   EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, function(event) {
-    const target = getElementFromSelector(this);
+    const target = SelectorEngine.getElementFromSelector(this);
     if (["A", "AREA"].includes(this.tagName)) {
       event.preventDefault();
     }
@@ -18619,11 +18373,11 @@
         if (event.key !== ESCAPE_KEY) {
           return;
         }
-        if (!this._config.keyboard) {
-          EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED);
+        if (this._config.keyboard) {
+          this.hide();
           return;
         }
-        this.hide();
+        EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED);
       });
     }
     // Static
@@ -18641,7 +18395,7 @@
     }
   };
   EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function(event) {
-    const target = getElementFromSelector(this);
+    const target = SelectorEngine.getElementFromSelector(this);
     if (["A", "AREA"].includes(this.tagName)) {
       event.preventDefault();
     }
@@ -18674,20 +18428,7 @@
   });
   enableDismissTrigger(Offcanvas);
   defineJQueryPlugin(Offcanvas);
-  var uriAttributes = /* @__PURE__ */ new Set(["background", "cite", "href", "itemtype", "longdesc", "poster", "src", "xlink:href"]);
   var ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i;
-  var SAFE_URL_PATTERN = /^(?:(?:https?|mailto|ftp|tel|file|sms):|[^#&/:?]*(?:[#/?]|$))/i;
-  var DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[\d+/a-z]+=*$/i;
-  var allowedAttribute = (attribute, allowedAttributeList) => {
-    const attributeName = attribute.nodeName.toLowerCase();
-    if (allowedAttributeList.includes(attributeName)) {
-      if (uriAttributes.has(attributeName)) {
-        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue) || DATA_URL_PATTERN.test(attribute.nodeValue));
-      }
-      return true;
-    }
-    return allowedAttributeList.filter((attributeRegex) => attributeRegex instanceof RegExp).some((regex) => regex.test(attributeName));
-  };
   var DefaultAllowlist = {
     // Global attributes allowed on any supplied element below.
     "*": ["class", "dir", "id", "lang", "role", ARIA_ATTRIBUTE_PATTERN],
@@ -18720,6 +18461,18 @@
     strong: [],
     u: [],
     ul: []
+  };
+  var uriAttributes = /* @__PURE__ */ new Set(["background", "cite", "href", "itemtype", "longdesc", "poster", "src", "xlink:href"]);
+  var SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+  var allowedAttribute = (attribute, allowedAttributeList) => {
+    const attributeName = attribute.nodeName.toLowerCase();
+    if (allowedAttributeList.includes(attributeName)) {
+      if (uriAttributes.has(attributeName)) {
+        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
+      }
+      return true;
+    }
+    return allowedAttributeList.filter((attributeRegex) => attributeRegex instanceof RegExp).some((regex) => regex.test(attributeName));
   };
   function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
     if (!unsafeHtml.length) {
@@ -18851,7 +18604,7 @@
       return this._config.sanitize ? sanitizeHtml(arg, this._config.allowList, this._config.sanitizeFn) : arg;
     }
     _resolvePossibleFunction(arg) {
-      return typeof arg === "function" ? arg(this) : arg;
+      return execute(arg, [this]);
     }
     _putElementInTemplate(element, templateElement) {
       if (this._config.html) {
@@ -18900,7 +18653,7 @@
     delay: 0,
     fallbackPlacements: ["top", "right", "bottom", "left"],
     html: false,
-    offset: [0, 0],
+    offset: [0, 6],
     placement: "top",
     popperConfig: null,
     sanitize: true,
@@ -19127,7 +18880,7 @@
       return this.tip && this.tip.classList.contains(CLASS_NAME_SHOW$2);
     }
     _createPopper(tip) {
-      const placement = typeof this._config.placement === "function" ? this._config.placement.call(this, tip, this._element) : this._config.placement;
+      const placement = execute(this._config.placement, [this, tip, this._element]);
       const attachment = AttachmentMap[placement.toUpperCase()];
       return createPopper3(this._element, tip, this._getPopperConfig(attachment));
     }
@@ -19144,7 +18897,7 @@
       return offset2;
     }
     _resolvePossibleFunction(arg) {
-      return typeof arg === "function" ? arg.call(this._element) : arg;
+      return execute(arg, [this._element]);
     }
     _getPopperConfig(attachment) {
       const defaultBsPopperConfig = {
@@ -19180,7 +18933,7 @@
       };
       return {
         ...defaultBsPopperConfig,
-        ...typeof this._config.popperConfig === "function" ? this._config.popperConfig(defaultBsPopperConfig) : this._config.popperConfig
+        ...execute(this._config.popperConfig, [defaultBsPopperConfig])
       };
     }
     _setListeners() {
@@ -19288,9 +19041,9 @@
     }
     _getDelegateConfig() {
       const config = {};
-      for (const key in this._config) {
-        if (this.constructor.Default[key] !== this._config[key]) {
-          config[key] = this._config[key];
+      for (const [key, value] of Object.entries(this._config)) {
+        if (this.constructor.Default[key] !== value) {
+          config[key] = value;
         }
       }
       config.selector = false;
@@ -19528,9 +19281,9 @@
         if (!anchor.hash || isDisabled(anchor)) {
           continue;
         }
-        const observableSection = SelectorEngine.findOne(anchor.hash, this._element);
+        const observableSection = SelectorEngine.findOne(decodeURI(anchor.hash), this._element);
         if (isVisible(observableSection)) {
-          this._targetLinks.set(anchor.hash, anchor);
+          this._targetLinks.set(decodeURI(anchor.hash), anchor);
           this._observableSections.set(anchor.hash, observableSection);
         }
       }
@@ -19651,7 +19404,7 @@
         return;
       }
       element.classList.add(CLASS_NAME_ACTIVE);
-      this._activate(getElementFromSelector(element));
+      this._activate(SelectorEngine.getElementFromSelector(element));
       const complete = () => {
         if (element.getAttribute("role") !== "tab") {
           element.classList.add(CLASS_NAME_SHOW$1);
@@ -19672,7 +19425,7 @@
       }
       element.classList.remove(CLASS_NAME_ACTIVE);
       element.blur();
-      this._deactivate(getElementFromSelector(element));
+      this._deactivate(SelectorEngine.getElementFromSelector(element));
       const complete = () => {
         if (element.getAttribute("role") !== "tab") {
           element.classList.remove(CLASS_NAME_SHOW$1);
@@ -19729,13 +19482,13 @@
       this._setInitialAttributesOnTargetPanel(child);
     }
     _setInitialAttributesOnTargetPanel(child) {
-      const target = getElementFromSelector(child);
+      const target = SelectorEngine.getElementFromSelector(child);
       if (!target) {
         return;
       }
       this._setAttributeIfNotExists(target, "role", "tabpanel");
       if (child.id) {
-        this._setAttributeIfNotExists(target, "aria-labelledby", `#${child.id}`);
+        this._setAttributeIfNotExists(target, "aria-labelledby", `${child.id}`);
       }
     }
     _toggleDropDown(element, open) {
@@ -22387,30 +22140,27 @@
 
 jquery/dist/jquery.js:
   (*!
-   * jQuery JavaScript Library v3.6.4
+   * jQuery JavaScript Library v3.7.0
    * https://jquery.com/
-   *
-   * Includes Sizzle.js
-   * https://sizzlejs.com/
    *
    * Copyright OpenJS Foundation and other contributors
    * Released under the MIT license
    * https://jquery.org/license
    *
-   * Date: 2023-03-08T15:28Z
+   * Date: 2023-05-11T18:29Z
    *)
 
 bootstrap-datepicker/dist/js/bootstrap-datepicker.js:
   (*!
-   * Datepicker for Bootstrap v1.9.0 (https://github.com/uxsolutions/bootstrap-datepicker)
+   * Datepicker for Bootstrap v1.10.0 (https://github.com/uxsolutions/bootstrap-datepicker)
    *
-   * Licensed under the Apache License v2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+   * Licensed under the Apache License v2.0 (https://www.apache.org/licenses/LICENSE-2.0)
    *)
 
 bootstrap/dist/js/bootstrap.esm.js:
   (*!
-    * Bootstrap v5.2.3 (https://getbootstrap.com/)
-    * Copyright 2011-2022 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+    * Bootstrap v5.3.0 (https://getbootstrap.com/)
+    * Copyright 2011-2023 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
     * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
     *)
 */
