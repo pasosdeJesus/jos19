@@ -233,8 +233,10 @@ module Jos19
               "   JOIN msip_persona AS p2 ON p1.id < p2.id "\
               "   JOIN msip_tdocumento AS t1 ON p1.tdocumento_id=t1.id "\
               "   JOIN msip_tdocumento AS t2 ON p2.tdocumento_id=t2.id " \
-              "   WHERE soundexespm(p1.nombres)=soundexespm(p2.nombres) AND "\
-              "   soundexespm(p1.apellidos)=soundexespm(p2.apellidos) " + 
+              "   WHERE p1.nombres<>'N' AND p1.apellidos<>'N' "\
+              "   AND p2.nombres<>'N' AND p2.apellidos<>'N' "\
+              "   AND soundexespm(p1.nombres)=soundexespm(p2.nombres) "\
+              "   AND soundexespm(p1.apellidos)=soundexespm(p2.apellidos) " + 
               sinhom +
               "   ORDER BY p1.nombres, p1.apellidos, p2.nombres, p2.apellidos"
             @idrep = ActiveRecord::Base.connection.select_all(rep) 
