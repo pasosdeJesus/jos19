@@ -591,7 +591,6 @@ module Jos19
                 return [menserror, nil]
               end
 
-              debugger
               ep = Msip::EtiquetaPersona.new(
                 persona_id: p1.id,
                 etiqueta_id: eunif.id,
