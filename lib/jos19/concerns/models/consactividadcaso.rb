@@ -129,28 +129,6 @@ module Jos19
 
         module ClassMethods
 
-          def interpreta_ordenar_por(campo)
-            critord = ""
-            case campo.to_s
-            when /^fechadesc/
-              critord = "conscaso.fecha desc"
-            when /^fecha/
-              critord = "conscaso.fecha asc"
-            when /^ubicaciondesc/
-              critord = "conscaso.ubicaciones desc"
-            when /^ubicacion/
-              critord = "conscaso.ubicaciones asc"
-            when /^codigodesc/
-              critord = "conscaso.caso_id desc"
-            when /^codigo/
-              critord = "conscaso.caso_id asc"
-            else
-              raise(ArgumentError, "Ordenamiento invalido: #{ campo.inspect }")
-            end
-            critord += ", conscaso.caso_id"
-            return critord
-          end
-
           def consulta
             "SELECT row_number() over () AS id,
         caso.id AS caso_id, 
@@ -186,7 +164,7 @@ module Jos19
         INNER JOIN sivel2_gen_victima AS victima 
           ON victima.persona_id=persona.id
         INNER JOIN sivel2_gen_caso AS caso ON victima.caso_id=caso.id
-        INNER JOIN jos19_casosjr AS casosjr ON caso.id=casosjr.caso_id
+        INNER JOIN sivel2_sjr_casosjr AS casosjr ON caso.id=casosjr.caso_id
             "
           end
 
@@ -207,10 +185,10 @@ module Jos19
               #{self.consulta}
               #{w} ;"
             ActiveRecord::Base.connection.execute(c)
-          end # def crea_consulta
+          end #def crea_consulta
 
 
-          def self.refresca_consulta(ordenar_por = nil)
+          def refresca_consulta(ordenar_por = nil)
             if !ActiveRecord::Base.connection.data_source_exists?(
                 'jos19_consactividadcaso')
               crea_consulta(ordenar_por = nil)
@@ -243,69 +221,6 @@ module Jos19
             return critord
           end
 
-
-          def consulta
-            "SELECT cast(actividad_id AS BIGINT)*50000 + persona.id AS id,
-              casosjr_id AS caso_id, 
-              actividad_id,
-              victima.id AS victima_id,
-              CASE WHEN casosjr.contacto_id=persona.id THEN 1 ELSE 0 END 
-                AS es_contacto,
-              actividad.fecha AS actividad_fecha,
-              (SELECT nombre FROM msip_oficina 
-                WHERE msip_oficina.id=actividad.oficina_id LIMIT 1) 
-                AS actividad_oficina,
-              (SELECT nusuario FROM usuario 
-                WHERE usuario.id=actividad.usuario_id LIMIT 1)
-                AS actividad_responsable,
-              ARRAY_TO_STRING(ARRAY(SELECT nombre FROM cor1440_gen_proyectofinanciero
-                WHERE cor1440_gen_proyectofinanciero.id IN
-                (SELECT proyectofinanciero_id FROM cor1440_gen_actividad_proyectofinanciero AS apf WHERE apf.actividad_id=actividad.id)), ',') 
-                AS actividad_convenios,
-              persona.id AS persona_id,
-              persona.nombres AS persona_nombres,
-              persona.apellidos AS persona_apellidos,
-              caso.memo AS caso_memo,
-              casosjr.fecharec AS caso_fecharec
-              FROM public.jos19_actividad_casosjr AS ac
-              INNER JOIN cor1440_gen_actividad AS actividad 
-                ON actividad_id=actividad.id
-              INNER JOIN msip_oficina AS oficinaac 
-                ON oficinaac.id=actividad.oficina_id
-              INNER JOIN sivel2_gen_caso AS caso ON caso.id=casosjr_id
-              INNER JOIN jos19_casosjr AS casosjr ON casosjr.caso_id=casosjr_id
-              INNER JOIN sivel2_gen_victima AS victima ON victima.caso_id=caso.id
-              INNER JOIN msip_persona AS persona ON persona.id=victima.persona_id
-              "
-          end
-
-
-          def crea_consulta(ordenar_por = nil)
-            if ARGV.include?("db:migrate")
-              return
-            end
-            if ActiveRecord::Base.connection.data_source_exists? 'jos19_consactividadcaso'
-              ActiveRecord::Base.connection.execute(
-                "DROP MATERIALIZED VIEW IF EXISTS jos19_consactividadcaso")
-            end
-            if ordenar_por
-              w += ' ORDER BY ' + self.interpreta_ordenar_por(ordenar_por)
-            end
-            c = "CREATE 
-              MATERIALIZED VIEW jos19_consactividadcaso AS
-              #{self.consulta}
-              #{w} ;"
-            ActiveRecord::Base.connection.execute(c)
-          end # def crea_consulta
-
-          def refresca_consulta(ordenar_por = nil)
-            if !ActiveRecord::Base.connection.data_source_exists? 'jos19_consactividadcaso'
-              crea_consulta(ordenar_por = nil)
-            else
-              ActiveRecord::Base.connection.execute(
-                "REFRESH MATERIALIZED VIEW jos19_consactividadcaso")
-            end
-          end
 
         end # module ClassMethods
 
