@@ -6,11 +6,6 @@ Jos19::Engine.routes.draw do
   get '/consactividadcaso' => 'consactividadcaso#index', 
     as: :consactividadcaso
 
-  post '/personas/unificar' => 'msip/personas#unificar',
-    as: :personas_unificar
-  get '/personas/unificar' => 'msip/personas#unificar',
-    as: :personas_unificar_get
-
   namespace :admin do
     ab=::Ability.new
     ab.tablasbasicas.each do |t|
