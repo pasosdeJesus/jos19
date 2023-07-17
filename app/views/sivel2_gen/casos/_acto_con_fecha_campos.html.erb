@@ -1,0 +1,68 @@
+<%= turbo_frame_tag "acto_#{f.index}", class: 'div-tabla-fila nested-fields' do %>
+  <!--%= f.simple_fields_for :acto do |ac| %-->
+    <div class="div-tabla-celda">
+      <%= f.association :presponsable,
+        collection: Sivel2Gen::Presponsable.habilitados,
+        label_method: :presenta_nombre,
+        value_method: :id,
+        readonly: true,
+        multiple: true,
+        selected:  f.object.presponsable_id,
+        wrapper_html: {style: "width: 12em"},
+        label: false
+        %>
+    </div>
+    <div class="div-tabla-celda">
+    <%= f.association :categoria,
+      collection: Sivel2Gen::Categoria.from(
+        'sivel2_gen_categoria, sivel2_gen_supracategoria').where(
+          "sivel2_gen_categoria.supracategoria_id=sivel2_gen_supracategoria.id"\
+          " AND sivel2_gen_categoria.fechadeshabilitacion IS NULL"\
+          " AND sivel2_gen_categoria.tipocat = 'I'"
+        ).order(
+          'sivel2_gen_supracategoria.tviolencia_id', :id
+        ),
+        label_method: lambda {|t| 
+          t.supracategoria.tviolencia_id + t.id.to_s + ' ' + t.nombre 
+        },
+        value_method: :id,
+        readonly: true,
+        selected:  f.object.categoria_id,
+        wrapper_html: {style: "width: 12em"},
+        label: false %>
+    </div>
+    <div class="div-tabla-celda">
+      <% numcaso = @caso && @caso.id ? @caso.id : params[:caso][:id].to_i %>
+      <%= f.association :persona,
+        collection: Msip::Persona.where(
+          'id IN (SELECT persona_id FROM sivel2_gen_victima '\
+          'WHERE caso_id=?)', numcaso
+        ),
+        label_method: :presenta_nombre,
+        value_method: :id,
+        readonly: true,
+        selected:  f.object.persona_id,
+        wrapper_html: {style: "width: 12em"},
+        label: false
+      %>
+    </div>
+    <div class="div-tabla-celda">
+      <%= f.input :fecha, 
+        :input_html => { type: "date" },
+        label: false,
+        :as => :string %>
+    </div>
+    <div class="div-tabla-celda">
+      <%= f.submit "Eliminar", 
+        formaction: main_app.eliminar_acto_path(
+          id: f.object.id, index: f.index),
+          formmethod: :delete, 
+          formnovalidate: true, 
+          class: 'btn btn-sm btn-danger',
+          data: { 
+            turbo_frame: "acto_#{f.index}",
+            disable_with: false
+          } %>
+    </div>
+  <!--% end %-->
+<% end %>

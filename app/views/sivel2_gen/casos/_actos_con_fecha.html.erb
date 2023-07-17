@@ -1,0 +1,29 @@
+
+<div id="actos" class="panel-body table-responsive" >
+  <div class="div-tabla"> 
+    <div id="actos_marco" class="div-tabla-cuerpo">
+      <div class="div-tabla-fila"> 
+        <div class="div-tabla-celda">Presunto Responsable</div>
+        <div class="div-tabla-celda">Categoría</div>
+        <div class="div-tabla-celda">Víctima</div>
+        <div class="div-tabla-celda">Fecha</div>
+        <div class="div-tabla-celda"><%=t '.actions', :default => t("helpers.actions") %></div>
+      </div>
+      <%= f.simple_fields_for :acto do |op| %>
+        <%= render partial: 'sivel2_gen/casos/acto_con_fecha_campos', 
+          locals: {f: op} %>
+      <% end %>
+    </div>
+  </div>
+  <div class="enlace-agregar-acto">
+    <%= f.submit "Agregar #{Sivel2Gen::Acto.human_attribute_name(:Acto)}",
+      formaction: main_app.crear_acto_path(index: @caso.acto.size),
+      formmethod: :post,
+      formnovalidate: true,
+      class: 'btn btn-sm btn-primary',
+      name: "agregar-acto",
+      id: "agregar-acto", 
+      data:  {
+        disable_with: false } %>
+  </div>
+</div>
