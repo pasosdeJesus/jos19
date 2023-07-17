@@ -2,7 +2,7 @@
   <% numcaso = @caso && @caso.id ? @caso.id : params[:caso][:id].to_i %>
   <div class="div-tabla-celda">
     <%= f.association :presponsable,
-      collection: Sivel2Gen::Presponsable.habilitado.where(
+      collection: Sivel2Gen::Presponsable.habilitados.where(
         'id IN (SELECT presponsable_id FROM sivel2_gen_caso_presponsable '\
         'WHERE caso_id=?)', numcaso
       ),
