@@ -9,7 +9,7 @@
         <div class="div-tabla-celda">Fecha</div>
         <div class="div-tabla-celda"><%=t '.actions', :default => t("helpers.actions") %></div>
       </div>
-      <%= f.simple_fields_for :acto do |op| %>
+      <%= f.simple_fields_for :acto. f.object.acto.order(:fecha) do |op| %>
         <%= render partial: 'sivel2_gen/casos/acto_con_fecha_campos', 
           locals: {f: op} %>
       <% end %>
