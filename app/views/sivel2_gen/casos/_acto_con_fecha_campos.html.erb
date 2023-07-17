@@ -6,7 +6,6 @@
         'id IN (SELECT presponsable_id FROM sivel2_gen_caso_presponsable '\
         'WHERE caso_id=?)', numcaso
       ),
-      Sivel2Gen::Presponsable.habilitados,
       label_method: :presenta_nombre,
       value_method: :id,
       readonly: true,
