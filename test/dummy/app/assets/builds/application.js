@@ -16567,7 +16567,7 @@
       }
     }
   };
-  var VERSION = "5.3.0";
+  var VERSION = "5.3.1";
   var BaseComponent = class extends Config {
     constructor(element, config) {
       super();
@@ -19352,6 +19352,8 @@
   var ARROW_RIGHT_KEY = "ArrowRight";
   var ARROW_UP_KEY = "ArrowUp";
   var ARROW_DOWN_KEY = "ArrowDown";
+  var HOME_KEY = "Home";
+  var END_KEY = "End";
   var CLASS_NAME_ACTIVE = "active";
   var CLASS_NAME_FADE$1 = "fade";
   var CLASS_NAME_SHOW$1 = "show";
@@ -19441,13 +19443,19 @@
       this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE$1));
     }
     _keydown(event) {
-      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key)) {
         return;
       }
       event.stopPropagation();
       event.preventDefault();
-      const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
-      const nextActiveElement = getNextActiveElement(this._getChildren().filter((element) => !isDisabled(element)), event.target, isNext, true);
+      const children = this._getChildren().filter((element) => !isDisabled(element));
+      let nextActiveElement;
+      if ([HOME_KEY, END_KEY].includes(event.key)) {
+        nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
+      } else {
+        const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
+        nextActiveElement = getNextActiveElement(children, event.target, isNext, true);
+      }
       if (nextActiveElement) {
         nextActiveElement.focus({
           preventScroll: true
@@ -19867,23 +19875,23 @@
       }
     }
   };
-  var descriptorPattern = /^(?:(.+?)(?:\.(.+?))?(?:@(window|document))?->)?(.+?)(?:#([^:]+?))(?::(.+))?$/;
+  var descriptorPattern = /^(?:(?:([^.]+?)\+)?(.+?)(?:\.(.+?))?(?:@(window|document))?->)?(.+?)(?:#([^:]+?))(?::(.+))?$/;
   function parseActionDescriptorString(descriptorString) {
     const source = descriptorString.trim();
     const matches = source.match(descriptorPattern) || [];
-    let eventName = matches[1];
-    let keyFilter = matches[2];
+    let eventName = matches[2];
+    let keyFilter = matches[3];
     if (keyFilter && !["keydown", "keyup", "keypress"].includes(eventName)) {
       eventName += `.${keyFilter}`;
       keyFilter = "";
     }
     return {
-      eventTarget: parseEventTarget(matches[3]),
+      eventTarget: parseEventTarget(matches[4]),
       eventName,
-      eventOptions: matches[6] ? parseEventOptions(matches[6]) : {},
-      identifier: matches[4],
-      methodName: matches[5],
-      keyFilter
+      eventOptions: matches[7] ? parseEventOptions(matches[7]) : {},
+      identifier: matches[5],
+      methodName: matches[6],
+      keyFilter: matches[1] || keyFilter
     };
   }
   function parseEventTarget(eventTargetName) {
@@ -19918,6 +19926,13 @@
   function tokenize(value) {
     return value.match(/[^\s]+/g) || [];
   }
+  function isSomething(object) {
+    return object !== null && object !== void 0;
+  }
+  function hasProperty(object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+  }
+  var allModifiers = ["meta", "ctrl", "alt", "shift"];
   var Action = class {
     constructor(element, index, descriptor, schema) {
       this.element = element;
@@ -19938,24 +19953,32 @@
       const eventTarget = this.eventTargetName ? `@${this.eventTargetName}` : "";
       return `${this.eventName}${eventFilter}${eventTarget}->${this.identifier}#${this.methodName}`;
     }
-    isFilterTarget(event) {
+    shouldIgnoreKeyboardEvent(event) {
       if (!this.keyFilter) {
         return false;
       }
-      const filteres = this.keyFilter.split("+");
-      const modifiers = ["meta", "ctrl", "alt", "shift"];
-      const [meta, ctrl, alt, shift] = modifiers.map((modifier) => filteres.includes(modifier));
-      if (event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift) {
+      const filters = this.keyFilter.split("+");
+      if (this.keyFilterDissatisfied(event, filters)) {
         return true;
       }
-      const standardFilter = filteres.filter((key) => !modifiers.includes(key))[0];
+      const standardFilter = filters.filter((key) => !allModifiers.includes(key))[0];
       if (!standardFilter) {
         return false;
       }
-      if (!Object.prototype.hasOwnProperty.call(this.keyMappings, standardFilter)) {
+      if (!hasProperty(this.keyMappings, standardFilter)) {
         error(`contains unknown key filter: ${this.keyFilter}`);
       }
       return this.keyMappings[standardFilter].toLowerCase() !== event.key.toLowerCase();
+    }
+    shouldIgnoreMouseEvent(event) {
+      if (!this.keyFilter) {
+        return false;
+      }
+      const filters = [this.keyFilter];
+      if (this.keyFilterDissatisfied(event, filters)) {
+        return true;
+      }
+      return false;
     }
     get params() {
       const params = {};
@@ -19974,6 +19997,10 @@
     }
     get keyMappings() {
       return this.schema.keyMappings;
+    }
+    keyFilterDissatisfied(event, filters) {
+      const [meta, ctrl, alt, shift] = allModifiers.map((modifier) => filters.includes(modifier));
+      return event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift;
     }
   };
   var defaultEventNames = {
@@ -20019,8 +20046,9 @@
       return this.context.identifier;
     }
     handleEvent(event) {
-      if (this.willBeInvokedByEvent(event) && this.applyEventModifiers(event)) {
-        this.invokeWithEvent(event);
+      const actionEvent = this.prepareActionEvent(event);
+      if (this.willBeInvokedByEvent(event) && this.applyEventModifiers(actionEvent)) {
+        this.invokeWithEvent(actionEvent);
       }
     }
     get eventName() {
@@ -20036,23 +20064,25 @@
     applyEventModifiers(event) {
       const { element } = this.action;
       const { actionDescriptorFilters } = this.context.application;
+      const { controller } = this.context;
       let passes = true;
       for (const [name, value] of Object.entries(this.eventOptions)) {
         if (name in actionDescriptorFilters) {
           const filter = actionDescriptorFilters[name];
-          passes = passes && filter({ name, value, event, element });
+          passes = passes && filter({ name, value, event, element, controller });
         } else {
           continue;
         }
       }
       return passes;
     }
+    prepareActionEvent(event) {
+      return Object.assign(event, { params: this.action.params });
+    }
     invokeWithEvent(event) {
       const { target, currentTarget } = event;
       try {
-        const { params } = this.action;
-        const actionEvent = Object.assign(event, { params });
-        this.method.call(this.controller, actionEvent);
+        this.method.call(this.controller, event);
         this.context.logDebugActivity(this.methodName, { event, target, currentTarget, action: this.methodName });
       } catch (error2) {
         const { identifier, controller, element, index } = this;
@@ -20062,7 +20092,10 @@
     }
     willBeInvokedByEvent(event) {
       const eventTarget = event.target;
-      if (event instanceof KeyboardEvent && this.action.isFilterTarget(event)) {
+      if (event instanceof KeyboardEvent && this.action.shouldIgnoreKeyboardEvent(event)) {
+        return false;
+      }
+      if (event instanceof MouseEvent && this.action.shouldIgnoreMouseEvent(event)) {
         return false;
       }
       if (this.element === eventTarget) {
@@ -20148,8 +20181,7 @@
         this.processAddedNodes(mutation.addedNodes);
       }
     }
-    processAttributeChange(node, attributeName) {
-      const element = node;
+    processAttributeChange(element, attributeName) {
       if (this.elements.has(element)) {
         if (this.delegate.elementAttributeChanged && this.matchElement(element)) {
           this.delegate.elementAttributeChanged(element, attributeName);
@@ -20331,8 +20363,8 @@
     }
   };
   var SelectorObserver = class {
-    constructor(element, selector, delegate, details = {}) {
-      this.selector = selector;
+    constructor(element, selector, delegate, details) {
+      this._selector = selector;
       this.details = details;
       this.elementObserver = new ElementObserver(element, this);
       this.delegate = delegate;
@@ -20340,6 +20372,13 @@
     }
     get started() {
       return this.elementObserver.started;
+    }
+    get selector() {
+      return this._selector;
+    }
+    set selector(selector) {
+      this._selector = selector;
+      this.refresh();
     }
     start() {
       this.elementObserver.start();
@@ -20357,39 +20396,58 @@
       return this.elementObserver.element;
     }
     matchElement(element) {
-      const matches = element.matches(this.selector);
-      if (this.delegate.selectorMatchElement) {
-        return matches && this.delegate.selectorMatchElement(element, this.details);
+      const { selector } = this;
+      if (selector) {
+        const matches = element.matches(selector);
+        if (this.delegate.selectorMatchElement) {
+          return matches && this.delegate.selectorMatchElement(element, this.details);
+        }
+        return matches;
+      } else {
+        return false;
       }
-      return matches;
     }
     matchElementsInTree(tree) {
-      const match = this.matchElement(tree) ? [tree] : [];
-      const matches = Array.from(tree.querySelectorAll(this.selector)).filter((match2) => this.matchElement(match2));
-      return match.concat(matches);
+      const { selector } = this;
+      if (selector) {
+        const match = this.matchElement(tree) ? [tree] : [];
+        const matches = Array.from(tree.querySelectorAll(selector)).filter((match2) => this.matchElement(match2));
+        return match.concat(matches);
+      } else {
+        return [];
+      }
     }
     elementMatched(element) {
-      this.selectorMatched(element);
+      const { selector } = this;
+      if (selector) {
+        this.selectorMatched(element, selector);
+      }
     }
     elementUnmatched(element) {
-      this.selectorUnmatched(element);
+      const selectors = this.matchesByElement.getKeysForValue(element);
+      for (const selector of selectors) {
+        this.selectorUnmatched(element, selector);
+      }
     }
     elementAttributeChanged(element, _attributeName) {
-      const matches = this.matchElement(element);
-      const matchedBefore = this.matchesByElement.has(this.selector, element);
-      if (!matches && matchedBefore) {
-        this.selectorUnmatched(element);
+      const { selector } = this;
+      if (selector) {
+        const matches = this.matchElement(element);
+        const matchedBefore = this.matchesByElement.has(selector, element);
+        if (matches && !matchedBefore) {
+          this.selectorMatched(element, selector);
+        } else if (!matches && matchedBefore) {
+          this.selectorUnmatched(element, selector);
+        }
       }
     }
-    selectorMatched(element) {
-      if (this.delegate.selectorMatched) {
-        this.delegate.selectorMatched(element, this.selector, this.details);
-        this.matchesByElement.add(this.selector, element);
-      }
+    selectorMatched(element, selector) {
+      this.delegate.selectorMatched(element, selector, this.details);
+      this.matchesByElement.add(selector, element);
     }
-    selectorUnmatched(element) {
-      this.delegate.selectorUnmatched(element, this.selector, this.details);
-      this.matchesByElement.delete(this.selector, element);
+    selectorUnmatched(element, selector) {
+      this.delegate.selectorUnmatched(element, selector, this.details);
+      this.matchesByElement.delete(selector, element);
     }
   };
   var StringMapObserver = class {
@@ -20869,34 +20927,47 @@
   }
   var OutletObserver = class {
     constructor(context, delegate) {
+      this.started = false;
       this.context = context;
       this.delegate = delegate;
       this.outletsByName = new Multimap();
       this.outletElementsByName = new Multimap();
       this.selectorObserverMap = /* @__PURE__ */ new Map();
+      this.attributeObserverMap = /* @__PURE__ */ new Map();
     }
     start() {
-      if (this.selectorObserverMap.size === 0) {
+      if (!this.started) {
         this.outletDefinitions.forEach((outletName) => {
-          const selector = this.selector(outletName);
-          const details = { outletName };
-          if (selector) {
-            this.selectorObserverMap.set(outletName, new SelectorObserver(document.body, selector, this, details));
-          }
+          this.setupSelectorObserverForOutlet(outletName);
+          this.setupAttributeObserverForOutlet(outletName);
         });
-        this.selectorObserverMap.forEach((observer) => observer.start());
-      }
-      this.dependentContexts.forEach((context) => context.refresh());
-    }
-    stop() {
-      if (this.selectorObserverMap.size > 0) {
-        this.disconnectAllOutlets();
-        this.selectorObserverMap.forEach((observer) => observer.stop());
-        this.selectorObserverMap.clear();
+        this.started = true;
+        this.dependentContexts.forEach((context) => context.refresh());
       }
     }
     refresh() {
       this.selectorObserverMap.forEach((observer) => observer.refresh());
+      this.attributeObserverMap.forEach((observer) => observer.refresh());
+    }
+    stop() {
+      if (this.started) {
+        this.started = false;
+        this.disconnectAllOutlets();
+        this.stopSelectorObservers();
+        this.stopAttributeObservers();
+      }
+    }
+    stopSelectorObservers() {
+      if (this.selectorObserverMap.size > 0) {
+        this.selectorObserverMap.forEach((observer) => observer.stop());
+        this.selectorObserverMap.clear();
+      }
+    }
+    stopAttributeObservers() {
+      if (this.attributeObserverMap.size > 0) {
+        this.attributeObserverMap.forEach((observer) => observer.stop());
+        this.attributeObserverMap.clear();
+      }
     }
     selectorMatched(element, _selector, { outletName }) {
       const outlet = this.getOutlet(element, outletName);
@@ -20911,7 +20982,32 @@
       }
     }
     selectorMatchElement(element, { outletName }) {
-      return this.hasOutlet(element, outletName) && element.matches(`[${this.context.application.schema.controllerAttribute}~=${outletName}]`);
+      const selector = this.selector(outletName);
+      const hasOutlet = this.hasOutlet(element, outletName);
+      const hasOutletController = element.matches(`[${this.schema.controllerAttribute}~=${outletName}]`);
+      if (selector) {
+        return hasOutlet && hasOutletController && element.matches(selector);
+      } else {
+        return false;
+      }
+    }
+    elementMatchedAttribute(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
+    }
+    elementAttributeValueChanged(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
+    }
+    elementUnmatchedAttribute(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
     }
     connectOutlet(outlet, element, outletName) {
       var _a;
@@ -20938,8 +21034,32 @@
         }
       }
     }
+    updateSelectorObserverForOutlet(outletName) {
+      const observer = this.selectorObserverMap.get(outletName);
+      if (observer) {
+        observer.selector = this.selector(outletName);
+      }
+    }
+    setupSelectorObserverForOutlet(outletName) {
+      const selector = this.selector(outletName);
+      const selectorObserver = new SelectorObserver(document.body, selector, this, { outletName });
+      this.selectorObserverMap.set(outletName, selectorObserver);
+      selectorObserver.start();
+    }
+    setupAttributeObserverForOutlet(outletName) {
+      const attributeName = this.attributeNameForOutletName(outletName);
+      const attributeObserver = new AttributeObserver(this.scope.element, attributeName, this);
+      this.attributeObserverMap.set(outletName, attributeObserver);
+      attributeObserver.start();
+    }
     selector(outletName) {
       return this.scope.outlets.getSelectorForOutletName(outletName);
+    }
+    attributeNameForOutletName(outletName) {
+      return this.scope.schema.outletAttributeForScope(this.identifier, outletName);
+    }
+    getOutletNameFromOutletAttributeName(attributeName) {
+      return this.outletDefinitions.find((outletName) => this.attributeNameForOutletName(outletName) === attributeName);
     }
     get outletDependencies() {
       const dependencies = new Multimap();
@@ -20971,6 +21091,9 @@
     }
     get scope() {
       return this.context.scope;
+    }
+    get schema() {
+      return this.context.schema;
     }
     get identifier() {
       return this.context.identifier;
@@ -21439,6 +21562,9 @@
     }
     parseValueForToken(token) {
       const { element, content: identifier } = token;
+      return this.parseValueForElementAndIdentifier(element, identifier);
+    }
+    parseValueForElementAndIdentifier(element, identifier) {
       const scopesByIdentifier = this.fetchScopesByIdentifierForElement(element);
       let scope = scopesByIdentifier.get(identifier);
       if (!scope) {
@@ -21509,7 +21635,7 @@
       this.connectModule(module);
       const afterLoad = definition.controllerConstructor.afterLoad;
       if (afterLoad) {
-        afterLoad(definition.identifier, this.application);
+        afterLoad.call(definition.controllerConstructor, definition.identifier, this.application);
       }
     }
     unloadIdentifier(identifier) {
@@ -21522,6 +21648,14 @@
       const module = this.modulesByIdentifier.get(identifier);
       if (module) {
         return module.contexts.find((context) => context.element == element);
+      }
+    }
+    proposeToConnectScopeForElementAndIdentifier(element, identifier) {
+      const scope = this.scopeObserver.parseValueForElementAndIdentifier(element, identifier);
+      if (scope) {
+        this.scopeObserver.elementMatchedValue(scope.element, scope);
+      } else {
+        console.error(`Couldn't find or create scope for identifier: "${identifier}" and element:`, element);
       }
     }
     handleError(error2, message, detail) {
@@ -21561,7 +21695,7 @@
     targetAttribute: "data-target",
     targetAttributeForScope: (identifier) => `data-${identifier}-target`,
     outletAttributeForScope: (identifier, outlet) => `data-${identifier}-${outlet}-outlet`,
-    keyMappings: Object.assign(Object.assign({ enter: "Enter", tab: "Tab", esc: "Escape", space: " ", up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", home: "Home", end: "End" }, objectFromEntries("abcdefghijklmnopqrstuvwxyz".split("").map((c) => [c, c]))), objectFromEntries("0123456789".split("").map((n) => [n, n])))
+    keyMappings: Object.assign(Object.assign({ enter: "Enter", tab: "Tab", esc: "Escape", space: " ", up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", home: "Home", end: "End", page_up: "PageUp", page_down: "PageDown" }, objectFromEntries("abcdefghijklmnopqrstuvwxyz".split("").map((c) => [c, c]))), objectFromEntries("0123456789".split("").map((n) => [n, n])))
   };
   function objectFromEntries(array) {
     return array.reduce((memo, [k, v]) => Object.assign(Object.assign({}, memo), { [k]: v }), {});
@@ -21686,34 +21820,43 @@
       return Object.assign(properties, propertiesForOutletDefinition(outletDefinition));
     }, {});
   }
+  function getOutletController(controller, element, identifier) {
+    return controller.application.getControllerForElementAndIdentifier(element, identifier);
+  }
+  function getControllerAndEnsureConnectedScope(controller, element, outletName) {
+    let outletController = getOutletController(controller, element, outletName);
+    if (outletController)
+      return outletController;
+    controller.application.router.proposeToConnectScopeForElementAndIdentifier(element, outletName);
+    outletController = getOutletController(controller, element, outletName);
+    if (outletController)
+      return outletController;
+  }
   function propertiesForOutletDefinition(name) {
     const camelizedName = namespaceCamelize(name);
     return {
       [`${camelizedName}Outlet`]: {
         get() {
-          const outlet = this.outlets.find(name);
-          if (outlet) {
-            const outletController = this.application.getControllerForElementAndIdentifier(outlet, name);
-            if (outletController) {
+          const outletElement = this.outlets.find(name);
+          const selector = this.outlets.getSelectorForOutletName(name);
+          if (outletElement) {
+            const outletController = getControllerAndEnsureConnectedScope(this, outletElement, name);
+            if (outletController)
               return outletController;
-            } else {
-              throw new Error(`Missing "data-controller=${name}" attribute on outlet element for "${this.identifier}" controller`);
-            }
+            throw new Error(`The provided outlet element is missing an outlet controller "${name}" instance for host controller "${this.identifier}"`);
           }
-          throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+          throw new Error(`Missing outlet element "${name}" for host controller "${this.identifier}". Stimulus couldn't find a matching outlet element using selector "${selector}".`);
         }
       },
       [`${camelizedName}Outlets`]: {
         get() {
           const outlets = this.outlets.findAll(name);
           if (outlets.length > 0) {
-            return outlets.map((outlet) => {
-              const controller = this.application.getControllerForElementAndIdentifier(outlet, name);
-              if (controller) {
-                return controller;
-              } else {
-                console.warn(`The provided outlet element is missing the outlet controller "${name}" for "${this.identifier}"`, outlet);
-              }
+            return outlets.map((outletElement) => {
+              const outletController = getControllerAndEnsureConnectedScope(this, outletElement, name);
+              if (outletController)
+                return outletController;
+              console.warn(`The provided outlet element is missing an outlet controller "${name}" instance for host controller "${this.identifier}"`, outletElement);
             }).filter((controller) => controller);
           }
           return [];
@@ -21721,11 +21864,12 @@
       },
       [`${camelizedName}OutletElement`]: {
         get() {
-          const outlet = this.outlets.find(name);
-          if (outlet) {
-            return outlet;
+          const outletElement = this.outlets.find(name);
+          const selector = this.outlets.getSelectorForOutletName(name);
+          if (outletElement) {
+            return outletElement;
           } else {
-            throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+            throw new Error(`Missing outlet element "${name}" for host controller "${this.identifier}". Stimulus couldn't find a matching outlet element using selector "${selector}".`);
           }
         }
       },
@@ -21852,51 +21996,67 @@
       return "object";
   }
   function parseValueTypeObject(payload) {
-    const typeFromObject = parseValueTypeConstant(payload.typeObject.type);
-    if (!typeFromObject)
-      return;
-    const defaultValueType = parseValueTypeDefault(payload.typeObject.default);
-    if (typeFromObject !== defaultValueType) {
-      const propertyPath = payload.controller ? `${payload.controller}.${payload.token}` : payload.token;
-      throw new Error(`The specified default value for the Stimulus Value "${propertyPath}" must match the defined type "${typeFromObject}". The provided default value of "${payload.typeObject.default}" is of type "${defaultValueType}".`);
+    const { controller, token, typeObject } = payload;
+    const hasType = isSomething(typeObject.type);
+    const hasDefault = isSomething(typeObject.default);
+    const fullObject = hasType && hasDefault;
+    const onlyType = hasType && !hasDefault;
+    const onlyDefault = !hasType && hasDefault;
+    const typeFromObject = parseValueTypeConstant(typeObject.type);
+    const typeFromDefaultValue = parseValueTypeDefault(payload.typeObject.default);
+    if (onlyType)
+      return typeFromObject;
+    if (onlyDefault)
+      return typeFromDefaultValue;
+    if (typeFromObject !== typeFromDefaultValue) {
+      const propertyPath = controller ? `${controller}.${token}` : token;
+      throw new Error(`The specified default value for the Stimulus Value "${propertyPath}" must match the defined type "${typeFromObject}". The provided default value of "${typeObject.default}" is of type "${typeFromDefaultValue}".`);
     }
-    return typeFromObject;
+    if (fullObject)
+      return typeFromObject;
   }
   function parseValueTypeDefinition(payload) {
-    const typeFromObject = parseValueTypeObject({
-      controller: payload.controller,
-      token: payload.token,
-      typeObject: payload.typeDefinition
-    });
-    const typeFromDefaultValue = parseValueTypeDefault(payload.typeDefinition);
-    const typeFromConstant = parseValueTypeConstant(payload.typeDefinition);
+    const { controller, token, typeDefinition } = payload;
+    const typeObject = { controller, token, typeObject: typeDefinition };
+    const typeFromObject = parseValueTypeObject(typeObject);
+    const typeFromDefaultValue = parseValueTypeDefault(typeDefinition);
+    const typeFromConstant = parseValueTypeConstant(typeDefinition);
     const type = typeFromObject || typeFromDefaultValue || typeFromConstant;
     if (type)
       return type;
-    const propertyPath = payload.controller ? `${payload.controller}.${payload.typeDefinition}` : payload.token;
-    throw new Error(`Unknown value type "${propertyPath}" for "${payload.token}" value`);
+    const propertyPath = controller ? `${controller}.${typeDefinition}` : token;
+    throw new Error(`Unknown value type "${propertyPath}" for "${token}" value`);
   }
   function defaultValueForDefinition(typeDefinition) {
     const constant = parseValueTypeConstant(typeDefinition);
     if (constant)
       return defaultValuesByType[constant];
-    const defaultValue = typeDefinition.default;
-    if (defaultValue !== void 0)
-      return defaultValue;
+    const hasDefault = hasProperty(typeDefinition, "default");
+    const hasType = hasProperty(typeDefinition, "type");
+    const typeObject = typeDefinition;
+    if (hasDefault)
+      return typeObject.default;
+    if (hasType) {
+      const { type } = typeObject;
+      const constantFromType = parseValueTypeConstant(type);
+      if (constantFromType)
+        return defaultValuesByType[constantFromType];
+    }
     return typeDefinition;
   }
   function valueDescriptorForTokenAndTypeDefinition(payload) {
-    const key = `${dasherize(payload.token)}-value`;
+    const { token, typeDefinition } = payload;
+    const key = `${dasherize(token)}-value`;
     const type = parseValueTypeDefinition(payload);
     return {
       type,
       key,
       name: camelize(key),
       get defaultValue() {
-        return defaultValueForDefinition(payload.typeDefinition);
+        return defaultValueForDefinition(typeDefinition);
       },
       get hasCustomDefaultValue() {
-        return parseValueTypeDefault(payload.typeDefinition) !== void 0;
+        return parseValueTypeDefault(typeDefinition) !== void 0;
       },
       reader: readers[type],
       writer: writers[type] || writers.default
@@ -21925,7 +22085,7 @@
       return !(value == "0" || String(value).toLowerCase() == "false");
     },
     number(value) {
-      return Number(value);
+      return Number(value.replace(/_/g, ""));
     },
     object(value) {
       const object = JSON.parse(value);
@@ -22011,6 +22171,99 @@
   application.debug = false;
   window.Stimulus = application;
 
+  // app/javascript/controllers/msip/bitacoraap_controller.js
+  var bitacoraap_controller_default = class extends Controller {
+    /*!
+     * Serializa valores de un formulario en un arreglo
+     * Idea de serializeArray de jQuery, implemantación basada en
+     * https://vanillajstoolkit.com/helpers/serializearray/
+     * FormData debería dejar esto obsoleto
+     **/
+    static serializarFormularioEnArreglo(formulario) {
+      var arr = [];
+      Array.prototype.slice.call(formulario.elements).forEach(function(campo) {
+        if (!campo.name || campo.disabled || ["file", "reset", "submit", "button"].indexOf(campo.type) > -1) {
+          return;
+        }
+        if (campo.type === "select-multiple") {
+          Array.prototype.slice.call(campo.options).forEach(function(opcion) {
+            if (!opcion.selected)
+              return;
+            arr.push({
+              name: campo.name,
+              value: opcion.value
+            });
+          });
+          return;
+        }
+        if (["checkbox", "radio"].indexOf(campo.type) > -1 && !campo.checked) {
+          return;
+        }
+        arr.push({
+          name: campo.name,
+          value: campo.value
+        });
+      });
+      return arr;
+    }
+    static calcularCambiosParaBitacora() {
+      let bitacora = document.querySelector("input.bitacora_cambio");
+      if (bitacora == null) {
+        return { vacio: false };
+      }
+      window.bitacora_estado_final_formulario = this.serializarFormularioEnArreglo(
+        bitacora.closest("form")
+      );
+      if (typeof window.bitacora_estado_inicial_formulario != "object") {
+        return { vacio: false };
+      }
+      let cambio = {};
+      let di = {};
+      window.bitacora_estado_inicial_formulario.forEach(
+        (v) => di[v.name] = v.value
+      );
+      let df = {};
+      window.bitacora_estado_final_formulario.forEach((v) => {
+        df[v.name] = v.value;
+        if (typeof di[v.name] == "undefined") {
+          cambio[v.name] = [null, v.value];
+        }
+      });
+      for (const i in di) {
+        if (typeof df[i] == "undefined") {
+          cambio[i] = [di[i], null];
+        } else if (df[i] != di[i] && i.search(/\[bitacora_cambio\]/) < 0) {
+          cambio[i] = [di[i], df[i]];
+        }
+      }
+      return cambio;
+    }
+    initialize() {
+      console.log("inicializa controlador bitacoraap");
+    }
+    connect() {
+      console.log("conectado controlador bitacoraap");
+      let campo = document.querySelector("input.bitacora_cambio");
+      if (campo != null) {
+        window.bitacora_estado_inicial_formulario = this.constructor.serializarFormularioEnArreglo(
+          campo.closest("form")
+        );
+      }
+    }
+    enviarFormulario(e) {
+      let campo = document.querySelector("input.bitacora_cambio");
+      if (campo == null) {
+        return;
+      }
+      let cambio = this.constructor.calcularCambiosParaBitacora();
+      campo.value = JSON.stringify(cambio);
+    }
+  };
+  // Conecta por ejemplo en form con data-controller="msip--bitacoraap"
+  // En el botón para enviar agregar
+  // data-msip--bitacoraap-action='submit->msip--bitacoraap#enviarFormulario'
+  __publicField(bitacoraap_controller_default, "targets", []);
+
   // app/javascript/controllers/msip/cancelar_vacio_es_eliminar_controller.js
   var cancelar_vacio_es_eliminar_controller_default = class extends Controller {
     connect() {
@@ -22061,6 +22314,42 @@
     "determinador"
   ]);
 
+  // app/javascript/controllers/msip/filtro_tan_controller.js
+  var filtro_tan_controller_default = class extends Controller {
+    initialize() {
+      console.log("inicializa controlador filto-tan");
+    }
+    connect() {
+      console.log("conectado controlador filto-tan");
+    }
+    cambiarATodos(e) {
+      console.log(this.seleccionTarget.id);
+      csSeleccionarTodasSinSpan(this.seleccionTarget.id);
+    }
+    cambiarANinguno(e) {
+      console.log(this.seleccionTarget.id);
+      csDeseleccionarTodas(this.seleccionTarget.id);
+    }
+    revisarCambioAlgunas(e) {
+      debugger;
+    }
+  };
+  // Conecta con data-controller="msip--filtro-tan"
+  // En el campo con botones de radio agregar
+  // data-action='change->msip--filtro-tan#cambia_boton_todos'
+  // data-msip--filtro-tan-target='boton-todos'
+  // data-action='change->msip--filtro-tan#cambia_boton_ninguno'
+  // data-msip--filtro-tan-target='boton-ninguno'
+  // data-msip--filtro-tan-target='boton-algunos'
+  // En el campo de selección por ayudar a controlar
+  // data-msip--filtro-tan-target='cuadro-de-seleccion'
+  __publicField(filtro_tan_controller_default, "targets", [
+    "todos",
+    "algunos",
+    "ninguno",
+    "seleccion"
+  ]);
+
   // app/javascript/controllers/msip/sindocaut_controller.js
   var sindocaut_controller_default = class extends Controller {
     initialize() {
@@ -22070,12 +22359,12 @@
       console.log("conectado controlador sindocaut");
     }
     cambia_tdocumento(e) {
+      var purl = window.puntomontaje;
+      if (purl == "/") {
+        purl = "";
+      }
       console.log("numerodocumento ahora es", this.numerodocumentoTarget.value);
       if (e.target.value == "11" && this.numerodocumentoTarget.value == "") {
-        var purl = window.puntomontaje;
-        if (purl == "/") {
-          purl = "";
-        }
         window.Rails.ajax({
           type: "GET",
           url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value,
@@ -22088,6 +22377,22 @@
           }
         });
       }
+      window.Rails.ajax({
+        type: "GET",
+        url: purl + "/admin/tdocumentos/" + e.target.value + ".json",
+        data: null,
+        success: (resp, estado, xhr) => {
+          this.numerodocumentoTarget.setAttribute("data-bs-toggle", "tooltip");
+          this.numerodocumentoTarget.setAttribute(
+            "data-bs-original-title",
+            resp.ayuda
+          );
+          this.numerodocumentoTarget.setAttribute("title", resp.ayuda);
+        },
+        error: (req, estado, xhr) => {
+          window.alert("No pudo consultar tipo de documento " + e.target.value);
+        }
+      });
     }
   };
   // Conecta con data-controller="msip--sindocaut"
@@ -22103,7 +22408,9 @@
   ]);
 
   // app/javascript/controllers/index.js
+  application.register("msip--bitacoraap", bitacoraap_controller_default);
   application.register("msip--cancelar-vacio-es-eliminar", cancelar_vacio_es_eliminar_controller_default);
+  application.register("msip--filtro-tan", filtro_tan_controller_default);
   application.register("msip--sindocaut", sindocaut_controller_default);
 
   // app/javascript/application.js
@@ -22159,7 +22466,7 @@ bootstrap-datepicker/dist/js/bootstrap-datepicker.js:
 
 bootstrap/dist/js/bootstrap.esm.js:
   (*!
-    * Bootstrap v5.3.0 (https://getbootstrap.com/)
+    * Bootstrap v5.3.1 (https://getbootstrap.com/)
     * Copyright 2011-2023 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
     * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
     *)
