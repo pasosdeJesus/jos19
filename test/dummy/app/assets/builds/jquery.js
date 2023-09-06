@@ -91,7 +91,7 @@
           }
           return typeof obj === "object" || typeof obj === "function" ? class2type[toString.call(obj)] || "object" : typeof obj;
         }
-        var version = "3.7.0", rhtmlSuffix = /HTML$/i, jQuery = function(selector, context) {
+        var version = "3.7.1", rhtmlSuffix = /HTML$/i, jQuery = function(selector, context) {
           return new jQuery.fn.init(selector, context);
         };
         jQuery.fn = jQuery.prototype = {
@@ -258,9 +258,14 @@
               while (node = elem[i++]) {
                 ret += jQuery.text(node);
               }
-            } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+            }
+            if (nodeType === 1 || nodeType === 11) {
               return elem.textContent;
-            } else if (nodeType === 3 || nodeType === 4) {
+            }
+            if (nodeType === 9) {
+              return elem.documentElement.textContent;
+            }
+            if (nodeType === 3 || nodeType === 4) {
               return elem.nodeValue;
             }
             return ret;
@@ -594,7 +599,11 @@
             documentElement2 = document2.documentElement;
             documentIsHTML = !jQuery.isXMLDoc(document2);
             matches = documentElement2.matches || documentElement2.webkitMatchesSelector || documentElement2.msMatchesSelector;
-            if (preferredDoc != document2 && (subWindow = document2.defaultView) && subWindow.top !== subWindow) {
+            if (documentElement2.msMatchesSelector && // Support: IE 11+, Edge 17 - 18+
+            // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
+            // two documents; shallow comparisons work.
+            // eslint-disable-next-line eqeqeq
+            preferredDoc != document2 && (subWindow = document2.defaultView) && subWindow.top !== subWindow) {
               subWindow.addEventListener("unload", unloadHandler);
             }
             support.getById = assert(function(el) {
@@ -1514,6 +1523,7 @@
           find.compile = compile;
           find.select = select;
           find.setDocument = setDocument;
+          find.tokenize = tokenize;
           find.escape = jQuery.escapeSelector;
           find.getText = jQuery.text;
           find.isXML = jQuery.isXMLDoc;
@@ -3729,7 +3739,7 @@
                 tr = document.createElement("tr");
                 trChild = document.createElement("div");
                 table.style.cssText = "position:absolute;left:-11111px;border-collapse:separate";
-                tr.style.cssText = "border:1px solid";
+                tr.style.cssText = "box-sizing:content-box;border:1px solid";
                 tr.style.height = "1px";
                 trChild.style.height = "9px";
                 trChild.style.display = "block";
@@ -6288,7 +6298,7 @@
             return arguments.length === 1 ? this.off(selector, "**") : this.off(types, selector || "**", fn);
           },
           hover: function(fnOver, fnOut) {
-            return this.mouseenter(fnOver).mouseleave(fnOut || fnOver);
+            return this.on("mouseenter", fnOver).on("mouseleave", fnOut || fnOver);
           }
         });
         jQuery.each(
@@ -6374,14 +6384,14 @@
 
 jquery/dist/jquery.js:
   (*!
-   * jQuery JavaScript Library v3.7.0
+   * jQuery JavaScript Library v3.7.1
    * https://jquery.com/
    *
    * Copyright OpenJS Foundation and other contributors
    * Released under the MIT license
    * https://jquery.org/license
    *
-   * Date: 2023-05-11T18:29Z
+   * Date: 2023-08-28T13:37Z
    *)
 */
 //# sourceMappingURL=jquery.js.map
