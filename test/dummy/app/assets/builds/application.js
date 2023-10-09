@@ -37,709 +37,6 @@
     return value;
   };
 
-  // node_modules/@rails/ujs/lib/assets/compiled/rails-ujs.js
-  var require_rails_ujs = __commonJS({
-    "node_modules/@rails/ujs/lib/assets/compiled/rails-ujs.js"(exports, module) {
-      (function() {
-        var context = this;
-        (function() {
-          (function() {
-            this.Rails = {
-              linkClickSelector: "a[data-confirm], a[data-method], a[data-remote]:not([disabled]), a[data-disable-with], a[data-disable]",
-              buttonClickSelector: {
-                selector: "button[data-remote]:not([form]), button[data-confirm]:not([form])",
-                exclude: "form button"
-              },
-              inputChangeSelector: "select[data-remote], input[data-remote], textarea[data-remote]",
-              formSubmitSelector: "form:not([data-turbo=true])",
-              formInputClickSelector: "form:not([data-turbo=true]) input[type=submit], form:not([data-turbo=true]) input[type=image], form:not([data-turbo=true]) button[type=submit], form:not([data-turbo=true]) button:not([type]), input[type=submit][form], input[type=image][form], button[type=submit][form], button[form]:not([type])",
-              formDisableSelector: "input[data-disable-with]:enabled, button[data-disable-with]:enabled, textarea[data-disable-with]:enabled, input[data-disable]:enabled, button[data-disable]:enabled, textarea[data-disable]:enabled",
-              formEnableSelector: "input[data-disable-with]:disabled, button[data-disable-with]:disabled, textarea[data-disable-with]:disabled, input[data-disable]:disabled, button[data-disable]:disabled, textarea[data-disable]:disabled",
-              fileInputSelector: "input[name][type=file]:not([disabled])",
-              linkDisableSelector: "a[data-disable-with], a[data-disable]",
-              buttonDisableSelector: "button[data-remote][data-disable-with], button[data-remote][data-disable]"
-            };
-          }).call(this);
-        }).call(context);
-        var Rails2 = context.Rails;
-        (function() {
-          (function() {
-            var nonce;
-            nonce = null;
-            Rails2.loadCSPNonce = function() {
-              var ref;
-              return nonce = (ref = document.querySelector("meta[name=csp-nonce]")) != null ? ref.content : void 0;
-            };
-            Rails2.cspNonce = function() {
-              return nonce != null ? nonce : Rails2.loadCSPNonce();
-            };
-          }).call(this);
-          (function() {
-            var expando, m;
-            m = Element.prototype.matches || Element.prototype.matchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector || Element.prototype.webkitMatchesSelector;
-            Rails2.matches = function(element, selector) {
-              if (selector.exclude != null) {
-                return m.call(element, selector.selector) && !m.call(element, selector.exclude);
-              } else {
-                return m.call(element, selector);
-              }
-            };
-            expando = "_ujsData";
-            Rails2.getData = function(element, key) {
-              var ref;
-              return (ref = element[expando]) != null ? ref[key] : void 0;
-            };
-            Rails2.setData = function(element, key, value) {
-              if (element[expando] == null) {
-                element[expando] = {};
-              }
-              return element[expando][key] = value;
-            };
-            Rails2.isContentEditable = function(element) {
-              var isEditable;
-              isEditable = false;
-              while (true) {
-                if (element.isContentEditable) {
-                  isEditable = true;
-                  break;
-                }
-                element = element.parentElement;
-                if (!element) {
-                  break;
-                }
-              }
-              return isEditable;
-            };
-            Rails2.$ = function(selector) {
-              return Array.prototype.slice.call(document.querySelectorAll(selector));
-            };
-          }).call(this);
-          (function() {
-            var $, csrfParam, csrfToken;
-            $ = Rails2.$;
-            csrfToken = Rails2.csrfToken = function() {
-              var meta;
-              meta = document.querySelector("meta[name=csrf-token]");
-              return meta && meta.content;
-            };
-            csrfParam = Rails2.csrfParam = function() {
-              var meta;
-              meta = document.querySelector("meta[name=csrf-param]");
-              return meta && meta.content;
-            };
-            Rails2.CSRFProtection = function(xhr) {
-              var token;
-              token = csrfToken();
-              if (token != null) {
-                return xhr.setRequestHeader("X-CSRF-Token", token);
-              }
-            };
-            Rails2.refreshCSRFTokens = function() {
-              var param, token;
-              token = csrfToken();
-              param = csrfParam();
-              if (token != null && param != null) {
-                return $('form input[name="' + param + '"]').forEach(function(input) {
-                  return input.value = token;
-                });
-              }
-            };
-          }).call(this);
-          (function() {
-            var CustomEvent2, fire, matches, preventDefault;
-            matches = Rails2.matches;
-            CustomEvent2 = window.CustomEvent;
-            if (typeof CustomEvent2 !== "function") {
-              CustomEvent2 = function(event, params) {
-                var evt;
-                evt = document.createEvent("CustomEvent");
-                evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-                return evt;
-              };
-              CustomEvent2.prototype = window.Event.prototype;
-              preventDefault = CustomEvent2.prototype.preventDefault;
-              CustomEvent2.prototype.preventDefault = function() {
-                var result;
-                result = preventDefault.call(this);
-                if (this.cancelable && !this.defaultPrevented) {
-                  Object.defineProperty(this, "defaultPrevented", {
-                    get: function() {
-                      return true;
-                    }
-                  });
-                }
-                return result;
-              };
-            }
-            fire = Rails2.fire = function(obj, name, data) {
-              var event;
-              event = new CustomEvent2(name, {
-                bubbles: true,
-                cancelable: true,
-                detail: data
-              });
-              obj.dispatchEvent(event);
-              return !event.defaultPrevented;
-            };
-            Rails2.stopEverything = function(e) {
-              fire(e.target, "ujs:everythingStopped");
-              e.preventDefault();
-              e.stopPropagation();
-              return e.stopImmediatePropagation();
-            };
-            Rails2.delegate = function(element, selector, eventType, handler) {
-              return element.addEventListener(eventType, function(e) {
-                var target;
-                target = e.target;
-                while (!(!(target instanceof Element) || matches(target, selector))) {
-                  target = target.parentNode;
-                }
-                if (target instanceof Element && handler.call(target, e) === false) {
-                  e.preventDefault();
-                  return e.stopPropagation();
-                }
-              });
-            };
-          }).call(this);
-          (function() {
-            var AcceptHeaders, CSRFProtection, createXHR, cspNonce, fire, prepareOptions, processResponse;
-            cspNonce = Rails2.cspNonce, CSRFProtection = Rails2.CSRFProtection, fire = Rails2.fire;
-            AcceptHeaders = {
-              "*": "*/*",
-              text: "text/plain",
-              html: "text/html",
-              xml: "application/xml, text/xml",
-              json: "application/json, text/javascript",
-              script: "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"
-            };
-            Rails2.ajax = function(options) {
-              var xhr;
-              options = prepareOptions(options);
-              xhr = createXHR(options, function() {
-                var ref, response;
-                response = processResponse((ref = xhr.response) != null ? ref : xhr.responseText, xhr.getResponseHeader("Content-Type"));
-                if (Math.floor(xhr.status / 100) === 2) {
-                  if (typeof options.success === "function") {
-                    options.success(response, xhr.statusText, xhr);
-                  }
-                } else {
-                  if (typeof options.error === "function") {
-                    options.error(response, xhr.statusText, xhr);
-                  }
-                }
-                return typeof options.complete === "function" ? options.complete(xhr, xhr.statusText) : void 0;
-              });
-              if (options.beforeSend != null && !options.beforeSend(xhr, options)) {
-                return false;
-              }
-              if (xhr.readyState === XMLHttpRequest.OPENED) {
-                return xhr.send(options.data);
-              }
-            };
-            prepareOptions = function(options) {
-              options.url = options.url || location.href;
-              options.type = options.type.toUpperCase();
-              if (options.type === "GET" && options.data) {
-                if (options.url.indexOf("?") < 0) {
-                  options.url += "?" + options.data;
-                } else {
-                  options.url += "&" + options.data;
-                }
-              }
-              if (AcceptHeaders[options.dataType] == null) {
-                options.dataType = "*";
-              }
-              options.accept = AcceptHeaders[options.dataType];
-              if (options.dataType !== "*") {
-                options.accept += ", */*; q=0.01";
-              }
-              return options;
-            };
-            createXHR = function(options, done) {
-              var xhr;
-              xhr = new XMLHttpRequest();
-              xhr.open(options.type, options.url, true);
-              xhr.setRequestHeader("Accept", options.accept);
-              if (typeof options.data === "string") {
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-              }
-              if (!options.crossDomain) {
-                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                CSRFProtection(xhr);
-              }
-              xhr.withCredentials = !!options.withCredentials;
-              xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                  return done(xhr);
-                }
-              };
-              return xhr;
-            };
-            processResponse = function(response, type) {
-              var parser, script;
-              if (typeof response === "string" && typeof type === "string") {
-                if (type.match(/\bjson\b/)) {
-                  try {
-                    response = JSON.parse(response);
-                  } catch (error2) {
-                  }
-                } else if (type.match(/\b(?:java|ecma)script\b/)) {
-                  script = document.createElement("script");
-                  script.setAttribute("nonce", cspNonce());
-                  script.text = response;
-                  document.head.appendChild(script).parentNode.removeChild(script);
-                } else if (type.match(/\b(xml|html|svg)\b/)) {
-                  parser = new DOMParser();
-                  type = type.replace(/;.+/, "");
-                  try {
-                    response = parser.parseFromString(response, type);
-                  } catch (error2) {
-                  }
-                }
-              }
-              return response;
-            };
-            Rails2.href = function(element) {
-              return element.href;
-            };
-            Rails2.isCrossDomain = function(url) {
-              var e, originAnchor, urlAnchor;
-              originAnchor = document.createElement("a");
-              originAnchor.href = location.href;
-              urlAnchor = document.createElement("a");
-              try {
-                urlAnchor.href = url;
-                return !((!urlAnchor.protocol || urlAnchor.protocol === ":") && !urlAnchor.host || originAnchor.protocol + "//" + originAnchor.host === urlAnchor.protocol + "//" + urlAnchor.host);
-              } catch (error2) {
-                e = error2;
-                return true;
-              }
-            };
-          }).call(this);
-          (function() {
-            var matches, toArray;
-            matches = Rails2.matches;
-            toArray = function(e) {
-              return Array.prototype.slice.call(e);
-            };
-            Rails2.serializeElement = function(element, additionalParam) {
-              var inputs, params;
-              inputs = [element];
-              if (matches(element, "form")) {
-                inputs = toArray(element.elements);
-              }
-              params = [];
-              inputs.forEach(function(input) {
-                if (!input.name || input.disabled) {
-                  return;
-                }
-                if (matches(input, "fieldset[disabled] *")) {
-                  return;
-                }
-                if (matches(input, "select")) {
-                  return toArray(input.options).forEach(function(option) {
-                    if (option.selected) {
-                      return params.push({
-                        name: input.name,
-                        value: option.value
-                      });
-                    }
-                  });
-                } else if (input.checked || ["radio", "checkbox", "submit"].indexOf(input.type) === -1) {
-                  return params.push({
-                    name: input.name,
-                    value: input.value
-                  });
-                }
-              });
-              if (additionalParam) {
-                params.push(additionalParam);
-              }
-              return params.map(function(param) {
-                if (param.name != null) {
-                  return encodeURIComponent(param.name) + "=" + encodeURIComponent(param.value);
-                } else {
-                  return param;
-                }
-              }).join("&");
-            };
-            Rails2.formElements = function(form, selector) {
-              if (matches(form, "form")) {
-                return toArray(form.elements).filter(function(el) {
-                  return matches(el, selector);
-                });
-              } else {
-                return toArray(form.querySelectorAll(selector));
-              }
-            };
-          }).call(this);
-          (function() {
-            var allowAction, fire, stopEverything;
-            fire = Rails2.fire, stopEverything = Rails2.stopEverything;
-            Rails2.handleConfirm = function(e) {
-              if (!allowAction(this)) {
-                return stopEverything(e);
-              }
-            };
-            Rails2.confirm = function(message, element) {
-              return confirm(message);
-            };
-            allowAction = function(element) {
-              var answer, callback, message;
-              message = element.getAttribute("data-confirm");
-              if (!message) {
-                return true;
-              }
-              answer = false;
-              if (fire(element, "confirm")) {
-                try {
-                  answer = Rails2.confirm(message, element);
-                } catch (error2) {
-                }
-                callback = fire(element, "confirm:complete", [answer]);
-              }
-              return answer && callback;
-            };
-          }).call(this);
-          (function() {
-            var disableFormElement, disableFormElements, disableLinkElement, enableFormElement, enableFormElements, enableLinkElement, formElements, getData, isContentEditable, isXhrRedirect, matches, setData, stopEverything;
-            matches = Rails2.matches, getData = Rails2.getData, setData = Rails2.setData, stopEverything = Rails2.stopEverything, formElements = Rails2.formElements, isContentEditable = Rails2.isContentEditable;
-            Rails2.handleDisabledElement = function(e) {
-              var element;
-              element = this;
-              if (element.disabled) {
-                return stopEverything(e);
-              }
-            };
-            Rails2.enableElement = function(e) {
-              var element;
-              if (e instanceof Event) {
-                if (isXhrRedirect(e)) {
-                  return;
-                }
-                element = e.target;
-              } else {
-                element = e;
-              }
-              if (isContentEditable(element)) {
-                return;
-              }
-              if (matches(element, Rails2.linkDisableSelector)) {
-                return enableLinkElement(element);
-              } else if (matches(element, Rails2.buttonDisableSelector) || matches(element, Rails2.formEnableSelector)) {
-                return enableFormElement(element);
-              } else if (matches(element, Rails2.formSubmitSelector)) {
-                return enableFormElements(element);
-              }
-            };
-            Rails2.disableElement = function(e) {
-              var element;
-              element = e instanceof Event ? e.target : e;
-              if (isContentEditable(element)) {
-                return;
-              }
-              if (matches(element, Rails2.linkDisableSelector)) {
-                return disableLinkElement(element);
-              } else if (matches(element, Rails2.buttonDisableSelector) || matches(element, Rails2.formDisableSelector)) {
-                return disableFormElement(element);
-              } else if (matches(element, Rails2.formSubmitSelector)) {
-                return disableFormElements(element);
-              }
-            };
-            disableLinkElement = function(element) {
-              var replacement;
-              if (getData(element, "ujs:disabled")) {
-                return;
-              }
-              replacement = element.getAttribute("data-disable-with");
-              if (replacement != null) {
-                setData(element, "ujs:enable-with", element.innerHTML);
-                element.innerHTML = replacement;
-              }
-              element.addEventListener("click", stopEverything);
-              return setData(element, "ujs:disabled", true);
-            };
-            enableLinkElement = function(element) {
-              var originalText;
-              originalText = getData(element, "ujs:enable-with");
-              if (originalText != null) {
-                element.innerHTML = originalText;
-                setData(element, "ujs:enable-with", null);
-              }
-              element.removeEventListener("click", stopEverything);
-              return setData(element, "ujs:disabled", null);
-            };
-            disableFormElements = function(form) {
-              return formElements(form, Rails2.formDisableSelector).forEach(disableFormElement);
-            };
-            disableFormElement = function(element) {
-              var replacement;
-              if (getData(element, "ujs:disabled")) {
-                return;
-              }
-              replacement = element.getAttribute("data-disable-with");
-              if (replacement != null) {
-                if (matches(element, "button")) {
-                  setData(element, "ujs:enable-with", element.innerHTML);
-                  element.innerHTML = replacement;
-                } else {
-                  setData(element, "ujs:enable-with", element.value);
-                  element.value = replacement;
-                }
-              }
-              element.disabled = true;
-              return setData(element, "ujs:disabled", true);
-            };
-            enableFormElements = function(form) {
-              return formElements(form, Rails2.formEnableSelector).forEach(enableFormElement);
-            };
-            enableFormElement = function(element) {
-              var originalText;
-              originalText = getData(element, "ujs:enable-with");
-              if (originalText != null) {
-                if (matches(element, "button")) {
-                  element.innerHTML = originalText;
-                } else {
-                  element.value = originalText;
-                }
-                setData(element, "ujs:enable-with", null);
-              }
-              element.disabled = false;
-              return setData(element, "ujs:disabled", null);
-            };
-            isXhrRedirect = function(event) {
-              var ref, xhr;
-              xhr = (ref = event.detail) != null ? ref[0] : void 0;
-              return (xhr != null ? xhr.getResponseHeader("X-Xhr-Redirect") : void 0) != null;
-            };
-          }).call(this);
-          (function() {
-            var isContentEditable, stopEverything;
-            stopEverything = Rails2.stopEverything;
-            isContentEditable = Rails2.isContentEditable;
-            Rails2.handleMethod = function(e) {
-              var csrfParam, csrfToken, form, formContent, href, link, method;
-              link = this;
-              method = link.getAttribute("data-method");
-              if (!method) {
-                return;
-              }
-              if (isContentEditable(this)) {
-                return;
-              }
-              href = Rails2.href(link);
-              csrfToken = Rails2.csrfToken();
-              csrfParam = Rails2.csrfParam();
-              form = document.createElement("form");
-              formContent = "<input name='_method' value='" + method + "' type='hidden' />";
-              if (csrfParam != null && csrfToken != null && !Rails2.isCrossDomain(href)) {
-                formContent += "<input name='" + csrfParam + "' value='" + csrfToken + "' type='hidden' />";
-              }
-              formContent += '<input type="submit" />';
-              form.method = "post";
-              form.action = href;
-              form.target = link.target;
-              form.innerHTML = formContent;
-              form.style.display = "none";
-              document.body.appendChild(form);
-              form.querySelector('[type="submit"]').click();
-              return stopEverything(e);
-            };
-          }).call(this);
-          (function() {
-            var ajax, fire, getData, isContentEditable, isCrossDomain, isRemote, matches, serializeElement, setData, stopEverything, slice = [].slice;
-            matches = Rails2.matches, getData = Rails2.getData, setData = Rails2.setData, fire = Rails2.fire, stopEverything = Rails2.stopEverything, ajax = Rails2.ajax, isCrossDomain = Rails2.isCrossDomain, serializeElement = Rails2.serializeElement, isContentEditable = Rails2.isContentEditable;
-            isRemote = function(element) {
-              var value;
-              value = element.getAttribute("data-remote");
-              return value != null && value !== "false";
-            };
-            Rails2.handleRemote = function(e) {
-              var button, data, dataType, element, method, url, withCredentials;
-              element = this;
-              if (!isRemote(element)) {
-                return true;
-              }
-              if (!fire(element, "ajax:before")) {
-                fire(element, "ajax:stopped");
-                return false;
-              }
-              if (isContentEditable(element)) {
-                fire(element, "ajax:stopped");
-                return false;
-              }
-              withCredentials = element.getAttribute("data-with-credentials");
-              dataType = element.getAttribute("data-type") || "script";
-              if (matches(element, Rails2.formSubmitSelector)) {
-                button = getData(element, "ujs:submit-button");
-                method = getData(element, "ujs:submit-button-formmethod") || element.method;
-                url = getData(element, "ujs:submit-button-formaction") || element.getAttribute("action") || location.href;
-                if (method.toUpperCase() === "GET") {
-                  url = url.replace(/\?.*$/, "");
-                }
-                if (element.enctype === "multipart/form-data") {
-                  data = new FormData(element);
-                  if (button != null) {
-                    data.append(button.name, button.value);
-                  }
-                } else {
-                  data = serializeElement(element, button);
-                }
-                setData(element, "ujs:submit-button", null);
-                setData(element, "ujs:submit-button-formmethod", null);
-                setData(element, "ujs:submit-button-formaction", null);
-              } else if (matches(element, Rails2.buttonClickSelector) || matches(element, Rails2.inputChangeSelector)) {
-                method = element.getAttribute("data-method");
-                url = element.getAttribute("data-url");
-                data = serializeElement(element, element.getAttribute("data-params"));
-              } else {
-                method = element.getAttribute("data-method");
-                url = Rails2.href(element);
-                data = element.getAttribute("data-params");
-              }
-              ajax({
-                type: method || "GET",
-                url,
-                data,
-                dataType,
-                beforeSend: function(xhr, options) {
-                  if (fire(element, "ajax:beforeSend", [xhr, options])) {
-                    return fire(element, "ajax:send", [xhr]);
-                  } else {
-                    fire(element, "ajax:stopped");
-                    return false;
-                  }
-                },
-                success: function() {
-                  var args;
-                  args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-                  return fire(element, "ajax:success", args);
-                },
-                error: function() {
-                  var args;
-                  args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-                  return fire(element, "ajax:error", args);
-                },
-                complete: function() {
-                  var args;
-                  args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-                  return fire(element, "ajax:complete", args);
-                },
-                crossDomain: isCrossDomain(url),
-                withCredentials: withCredentials != null && withCredentials !== "false"
-              });
-              return stopEverything(e);
-            };
-            Rails2.formSubmitButtonClick = function(e) {
-              var button, form;
-              button = this;
-              form = button.form;
-              if (!form) {
-                return;
-              }
-              if (button.name) {
-                setData(form, "ujs:submit-button", {
-                  name: button.name,
-                  value: button.value
-                });
-              }
-              setData(form, "ujs:formnovalidate-button", button.formNoValidate);
-              setData(form, "ujs:submit-button-formaction", button.getAttribute("formaction"));
-              return setData(form, "ujs:submit-button-formmethod", button.getAttribute("formmethod"));
-            };
-            Rails2.preventInsignificantClick = function(e) {
-              var data, insignificantMetaClick, link, metaClick, method, nonPrimaryMouseClick;
-              link = this;
-              method = (link.getAttribute("data-method") || "GET").toUpperCase();
-              data = link.getAttribute("data-params");
-              metaClick = e.metaKey || e.ctrlKey;
-              insignificantMetaClick = metaClick && method === "GET" && !data;
-              nonPrimaryMouseClick = e.button != null && e.button !== 0;
-              if (nonPrimaryMouseClick || insignificantMetaClick) {
-                return e.stopImmediatePropagation();
-              }
-            };
-          }).call(this);
-          (function() {
-            var $, CSRFProtection, delegate, disableElement, enableElement, fire, formSubmitButtonClick, getData, handleConfirm, handleDisabledElement, handleMethod, handleRemote, loadCSPNonce, preventInsignificantClick, refreshCSRFTokens;
-            fire = Rails2.fire, delegate = Rails2.delegate, getData = Rails2.getData, $ = Rails2.$, refreshCSRFTokens = Rails2.refreshCSRFTokens, CSRFProtection = Rails2.CSRFProtection, loadCSPNonce = Rails2.loadCSPNonce, enableElement = Rails2.enableElement, disableElement = Rails2.disableElement, handleDisabledElement = Rails2.handleDisabledElement, handleConfirm = Rails2.handleConfirm, preventInsignificantClick = Rails2.preventInsignificantClick, handleRemote = Rails2.handleRemote, formSubmitButtonClick = Rails2.formSubmitButtonClick, handleMethod = Rails2.handleMethod;
-            if (typeof jQuery !== "undefined" && jQuery !== null && jQuery.ajax != null) {
-              if (jQuery.rails) {
-                throw new Error("If you load both jquery_ujs and rails-ujs, use rails-ujs only.");
-              }
-              jQuery.rails = Rails2;
-              jQuery.ajaxPrefilter(function(options, originalOptions, xhr) {
-                if (!options.crossDomain) {
-                  return CSRFProtection(xhr);
-                }
-              });
-            }
-            Rails2.start = function() {
-              if (window._rails_loaded) {
-                throw new Error("rails-ujs has already been loaded!");
-              }
-              window.addEventListener("pageshow", function() {
-                $(Rails2.formEnableSelector).forEach(function(el) {
-                  if (getData(el, "ujs:disabled")) {
-                    return enableElement(el);
-                  }
-                });
-                return $(Rails2.linkDisableSelector).forEach(function(el) {
-                  if (getData(el, "ujs:disabled")) {
-                    return enableElement(el);
-                  }
-                });
-              });
-              delegate(document, Rails2.linkDisableSelector, "ajax:complete", enableElement);
-              delegate(document, Rails2.linkDisableSelector, "ajax:stopped", enableElement);
-              delegate(document, Rails2.buttonDisableSelector, "ajax:complete", enableElement);
-              delegate(document, Rails2.buttonDisableSelector, "ajax:stopped", enableElement);
-              delegate(document, Rails2.linkClickSelector, "click", preventInsignificantClick);
-              delegate(document, Rails2.linkClickSelector, "click", handleDisabledElement);
-              delegate(document, Rails2.linkClickSelector, "click", handleConfirm);
-              delegate(document, Rails2.linkClickSelector, "click", disableElement);
-              delegate(document, Rails2.linkClickSelector, "click", handleRemote);
-              delegate(document, Rails2.linkClickSelector, "click", handleMethod);
-              delegate(document, Rails2.buttonClickSelector, "click", preventInsignificantClick);
-              delegate(document, Rails2.buttonClickSelector, "click", handleDisabledElement);
-              delegate(document, Rails2.buttonClickSelector, "click", handleConfirm);
-              delegate(document, Rails2.buttonClickSelector, "click", disableElement);
-              delegate(document, Rails2.buttonClickSelector, "click", handleRemote);
-              delegate(document, Rails2.inputChangeSelector, "change", handleDisabledElement);
-              delegate(document, Rails2.inputChangeSelector, "change", handleConfirm);
-              delegate(document, Rails2.inputChangeSelector, "change", handleRemote);
-              delegate(document, Rails2.formSubmitSelector, "submit", handleDisabledElement);
-              delegate(document, Rails2.formSubmitSelector, "submit", handleConfirm);
-              delegate(document, Rails2.formSubmitSelector, "submit", handleRemote);
-              delegate(document, Rails2.formSubmitSelector, "submit", function(e) {
-                return setTimeout(function() {
-                  return disableElement(e);
-                }, 13);
-              });
-              delegate(document, Rails2.formSubmitSelector, "ajax:send", disableElement);
-              delegate(document, Rails2.formSubmitSelector, "ajax:complete", enableElement);
-              delegate(document, Rails2.formInputClickSelector, "click", preventInsignificantClick);
-              delegate(document, Rails2.formInputClickSelector, "click", handleDisabledElement);
-              delegate(document, Rails2.formInputClickSelector, "click", handleConfirm);
-              delegate(document, Rails2.formInputClickSelector, "click", formSubmitButtonClick);
-              document.addEventListener("DOMContentLoaded", refreshCSRFTokens);
-              document.addEventListener("DOMContentLoaded", loadCSPNonce);
-              return window._rails_loaded = true;
-            };
-            if (window.Rails === Rails2 && fire(document, "rails:attachBindings")) {
-              Rails2.start();
-            }
-          }).call(this);
-        }).call(this);
-        if (typeof module === "object" && module.exports) {
-          module.exports = Rails2;
-        } else if (typeof define === "function" && define.amd) {
-          define(Rails2);
-        }
-      }).call(exports);
-    }
-  });
-
   // node_modules/@rails/actioncable/src/adapters.js
   var adapters_default;
   var init_adapters = __esm({
@@ -893,7 +190,8 @@
         "disconnect_reasons": {
           "unauthorized": "unauthorized",
           "invalid_request": "invalid_request",
-          "server_restart": "server_restart"
+          "server_restart": "server_restart",
+          "remote": "remote"
         },
         "default_mount_path": "/cable",
         "protocols": [
@@ -936,11 +234,12 @@
             logger_default.log(`Attempted to open WebSocket, but existing socket is ${this.getState()}`);
             return false;
           } else {
-            logger_default.log(`Opening WebSocket, current state is ${this.getState()}, subprotocols: ${protocols}`);
+            const socketProtocols = [...protocols, ...this.consumer.subprotocols || []];
+            logger_default.log(`Opening WebSocket, current state is ${this.getState()}, subprotocols: ${socketProtocols}`);
             if (this.webSocket) {
               this.uninstallEventHandlers();
             }
-            this.webSocket = new adapters_default.WebSocket(this.consumer.url, protocols);
+            this.webSocket = new adapters_default.WebSocket(this.consumer.url, socketProtocols);
             this.installEventHandlers();
             this.monitor.start();
             return true;
@@ -979,6 +278,9 @@
         }
         isActive() {
           return this.isState("open", "connecting");
+        }
+        triedToReconnect() {
+          return this.monitor.reconnectAttempts > 0;
         }
         // Private
         isProtocolSupported() {
@@ -1019,6 +321,9 @@
           const { identifier, message, reason, reconnect, type } = JSON.parse(event.data);
           switch (type) {
             case message_types.welcome:
+              if (this.triedToReconnect()) {
+                this.reconnectAttempted = true;
+              }
               this.monitor.recordConnect();
               return this.subscriptions.reload();
             case message_types.disconnect:
@@ -1028,7 +333,12 @@
               return this.monitor.recordPing();
             case message_types.confirmation:
               this.subscriptions.confirmSubscription(identifier);
-              return this.subscriptions.notify(identifier, "connected");
+              if (this.reconnectAttempted) {
+                this.reconnectAttempted = false;
+                return this.subscriptions.notify(identifier, "connected", { reconnected: true });
+              } else {
+                return this.subscriptions.notify(identifier, "connected", { reconnected: false });
+              }
             case message_types.rejection:
               return this.subscriptions.reject(identifier);
             default:
@@ -1248,6 +558,7 @@
           this._url = url;
           this.subscriptions = new Subscriptions(this);
           this.connection = new connection_default(this);
+          this.subprotocols = [];
         }
         get url() {
           return createWebSocketURL(this._url);
@@ -1265,6 +576,9 @@
           if (!this.connection.isActive()) {
             return this.connection.open();
           }
+        }
+        addSubProtocol(subprotocol) {
+          this.subprotocols = [...this.subprotocols, subprotocol];
         }
       };
     }
@@ -1311,11 +625,11 @@
 
   // node_modules/jquery/dist/jquery.js
   var require_jquery = __commonJS({
-    "node_modules/jquery/dist/jquery.js"(exports, module) {
+    "node_modules/jquery/dist/jquery.js"(exports2, module2) {
       (function(global, factory) {
         "use strict";
-        if (typeof module === "object" && typeof module.exports === "object") {
-          module.exports = global.document ? factory(global, true) : function(w) {
+        if (typeof module2 === "object" && typeof module2.exports === "object") {
+          module2.exports = global.document ? factory(global, true) : function(w) {
             if (!w.document) {
               throw new Error("jQuery requires a window with a document");
             }
@@ -1324,7 +638,7 @@
         } else {
           factory(global);
         }
-      })(typeof window !== "undefined" ? window : exports, function(window2, noGlobal) {
+      })(typeof window !== "undefined" ? window : exports2, function(window2, noGlobal) {
         "use strict";
         var arr = [];
         var getProto = Object.getPrototypeOf;
@@ -1587,14 +901,14 @@
             return first;
           },
           grep: function(elems, callback, invert) {
-            var callbackInverse, matches = [], i = 0, length = elems.length, callbackExpect = !invert;
+            var callbackInverse, matches2 = [], i = 0, length = elems.length, callbackExpect = !invert;
             for (; i < length; i++) {
               callbackInverse = !callback(elems[i], i);
               if (callbackInverse !== callbackExpect) {
-                matches.push(elems[i]);
+                matches2.push(elems[i]);
               }
             }
-            return matches;
+            return matches2;
           },
           // arg is for internal usage only
           map: function(elems, callback, arg) {
@@ -1671,7 +985,7 @@
         };
         var preferredDoc = document2, pushNative = push;
         (function() {
-          var i, Expr, outermostContext, sortInput, hasDuplicate, push2 = pushNative, document3, documentElement2, documentIsHTML, rbuggyQSA, matches, expando = jQuery2.expando, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
+          var i, Expr, outermostContext, sortInput, hasDuplicate, push2 = pushNative, document3, documentElement2, documentIsHTML, rbuggyQSA, matches2, expando = jQuery2.expando, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
             if (a === b) {
               hasDuplicate = true;
             }
@@ -1729,7 +1043,7 @@
             };
           }
           function find(selector, context, results, seed) {
-            var m, i2, elem, nid, match, groups, newSelector, newContext = context && context.ownerDocument, nodeType = context ? context.nodeType : 9;
+            var m2, i2, elem, nid, match, groups, newSelector, newContext = context && context.ownerDocument, nodeType = context ? context.nodeType : 9;
             results = results || [];
             if (typeof selector !== "string" || !selector || nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
               return results;
@@ -1739,10 +1053,10 @@
               context = context || document3;
               if (documentIsHTML) {
                 if (nodeType !== 11 && (match = rquickExpr2.exec(selector))) {
-                  if (m = match[1]) {
+                  if (m2 = match[1]) {
                     if (nodeType === 9) {
-                      if (elem = context.getElementById(m)) {
-                        if (elem.id === m) {
+                      if (elem = context.getElementById(m2)) {
+                        if (elem.id === m2) {
                           push2.call(results, elem);
                           return results;
                         }
@@ -1750,7 +1064,7 @@
                         return results;
                       }
                     } else {
-                      if (newContext && (elem = newContext.getElementById(m)) && find.contains(context, elem) && elem.id === m) {
+                      if (newContext && (elem = newContext.getElementById(m2)) && find.contains(context, elem) && elem.id === m2) {
                         push2.call(results, elem);
                         return results;
                       }
@@ -1758,8 +1072,8 @@
                   } else if (match[2]) {
                     push2.apply(results, context.getElementsByTagName(selector));
                     return results;
-                  } else if ((m = match[3]) && context.getElementsByClassName) {
-                    push2.apply(results, context.getElementsByClassName(m));
+                  } else if ((m2 = match[3]) && context.getElementsByClassName) {
+                    push2.apply(results, context.getElementsByClassName(m2));
                     return results;
                   }
                 }
@@ -1861,11 +1175,11 @@
           function createPositionalPseudo(fn2) {
             return markFunction(function(argument) {
               argument = +argument;
-              return markFunction(function(seed, matches2) {
+              return markFunction(function(seed, matches3) {
                 var j, matchIndexes = fn2([], seed.length, argument), i2 = matchIndexes.length;
                 while (i2--) {
                   if (seed[j = matchIndexes[i2]]) {
-                    seed[j] = !(matches2[j] = seed[j]);
+                    seed[j] = !(matches3[j] = seed[j]);
                   }
                 }
               });
@@ -1882,7 +1196,7 @@
             document3 = doc;
             documentElement2 = document3.documentElement;
             documentIsHTML = !jQuery2.isXMLDoc(document3);
-            matches = documentElement2.matches || documentElement2.webkitMatchesSelector || documentElement2.msMatchesSelector;
+            matches2 = documentElement2.matches || documentElement2.webkitMatchesSelector || documentElement2.msMatchesSelector;
             if (documentElement2.msMatchesSelector && // Support: IE 11+, Edge 17 - 18+
             // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
             // two documents; shallow comparisons work.
@@ -1895,7 +1209,7 @@
               return !document3.getElementsByName || !document3.getElementsByName(jQuery2.expando).length;
             });
             support.disconnectedMatch = assert(function(el) {
-              return matches.call(el, "*");
+              return matches2.call(el, "*");
             });
             support.scope = assert(function() {
               return document3.querySelectorAll(":scope");
@@ -2029,7 +1343,7 @@
             setDocument(elem);
             if (documentIsHTML && !nonnativeSelectorCache[expr + " "] && (!rbuggyQSA || !rbuggyQSA.test(expr))) {
               try {
-                var ret = matches.call(elem, expr);
+                var ret = matches2.call(elem, expr);
                 if (ret || support.disconnectedMatch || // As well, disconnected nodes are said to be in a document
                 // fragment in IE 9
                 elem.document && elem.document.nodeType !== 11) {
@@ -2191,7 +1505,7 @@
                     return !!elem.parentNode;
                   }
                 ) : function(elem, _context, xml) {
-                  var cache2, outerCache, node, nodeIndex, start4, dir2 = simple !== forward ? "nextSibling" : "previousSibling", parent = elem.parentNode, name = ofType && elem.nodeName.toLowerCase(), useCache = !xml && !ofType, diff = false;
+                  var cache2, outerCache, node, nodeIndex, start5, dir2 = simple !== forward ? "nextSibling" : "previousSibling", parent = elem.parentNode, name = ofType && elem.nodeName.toLowerCase(), useCache = !xml && !ofType, diff = false;
                   if (parent) {
                     if (simple) {
                       while (dir2) {
@@ -2201,11 +1515,11 @@
                             return false;
                           }
                         }
-                        start4 = dir2 = type === "only" && !start4 && "nextSibling";
+                        start5 = dir2 = type === "only" && !start5 && "nextSibling";
                       }
                       return true;
                     }
-                    start4 = [forward ? parent.firstChild : parent.lastChild];
+                    start5 = [forward ? parent.firstChild : parent.lastChild];
                     if (forward && useCache) {
                       outerCache = parent[expando] || (parent[expando] = {});
                       cache2 = outerCache[type] || [];
@@ -2213,7 +1527,7 @@
                       diff = nodeIndex && cache2[2];
                       node = nodeIndex && parent.childNodes[nodeIndex];
                       while (node = ++nodeIndex && node && node[dir2] || // Fallback to seeking `elem` from the start
-                      (diff = nodeIndex = 0) || start4.pop()) {
+                      (diff = nodeIndex = 0) || start5.pop()) {
                         if (node.nodeType === 1 && ++diff && node === elem) {
                           outerCache[type] = [dirruns, nodeIndex, diff];
                           break;
@@ -2227,7 +1541,7 @@
                         diff = nodeIndex;
                       }
                       if (diff === false) {
-                        while (node = ++nodeIndex && node && node[dir2] || (diff = nodeIndex = 0) || start4.pop()) {
+                        while (node = ++nodeIndex && node && node[dir2] || (diff = nodeIndex = 0) || start5.pop()) {
                           if ((ofType ? nodeName(node, name) : node.nodeType === 1) && ++diff) {
                             if (useCache) {
                               outerCache = node[expando] || (node[expando] = {});
@@ -2252,11 +1566,11 @@
                 }
                 if (fn2.length > 1) {
                   args = [pseudo, pseudo, "", argument];
-                  return Expr.setFilters.hasOwnProperty(pseudo.toLowerCase()) ? markFunction(function(seed, matches2) {
+                  return Expr.setFilters.hasOwnProperty(pseudo.toLowerCase()) ? markFunction(function(seed, matches3) {
                     var idx, matched = fn2(seed, argument), i2 = matched.length;
                     while (i2--) {
                       idx = indexOf2.call(seed, matched[i2]);
-                      seed[idx] = !(matches2[idx] = matched[i2]);
+                      seed[idx] = !(matches3[idx] = matched[i2]);
                     }
                   }) : function(elem) {
                     return fn2(elem, 0, args);
@@ -2269,11 +1583,11 @@
               // Potentially complex pseudos
               not: markFunction(function(selector) {
                 var input = [], results = [], matcher = compile(selector.replace(rtrimCSS, "$1"));
-                return matcher[expando] ? markFunction(function(seed, matches2, _context, xml) {
+                return matcher[expando] ? markFunction(function(seed, matches3, _context, xml) {
                   var elem, unmatched = matcher(seed, null, xml, []), i2 = seed.length;
                   while (i2--) {
                     if (elem = unmatched[i2]) {
-                      seed[i2] = !(matches2[i2] = elem);
+                      seed[i2] = !(matches3[i2] = elem);
                     }
                   }
                 }) : function(elem, _context, xml) {
@@ -3103,7 +2417,7 @@
         }
         jQuery2.Callbacks = function(options) {
           options = typeof options === "string" ? createOptions(options) : jQuery2.extend({}, options);
-          var firing, memory, fired, locked, list = [], queue = [], firingIndex = -1, fire = function() {
+          var firing, memory, fired, locked, list = [], queue = [], firingIndex = -1, fire2 = function() {
             locked = locked || options.once;
             fired = firing = true;
             for (; queue.length; firingIndex = -1) {
@@ -3146,7 +2460,7 @@
                   });
                 })(arguments);
                 if (memory && !firing) {
-                  fire();
+                  fire2();
                 }
               }
               return this;
@@ -3207,7 +2521,7 @@
                 args = [context, args.slice ? args.slice() : args];
                 queue.push(args);
                 if (!firing) {
-                  fire();
+                  fire2();
                 }
               }
               return this;
@@ -3654,7 +2968,7 @@
         var dataPriv = new Data2();
         var dataUser = new Data2();
         var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/, rmultiDash = /[A-Z]/g;
-        function getData(data) {
+        function getData2(data) {
           if (data === "true") {
             return true;
           }
@@ -3679,7 +2993,7 @@
             data = elem.getAttribute(name);
             if (typeof data === "string") {
               try {
-                data = getData(data);
+                data = getData2(data);
               } catch (e) {
               }
               dataUser.set(elem, key, data);
@@ -5100,10 +4414,10 @@
           fontWeight: "400"
         };
         function setPositiveNumber(_elem, value, subtract) {
-          var matches = rcssNum.exec(value);
-          return matches ? (
+          var matches2 = rcssNum.exec(value);
+          return matches2 ? (
             // Guard against undefined "subtract", e.g., when used as in cssHooks
-            Math.max(0, matches[2] - (subtract || 0)) + (matches[3] || "px")
+            Math.max(0, matches2[2] - (subtract || 0)) + (matches2[3] || "px")
           ) : value;
         }
         function boxModelAdjustment(elem, dimension, box, isBorderBox, styles, computedVal) {
@@ -5299,7 +4613,7 @@
               }
             },
             set: function(elem, value, extra) {
-              var matches, styles = getStyles(elem), scrollboxSizeBuggy = !support.scrollboxSize() && styles.position === "absolute", boxSizingNeeded = scrollboxSizeBuggy || extra, isBorderBox = boxSizingNeeded && jQuery2.css(elem, "boxSizing", false, styles) === "border-box", subtract = extra ? boxModelAdjustment(
+              var matches2, styles = getStyles(elem), scrollboxSizeBuggy = !support.scrollboxSize() && styles.position === "absolute", boxSizingNeeded = scrollboxSizeBuggy || extra, isBorderBox = boxSizingNeeded && jQuery2.css(elem, "boxSizing", false, styles) === "border-box", subtract = extra ? boxModelAdjustment(
                 elem,
                 dimension,
                 extra,
@@ -5311,7 +4625,7 @@
                   elem["offset" + dimension[0].toUpperCase() + dimension.slice(1)] - parseFloat(styles[dimension]) - boxModelAdjustment(elem, dimension, "border", false, styles) - 0.5
                 );
               }
-              if (subtract && (matches = rcssNum.exec(value)) && (matches[3] || "px") !== "px") {
+              if (subtract && (matches2 = rcssNum.exec(value)) && (matches2[3] || "px") !== "px") {
                 elem.style[dimension] = value;
                 value = jQuery2.css(elem, dimension);
               }
@@ -6339,7 +5653,7 @@
           }
         });
         var location2 = window2.location;
-        var nonce = { guid: Date.now() };
+        var nonce2 = { guid: Date.now() };
         var rquery = /\?/;
         jQuery2.parseXML = function(data) {
           var xml, parserErrorElem;
@@ -6865,7 +6179,7 @@
               }
               if (s.cache === false) {
                 cacheURL = cacheURL.replace(rantiCache, "$1");
-                uncached = (rquery.test(cacheURL) ? "&" : "?") + "_=" + nonce.guid++ + uncached;
+                uncached = (rquery.test(cacheURL) ? "&" : "?") + "_=" + nonce2.guid++ + uncached;
               }
               s.url = cacheURL + uncached;
             } else if (s.data && s.processData && (s.contentType || "").indexOf("application/x-www-form-urlencoded") === 0) {
@@ -7262,7 +6576,7 @@
         jQuery2.ajaxSetup({
           jsonp: "callback",
           jsonpCallback: function() {
-            var callback = oldCallbacks.pop() || jQuery2.expando + "_" + nonce.guid++;
+            var callback = oldCallbacks.pop() || jQuery2.expando + "_" + nonce2.guid++;
             this[callback] = true;
             return callback;
           }
@@ -7661,9 +6975,9 @@
 
   // node_modules/chosen-js/chosen.jquery.js
   var require_chosen_jquery = __commonJS({
-    "node_modules/chosen-js/chosen.jquery.js"(exports) {
+    "node_modules/chosen-js/chosen.jquery.js"(exports2) {
       (function() {
-        var $, AbstractChosen, Chosen, SelectParser, bind = function(fn2, me) {
+        var $2, AbstractChosen, Chosen, SelectParser, bind = function(fn2, me) {
           return function() {
             return fn2.apply(me, arguments);
           };
@@ -8237,15 +7551,15 @@
           AbstractChosen2.default_no_result_text = "No results match";
           return AbstractChosen2;
         }();
-        $ = jQuery;
-        $.fn.extend({
+        $2 = jQuery;
+        $2.fn.extend({
           chosen: function(options) {
             if (!AbstractChosen.browser_is_supported()) {
               return this;
             }
             return this.each(function(input_field) {
               var $this, chosen;
-              $this = $(this);
+              $this = $2(this);
               chosen = $this.data("chosen");
               if (options === "destroy") {
                 if (chosen instanceof Chosen) {
@@ -8265,7 +7579,7 @@
             return Chosen2.__super__.constructor.apply(this, arguments);
           }
           Chosen2.prototype.setup = function() {
-            this.form_field_jq = $(this.form_field);
+            this.form_field_jq = $2(this.form_field);
             return this.current_selectedIndex = this.form_field.selectedIndex;
           };
           Chosen2.prototype.set_up_html = function() {
@@ -8285,7 +7599,7 @@
             if (this.form_field.id.length) {
               container_props.id = this.form_field.id.replace(/[^\w]/g, "_") + "_chosen";
             }
-            this.container = $("<div />", container_props);
+            this.container = $2("<div />", container_props);
             this.container.width(this.container_width());
             if (this.is_multiple) {
               this.container.html(this.get_multi_html());
@@ -8443,7 +7757,7 @@
             }
           };
           Chosen2.prototype.destroy = function() {
-            $(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
+            $2(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
             if (this.form_field_label.length > 0) {
               this.form_field_label.off("click.chosen");
             }
@@ -8475,14 +7789,14 @@
             if (evt && ((ref = evt.type) === "mousedown" || ref === "touchstart") && !this.results_showing) {
               evt.preventDefault();
             }
-            if (!(evt != null && $(evt.target).hasClass("search-choice-close"))) {
+            if (!(evt != null && $2(evt.target).hasClass("search-choice-close"))) {
               if (!this.active_field) {
                 if (this.is_multiple) {
                   this.search_field.val("");
                 }
-                $(this.container[0].ownerDocument).on("click.chosen", this.click_test_action);
+                $2(this.container[0].ownerDocument).on("click.chosen", this.click_test_action);
                 this.results_show();
-              } else if (!this.is_multiple && evt && ($(evt.target)[0] === this.selected_item[0] || $(evt.target).parents("a.chosen-single").length)) {
+              } else if (!this.is_multiple && evt && ($2(evt.target)[0] === this.selected_item[0] || $2(evt.target).parents("a.chosen-single").length)) {
                 evt.preventDefault();
                 this.results_toggle();
               }
@@ -8513,7 +7827,7 @@
             }
           };
           Chosen2.prototype.close_field = function() {
-            $(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
+            $2(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
             this.active_field = false;
             this.results_hide();
             this.container.removeClass("chosen-container-active");
@@ -8533,7 +7847,7 @@
           };
           Chosen2.prototype.test_active_click = function(evt) {
             var active_container;
-            active_container = $(evt.target).closest(".chosen-container");
+            active_container = $2(evt.target).closest(".chosen-container");
             if (active_container.length && this.container[0] === active_container[0]) {
               return this.active_field = true;
             } else {
@@ -8628,7 +7942,7 @@
           Chosen2.prototype.set_label_behavior = function() {
             this.form_field_label = this.form_field_jq.parents("label");
             if (!this.form_field_label.length && this.form_field.id.length) {
-              this.form_field_label = $("label[for='" + this.form_field.id + "']");
+              this.form_field_label = $2("label[for='" + this.form_field.id + "']");
             }
             if (this.form_field_label.length > 0) {
               return this.form_field_label.on("click.chosen", this.label_click_handler);
@@ -8645,7 +7959,7 @@
           };
           Chosen2.prototype.search_results_mouseup = function(evt) {
             var target;
-            target = $(evt.target).hasClass("active-result") ? $(evt.target) : $(evt.target).parents(".active-result").first();
+            target = $2(evt.target).hasClass("active-result") ? $2(evt.target) : $2(evt.target).parents(".active-result").first();
             if (target.length) {
               this.result_highlight = target;
               this.result_select(evt);
@@ -8654,25 +7968,25 @@
           };
           Chosen2.prototype.search_results_mouseover = function(evt) {
             var target;
-            target = $(evt.target).hasClass("active-result") ? $(evt.target) : $(evt.target).parents(".active-result").first();
+            target = $2(evt.target).hasClass("active-result") ? $2(evt.target) : $2(evt.target).parents(".active-result").first();
             if (target) {
               return this.result_do_highlight(target);
             }
           };
           Chosen2.prototype.search_results_mouseout = function(evt) {
-            if ($(evt.target).hasClass("active-result") || $(evt.target).parents(".active-result").first()) {
+            if ($2(evt.target).hasClass("active-result") || $2(evt.target).parents(".active-result").first()) {
               return this.result_clear_highlight();
             }
           };
           Chosen2.prototype.choice_build = function(item) {
             var choice, close_link;
-            choice = $("<li />", {
+            choice = $2("<li />", {
               "class": "search-choice"
             }).html("<span>" + this.choice_label(item) + "</span>");
             if (item.disabled) {
               choice.addClass("search-choice-disabled");
             } else {
-              close_link = $("<a />", {
+              close_link = $2("<a />", {
                 "class": "search-choice-close",
                 "data-option-array-index": item.array_index
               });
@@ -8689,7 +8003,7 @@
             evt.preventDefault();
             evt.stopPropagation();
             if (!this.is_disabled) {
-              return this.choice_destroy($(evt.target));
+              return this.choice_destroy($2(evt.target));
             }
           };
           Chosen2.prototype.choice_destroy = function(link) {
@@ -8815,10 +8129,10 @@
             return this.search_field.val();
           };
           Chosen2.prototype.get_search_text = function() {
-            return $.trim(this.get_search_field_value());
+            return $2.trim(this.get_search_field_value());
           };
           Chosen2.prototype.escape_html = function(text) {
-            return $("<div/>").text(text).html();
+            return $2("<div/>").text(text).html();
           };
           Chosen2.prototype.winnow_results_set_highlight = function() {
             var do_high, selected_results;
@@ -8906,9 +8220,9 @@
               style = styles[i];
               style_block[style] = this.search_field.css(style);
             }
-            div = $("<div />").css(style_block);
+            div = $2("<div />").css(style_block);
             div.text(this.get_search_field_value());
-            $("body").append(div);
+            $2("body").append(div);
             width = div.width() + 25;
             div.remove();
             if (this.container.is(":visible")) {
@@ -8922,22 +8236,22 @@
           };
           return Chosen2;
         }(AbstractChosen);
-      }).call(exports);
+      }).call(exports2);
     }
   });
 
   // node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js
   var require_bootstrap_datepicker = __commonJS({
-    "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"(exports) {
+    "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"(exports2) {
       (function(factory) {
         if (typeof define === "function" && define.amd) {
           define(["jquery"], factory);
-        } else if (typeof exports === "object") {
+        } else if (typeof exports2 === "object") {
           factory(require_jquery());
         } else {
           factory(jQuery);
         }
-      })(function($, undefined2) {
+      })(function($2, undefined2) {
         function UTCDate() {
           return new Date(Date.UTC.apply(Date, arguments));
         }
@@ -8951,7 +8265,7 @@
         function alias(method, deprecationMsg) {
           return function() {
             if (deprecationMsg !== undefined2) {
-              $.fn.datepicker.deprecated(deprecationMsg);
+              $2.fn.datepicker.deprecated(deprecationMsg);
             }
             return this[method].apply(this, arguments);
           };
@@ -8994,19 +8308,19 @@
           return function() {
             var a = [];
             a.push.apply(a, arguments);
-            $.extend(a, extras);
+            $2.extend(a, extras);
             return a;
           };
         }();
         var Datepicker = function(element, options) {
-          $.data(element, "datepicker", this);
+          $2.data(element, "datepicker", this);
           this._events = [];
           this._secondaryEvents = [];
           this._process_options(options);
           this.dates = new DateArray();
           this.viewDate = this.o.defaultViewDate;
           this.focusDate = null;
-          this.element = $(element);
+          this.element = $2(element);
           this.isInput = this.element.is("input");
           this.inputField = this.isInput ? this.element : this.element.find("input");
           this.component = this.element.hasClass("date") ? this.element.find(".add-on, .input-group-addon, .input-group-append, .input-group-prepend, .btn") : false;
@@ -9018,7 +8332,7 @@
           } else {
             this.isInline = this.o.isInline;
           }
-          this.picker = $(DPGlobal.template);
+          this.picker = $2(DPGlobal.template);
           if (this._check_template(this.o.templates.leftArrow)) {
             this.picker.find(".prev").html(this.o.templates.leftArrow);
           }
@@ -9060,8 +8374,8 @@
         Datepicker.prototype = {
           constructor: Datepicker,
           _resolveViewName: function(view) {
-            $.each(DPGlobal.viewModes, function(i, viewMode) {
-              if (view === i || $.inArray(view, viewMode.names) !== -1) {
+            $2.each(DPGlobal.viewModes, function(i, viewMode) {
+              if (view === i || $2.inArray(view, viewMode.names) !== -1) {
                 view = i;
                 return false;
               }
@@ -9071,7 +8385,7 @@
           _resolveDaysOfWeek: function(daysOfWeek) {
             if (!Array.isArray(daysOfWeek))
               daysOfWeek = daysOfWeek.split(/[,\s]*/);
-            return $.map(daysOfWeek, Number);
+            return $2.map(daysOfWeek, Number);
           },
           _check_template: function(tmp) {
             try {
@@ -9081,15 +8395,15 @@
               if ((tmp.match(/[<>]/g) || []).length <= 0) {
                 return true;
               }
-              var jDom = $(tmp);
+              var jDom = $2(tmp);
               return jDom.length > 0;
             } catch (ex) {
               return false;
             }
           },
           _process_options: function(opts) {
-            this._o = $.extend({}, this._o, opts);
-            var o = this.o = $.extend({}, this._o);
+            this._o = $2.extend({}, this._o, opts);
+            var o = this.o = $2.extend({}, this._o);
             var lang = o.language;
             if (!dates[lang]) {
               lang = lang.split("-")[0];
@@ -9136,11 +8450,11 @@
             if (!Array.isArray(o.datesDisabled)) {
               o.datesDisabled = o.datesDisabled.split(",");
             }
-            o.datesDisabled = $.map(o.datesDisabled, function(d) {
+            o.datesDisabled = $2.map(o.datesDisabled, function(d) {
               return DPGlobal.parseDate(d, format, o.language, o.assumeNearbyYear);
             });
             var plc = String(o.orientation).toLowerCase().split(/\s+/g), _plc = o.orientation.toLowerCase();
-            plc = $.grep(plc, function(word) {
+            plc = $2.grep(plc, function(word) {
               return /^auto|left|right|top|bottom$/.test(word);
             });
             o.orientation = { x: "auto", y: "auto" };
@@ -9158,11 +8472,11 @@
                   break;
               }
             } else {
-              _plc = $.grep(plc, function(word) {
+              _plc = $2.grep(plc, function(word) {
                 return /^left|right$/.test(word);
               });
               o.orientation.x = _plc[0] || "auto";
-              _plc = $.grep(plc, function(word) {
+              _plc = $2.grep(plc, function(word) {
                 return /^top|bottom$/.test(word);
               });
               o.orientation.y = _plc[0] || "auto";
@@ -9206,15 +8520,15 @@
           },
           _buildEvents: function() {
             var events = {
-              keyup: $.proxy(function(e) {
-                if ($.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
+              keyup: $2.proxy(function(e) {
+                if ($2.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
                   this.update();
               }, this),
-              keydown: $.proxy(this.keydown, this),
-              paste: $.proxy(this.paste, this)
+              keydown: $2.proxy(this.keydown, this),
+              paste: $2.proxy(this.paste, this)
             };
             if (this.o.showOnFocus === true) {
-              events.focus = $.proxy(this.show, this);
+              events.focus = $2.proxy(this.show, this);
             }
             if (this.isInput) {
               this._events = [
@@ -9225,53 +8539,53 @@
                 // For components that are not readonly, allow keyboard nav
                 [this.inputField, events],
                 [this.component, {
-                  click: $.proxy(this.show, this)
+                  click: $2.proxy(this.show, this)
                 }]
               ];
             } else {
               this._events = [
                 [this.element, {
-                  click: $.proxy(this.show, this),
-                  keydown: $.proxy(this.keydown, this)
+                  click: $2.proxy(this.show, this),
+                  keydown: $2.proxy(this.keydown, this)
                 }]
               ];
             }
             this._events.push(
               // Component: listen for blur on element descendants
               [this.element, "*", {
-                blur: $.proxy(function(e) {
+                blur: $2.proxy(function(e) {
                   this._focused_from = e.target;
                 }, this)
               }],
               // Input: listen for blur on element
               [this.element, {
-                blur: $.proxy(function(e) {
+                blur: $2.proxy(function(e) {
                   this._focused_from = e.target;
                 }, this)
               }]
             );
             if (this.o.immediateUpdates) {
               this._events.push([this.element, {
-                "changeYear changeMonth": $.proxy(function(e) {
+                "changeYear changeMonth": $2.proxy(function(e) {
                   this.update(e.date);
                 }, this)
               }]);
             }
             this._secondaryEvents = [
               [this.picker, {
-                click: $.proxy(this.click, this)
+                click: $2.proxy(this.click, this)
               }],
               [this.picker, ".prev, .next", {
-                click: $.proxy(this.navArrowsClick, this)
+                click: $2.proxy(this.navArrowsClick, this)
               }],
               [this.picker, ".day:not(.disabled)", {
-                click: $.proxy(this.dayCellClick, this)
+                click: $2.proxy(this.dayCellClick, this)
               }],
-              [$(window), {
-                resize: $.proxy(this.place, this)
+              [$2(window), {
+                resize: $2.proxy(this.place, this)
               }],
-              [$(document), {
-                "mousedown touchstart": $.proxy(function(e) {
+              [$2(document), {
+                "mousedown touchstart": $2.proxy(function(e) {
                   if (!(this.element.is(e.target) || this.element.find(e.target).length || this.picker.is(e.target) || this.picker.find(e.target).length || this.isInline)) {
                     this.hide();
                   }
@@ -9299,8 +8613,8 @@
               type: event,
               date: local_date,
               viewMode: this.viewMode,
-              dates: $.map(this.dates, this._utc_to_local),
-              format: $.proxy(function(ix, format) {
+              dates: $2.map(this.dates, this._utc_to_local),
+              format: $2.proxy(function(ix, format) {
                 if (arguments.length === 0) {
                   ix = this.dates.length - 1;
                   format = this.o.format;
@@ -9324,7 +8638,7 @@
             this._attachSecondaryEvents();
             this._trigger("show");
             if ((window.navigator.msMaxTouchPoints || "ontouchstart" in document) && this.o.disableTouchKeyboard) {
-              $(this.element).blur();
+              $2(this.element).blur();
             }
             return this;
           },
@@ -9353,7 +8667,7 @@
           },
           paste: function(e) {
             var dateString;
-            if (e.originalEvent.clipboardData && e.originalEvent.clipboardData.types && $.inArray("text/plain", e.originalEvent.clipboardData.types) !== -1) {
+            if (e.originalEvent.clipboardData && e.originalEvent.clipboardData.types && $2.inArray("text/plain", e.originalEvent.clipboardData.types) !== -1) {
               dateString = e.originalEvent.clipboardData.getData("text/plain");
             } else if (window.clipboardData) {
               dateString = window.clipboardData.getData("Text");
@@ -9384,10 +8698,10 @@
             return utc && UTCDate(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
           },
           getDates: function() {
-            return $.map(this.dates, this._utc_to_local);
+            return $2.map(this.dates, this._utc_to_local);
           },
           getUTCDates: function() {
-            return $.map(this.dates, function(d) {
+            return $2.map(this.dates, function(d) {
               return new Date(d);
             });
           },
@@ -9419,7 +8733,7 @@
           },
           setUTCDates: function() {
             var args = Array.isArray(arguments[0]) ? arguments[0] : arguments;
-            this.setDates.apply(this, $.map(args, this._utc_to_local));
+            this.setDates.apply(this, $2.map(args, this._utc_to_local));
             return this;
           },
           setDate: alias("setDates"),
@@ -9434,7 +8748,7 @@
             if (format === undefined2)
               format = this.o.format;
             var lang = this.o.language;
-            return $.map(this.dates, function(d) {
+            return $2.map(this.dates, function(d) {
               return DPGlobal.formatDate(d, format, lang);
             }).join(this.o.multidateSeparator);
           },
@@ -9474,10 +8788,10 @@
           place: function() {
             if (this.isInline)
               return this;
-            var calendarWidth = this.picker.outerWidth(), calendarHeight = this.picker.outerHeight(), visualPadding = 10, container = $(this.o.container), windowWidth = container.width(), scrollTop = this.o.container === "body" ? $(document).scrollTop() : container.scrollTop(), appendOffset = container.offset();
+            var calendarWidth = this.picker.outerWidth(), calendarHeight = this.picker.outerHeight(), visualPadding = 10, container = $2(this.o.container), windowWidth = container.width(), scrollTop = this.o.container === "body" ? $2(document).scrollTop() : container.scrollTop(), appendOffset = container.offset();
             var parentsZindex = [0];
             this.element.parents().each(function() {
-              var itemZIndex = $(this).css("z-index");
+              var itemZIndex = $2(this).css("z-index");
               if (itemZIndex !== "auto" && Number(itemZIndex) !== 0)
                 parentsZindex.push(Number(itemZIndex));
             });
@@ -9544,7 +8858,7 @@
               return this;
             var oldDates = this.dates.copy(), dates2 = [], fromArgs = false;
             if (arguments.length) {
-              $.each(arguments, $.proxy(function(i, date) {
+              $2.each(arguments, $2.proxy(function(i, date) {
                 if (date instanceof Date)
                   date = this._local_to_utc(date);
                 dates2.push(date);
@@ -9558,10 +8872,10 @@
                 dates2 = [dates2];
               delete this.element.data().date;
             }
-            dates2 = $.map(dates2, $.proxy(function(date) {
+            dates2 = $2.map(dates2, $2.proxy(function(date) {
               return DPGlobal.parseDate(date, this.o.format, this.o.language, this.o.assumeNearbyYear);
             }, this));
-            dates2 = $.grep(dates2, $.proxy(function(date) {
+            dates2 = $2.grep(dates2, $2.proxy(function(date) {
               return !this.dateWithinRange(date) || !date;
             }, this), true);
             this.dates.replace(dates2);
@@ -9599,7 +8913,7 @@
               }
               while (dowCnt < this.o.weekStart + 7) {
                 html += '<th class="dow';
-                if ($.inArray(dowCnt, this.o.daysOfWeekDisabled) !== -1)
+                if ($2.inArray(dowCnt, this.o.daysOfWeekDisabled) !== -1)
                   html += " disabled";
                 html += '">' + dates[this.o.language].daysMin[dowCnt++ % 7] + "</th>";
               }
@@ -9621,7 +8935,7 @@
             if (!range || !range.length)
               delete this.range;
             else
-              this.range = $.map(range, function(d) {
+              this.range = $2.map(range, function(d) {
                 return d.valueOf();
               });
             this.fill();
@@ -9646,14 +8960,14 @@
             if (this.dateIsDisabled(date)) {
               cls.push("disabled", "disabled-date");
             }
-            if ($.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1) {
+            if ($2.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1) {
               cls.push("highlighted");
             }
             if (this.range) {
               if (date > this.range[0] && date < this.range[this.range.length - 1]) {
                 cls.push("range");
               }
-              if ($.inArray(date.valueOf(), this.range) !== -1) {
+              if ($2.inArray(date.valueOf(), this.range) !== -1) {
                 cls.push("selected");
               }
               if (date.valueOf() === this.range[0]) {
@@ -9672,7 +8986,7 @@
             var startVal = Math.floor(year / factor) * factor;
             var endVal = startVal + step * 9;
             var focusedVal = Math.floor(this.viewDate.getFullYear() / step) * step;
-            var selected = $.map(this.dates, function(d) {
+            var selected = $2.map(this.dates, function(d) {
               return Math.floor(d.getUTCFullYear() / step) * step;
             });
             var classes, tooltip, before;
@@ -9684,7 +8998,7 @@
               } else if (currVal === endVal + step) {
                 classes.push("new");
               }
-              if ($.inArray(currVal, selected) !== -1) {
+              if ($2.inArray(currVal, selected) !== -1) {
                 classes.push("active");
               }
               if (currVal < startYear || currVal > endYear) {
@@ -9693,7 +9007,7 @@
               if (currVal === focusedVal) {
                 classes.push("focused");
               }
-              if (beforeFn !== $.noop) {
+              if (beforeFn !== $2.noop) {
                 before = beforeFn(new Date(currVal, 0, 1));
                 if (before === undefined2) {
                   before = {};
@@ -9749,7 +9063,7 @@
               clsName = this.getClassNames(prevMonth);
               clsName.push("day");
               var content = prevMonth.getUTCDate();
-              if (this.o.beforeShowDay !== $.noop) {
+              if (this.o.beforeShowDay !== $2.noop) {
                 before = this.o.beforeShowDay(this._utc_to_local(prevMonth));
                 if (before === undefined2)
                   before = {};
@@ -9766,10 +9080,10 @@
                 if (before.content)
                   content = before.content;
               }
-              if (typeof $.uniqueSort === "function") {
-                clsName = $.uniqueSort(clsName);
+              if (typeof $2.uniqueSort === "function") {
+                clsName = $2.uniqueSort(clsName);
               } else {
-                clsName = $.unique(clsName);
+                clsName = $2.unique(clsName);
               }
               html.push('<td class="' + clsName.join(" ") + '"' + (tooltip ? ' title="' + tooltip + '"' : "") + ' data-date="' + prevMonth.getTime().toString() + '">' + content + "</td>");
               tooltip = null;
@@ -9781,7 +9095,7 @@
             this.picker.find(".datepicker-days tbody").html(html.join(""));
             var monthsTitle = dates[this.o.language].monthsTitle || dates["en"].monthsTitle || "Months";
             var months = this.picker.find(".datepicker-months").find(".datepicker-switch").text(this.o.maxViewMode < 2 ? monthsTitle : year).end().find("tbody span").removeClass("active");
-            $.each(this.dates, function(i, d2) {
+            $2.each(this.dates, function(i, d2) {
               if (d2.getUTCFullYear() === year)
                 months.eq(d2.getUTCMonth()).addClass("active");
             });
@@ -9794,9 +9108,9 @@
             if (year === endYear) {
               months.slice(endMonth + 1).addClass("disabled");
             }
-            if (this.o.beforeShowMonth !== $.noop) {
+            if (this.o.beforeShowMonth !== $2.noop) {
               var that = this;
-              $.each(months, function(i, month2) {
+              $2.each(months, function(i, month2) {
                 var moDate = new Date(year, i, 1);
                 var before2 = that.o.beforeShowMonth(moDate);
                 if (before2 === undefined2)
@@ -9805,12 +9119,12 @@
                   before2 = { enabled: before2 };
                 else if (typeof before2 === "string")
                   before2 = { classes: before2 };
-                if (before2.enabled === false && !$(month2).hasClass("disabled"))
-                  $(month2).addClass("disabled");
+                if (before2.enabled === false && !$2(month2).hasClass("disabled"))
+                  $2(month2).addClass("disabled");
                 if (before2.classes)
-                  $(month2).addClass(before2.classes);
+                  $2(month2).addClass(before2.classes);
                 if (before2.tooltip)
-                  $(month2).prop("title", before2.tooltip);
+                  $2(month2).prop("title", before2.tooltip);
               });
             }
             this._fill_yearsView(
@@ -9868,7 +9182,7 @@
             e.preventDefault();
             e.stopPropagation();
             var target, dir, day, year, month;
-            target = $(e.target);
+            target = $2(e.target);
             if (target.hasClass("datepicker-switch") && this.viewMode !== this.o.maxViewMode) {
               this.setViewMode(this.viewMode + 1);
             }
@@ -9907,7 +9221,7 @@
             delete this._focused_from;
           },
           dayCellClick: function(e) {
-            var $target = $(e.currentTarget);
+            var $target = $2(e.currentTarget);
             var timestamp = $target.data("date");
             var date = new Date(timestamp);
             if (this.o.updateViewDate) {
@@ -9922,7 +9236,7 @@
           },
           // Clicked on prev or next
           navArrowsClick: function(e) {
-            var $target = $(e.currentTarget);
+            var $target = $2(e.currentTarget);
             var dir = $target.hasClass("prev") ? -1 : 1;
             if (this.viewMode !== 0) {
               dir *= DPGlobal.viewModes[this.viewMode].navStep * 12;
@@ -10017,10 +9331,10 @@
             return date;
           },
           weekOfDateIsDisabled: function(date) {
-            return $.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
+            return $2.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
           },
           dateIsDisabled: function(date) {
-            return this.weekOfDateIsDisabled(date) || $.grep(this.o.datesDisabled, function(d) {
+            return this.weekOfDateIsDisabled(date) || $2.grep(this.o.datesDisabled, function(d) {
               return isUTCEquals(date, d);
             }).length > 0;
           },
@@ -10128,37 +9442,37 @@
           }
         };
         var DateRangePicker = function(element, options) {
-          $.data(element, "datepicker", this);
-          this.element = $(element);
-          this.inputs = $.map(options.inputs, function(i) {
+          $2.data(element, "datepicker", this);
+          this.element = $2(element);
+          this.inputs = $2.map(options.inputs, function(i) {
             return i.jquery ? i[0] : i;
           });
           delete options.inputs;
           this.keepEmptyValues = options.keepEmptyValues;
           delete options.keepEmptyValues;
-          datepickerPlugin.call($(this.inputs), options).on("changeDate", $.proxy(this.dateUpdated, this));
-          this.pickers = $.map(this.inputs, function(i) {
-            return $.data(i, "datepicker");
+          datepickerPlugin.call($2(this.inputs), options).on("changeDate", $2.proxy(this.dateUpdated, this));
+          this.pickers = $2.map(this.inputs, function(i) {
+            return $2.data(i, "datepicker");
           });
           this.updateDates();
         };
         DateRangePicker.prototype = {
           updateDates: function() {
-            this.dates = $.map(this.pickers, function(i) {
+            this.dates = $2.map(this.pickers, function(i) {
               return i.getUTCDate();
             });
             this.updateRanges();
           },
           updateRanges: function() {
-            var range = $.map(this.dates, function(d) {
+            var range = $2.map(this.dates, function(d) {
               return d.valueOf();
             });
-            $.each(this.pickers, function(i, p) {
+            $2.each(this.pickers, function(i, p) {
               p.setRange(range);
             });
           },
           clearDates: function() {
-            $.each(this.pickers, function(i, p) {
+            $2.each(this.pickers, function(i, p) {
               p.clearDates();
             });
           },
@@ -10166,14 +9480,14 @@
             if (this.updating)
               return;
             this.updating = true;
-            var dp = $.data(e.target, "datepicker");
+            var dp = $2.data(e.target, "datepicker");
             if (dp === undefined2) {
               return;
             }
-            var new_date = dp.getUTCDate(), keep_empty_values = this.keepEmptyValues, i = $.inArray(e.target, this.inputs), j = i - 1, k = i + 1, l = this.inputs.length;
+            var new_date = dp.getUTCDate(), keep_empty_values = this.keepEmptyValues, i = $2.inArray(e.target, this.inputs), j = i - 1, k = i + 1, l = this.inputs.length;
             if (i === -1)
               return;
-            $.each(this.pickers, function(i2, p) {
+            $2.each(this.pickers, function(i2, p) {
               if (!p.getUTCDate() && (p === dp || !keep_empty_values))
                 p.setUTCDate(new_date);
             });
@@ -10190,16 +9504,16 @@
             delete this.updating;
           },
           destroy: function() {
-            $.map(this.pickers, function(p) {
+            $2.map(this.pickers, function(p) {
               p.destroy();
             });
-            $(this.inputs).off("changeDate", this.dateUpdated);
+            $2(this.inputs).off("changeDate", this.dateUpdated);
             delete this.element.data().datepicker;
           },
           remove: alias("destroy", "Method `remove` is deprecated and will be removed in version 2.0. Use `destroy` instead")
         };
         function opts_from_el(el, prefix) {
-          var data = $(el).data(), out = {}, inkey, replace = new RegExp("^" + prefix.toLowerCase() + "([A-Z])");
+          var data = $2(el).data(), out = {}, inkey, replace = new RegExp("^" + prefix.toLowerCase() + "([A-Z])");
           prefix = new RegExp("^" + prefix.toLowerCase());
           function re_lower(_, a) {
             return a.toLowerCase();
@@ -10219,23 +9533,23 @@
               return;
           }
           var d = dates[lang];
-          $.each(locale_opts, function(i, k) {
+          $2.each(locale_opts, function(i, k) {
             if (k in d)
               out[k] = d[k];
           });
           return out;
         }
-        var old = $.fn.datepicker;
+        var old = $2.fn.datepicker;
         var datepickerPlugin = function(option) {
           var args = Array.apply(null, arguments);
           args.shift();
           var internal_return;
           this.each(function() {
-            var $this = $(this), data = $this.data("datepicker"), options = typeof option === "object" && option;
+            var $this = $2(this), data = $this.data("datepicker"), options = typeof option === "object" && option;
             if (!data) {
-              var elopts = opts_from_el(this, "date"), xopts = $.extend({}, defaults, elopts, options), locopts = opts_from_locale(xopts.language), opts = $.extend({}, defaults, locopts, elopts, options);
+              var elopts = opts_from_el(this, "date"), xopts = $2.extend({}, defaults, elopts, options), locopts = opts_from_locale(xopts.language), opts = $2.extend({}, defaults, locopts, elopts, options);
               if ($this.hasClass("input-daterange") || opts.inputs) {
-                $.extend(opts, {
+                $2.extend(opts, {
                   inputs: opts.inputs || $this.find("input").toArray()
                 });
                 data = new DateRangePicker(this, opts);
@@ -10255,15 +9569,15 @@
           else
             return internal_return;
         };
-        $.fn.datepicker = datepickerPlugin;
-        var defaults = $.fn.datepicker.defaults = {
+        $2.fn.datepicker = datepickerPlugin;
+        var defaults = $2.fn.datepicker.defaults = {
           assumeNearbyYear: false,
           autoclose: false,
-          beforeShowDay: $.noop,
-          beforeShowMonth: $.noop,
-          beforeShowYear: $.noop,
-          beforeShowDecade: $.noop,
-          beforeShowCentury: $.noop,
+          beforeShowDay: $2.noop,
+          beforeShowMonth: $2.noop,
+          beforeShowYear: $2.noop,
+          beforeShowDecade: $2.noop,
+          beforeShowCentury: $2.noop,
           calendarWeeks: false,
           clearBtn: false,
           toggleActive: false,
@@ -10302,13 +9616,13 @@
           },
           showWeekDays: true
         };
-        var locale_opts = $.fn.datepicker.locale_opts = [
+        var locale_opts = $2.fn.datepicker.locale_opts = [
           "format",
           "rtl",
           "weekStart"
         ];
-        $.fn.datepicker.Constructor = Datepicker;
-        var dates = $.fn.datepicker.dates = {
+        $2.fn.datepicker.Constructor = Datepicker;
+        var dates = $2.fn.datepicker.dates = {
           en: {
             days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -10434,13 +9748,13 @@
             date = UTCToday();
             var fparts = format.parts.slice();
             if (parts.length !== fparts.length) {
-              fparts = $(fparts).filter(function(i2, p) {
-                return $.inArray(p, setters_order) !== -1;
+              fparts = $2(fparts).filter(function(i2, p) {
+                return $2.inArray(p, setters_order) !== -1;
               }).toArray();
             }
             function match_part() {
-              var m = this.slice(0, parts[i].length), p = parts[i].slice(0, m.length);
-              return m.toLowerCase() === p.toLowerCase();
+              var m2 = this.slice(0, parts[i].length), p = parts[i].slice(0, m2.length);
+              return m2.toLowerCase() === p.toLowerCase();
             }
             if (parts.length === fparts.length) {
               var cnt;
@@ -10450,12 +9764,12 @@
                 if (isNaN(val)) {
                   switch (part) {
                     case "MM":
-                      filtered = $(dates[language].months).filter(match_part);
-                      val = $.inArray(filtered[0], dates[language].months) + 1;
+                      filtered = $2(dates[language].months).filter(match_part);
+                      val = $2.inArray(filtered[0], dates[language].months) + 1;
                       break;
                     case "M":
-                      filtered = $(dates[language].monthsShort).filter(match_part);
-                      val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
+                      filtered = $2(dates[language].monthsShort).filter(match_part);
+                      val = $2.inArray(filtered[0], dates[language].monthsShort) + 1;
                       break;
                   }
                 }
@@ -10494,7 +9808,7 @@
             val.dd = (val.d < 10 ? "0" : "") + val.d;
             val.mm = (val.m < 10 ? "0" : "") + val.m;
             date = [];
-            var seps = $.extend([], format.separators);
+            var seps = $2.extend([], format.separators);
             for (var i = 0, cnt = format.parts.length; i <= cnt; i++) {
               if (seps.length)
                 date.push(seps.shift());
@@ -10507,38 +9821,635 @@
           footTemplate: '<tfoot><tr><th colspan="7" class="today"></th></tr><tr><th colspan="7" class="clear"></th></tr></tfoot>'
         };
         DPGlobal.template = '<div class="datepicker"><div class="datepicker-days"><table class="table-condensed">' + DPGlobal.headTemplate + "<tbody></tbody>" + DPGlobal.footTemplate + '</table></div><div class="datepicker-months"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-years"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-decades"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-centuries"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + "</table></div></div>";
-        $.fn.datepicker.DPGlobal = DPGlobal;
-        $.fn.datepicker.noConflict = function() {
-          $.fn.datepicker = old;
+        $2.fn.datepicker.DPGlobal = DPGlobal;
+        $2.fn.datepicker.noConflict = function() {
+          $2.fn.datepicker = old;
           return this;
         };
-        $.fn.datepicker.version = "1.10.0";
-        $.fn.datepicker.deprecated = function(msg) {
+        $2.fn.datepicker.version = "1.10.0";
+        $2.fn.datepicker.deprecated = function(msg) {
           var console2 = window.console;
           if (console2 && console2.warn) {
             console2.warn("DEPRECATED: " + msg);
           }
         };
-        $(document).on(
+        $2(document).on(
           "focus.datepicker.data-api click.datepicker.data-api",
           '[data-provide="datepicker"]',
           function(e) {
-            var $this = $(this);
+            var $this = $2(this);
             if ($this.data("datepicker"))
               return;
             e.preventDefault();
             datepickerPlugin.call($this, "show");
           }
         );
-        $(function() {
-          datepickerPlugin.call($('[data-provide="datepicker-inline"]'));
+        $2(function() {
+          datepickerPlugin.call($2('[data-provide="datepicker-inline"]'));
         });
       });
     }
   });
 
-  // app/javascript/application.js
-  var import_ujs = __toESM(require_rails_ujs());
+  // node_modules/@rails/ujs/app/assets/javascripts/rails-ujs.esm.js
+  var linkClickSelector = "a[data-confirm], a[data-method], a[data-remote]:not([disabled]), a[data-disable-with], a[data-disable]";
+  var buttonClickSelector = {
+    selector: "button[data-remote]:not([form]), button[data-confirm]:not([form])",
+    exclude: "form button"
+  };
+  var inputChangeSelector = "select[data-remote], input[data-remote], textarea[data-remote]";
+  var formSubmitSelector = "form:not([data-turbo=true])";
+  var formInputClickSelector = "form:not([data-turbo=true]) input[type=submit], form:not([data-turbo=true]) input[type=image], form:not([data-turbo=true]) button[type=submit], form:not([data-turbo=true]) button:not([type]), input[type=submit][form], input[type=image][form], button[type=submit][form], button[form]:not([type])";
+  var formDisableSelector = "input[data-disable-with]:enabled, button[data-disable-with]:enabled, textarea[data-disable-with]:enabled, input[data-disable]:enabled, button[data-disable]:enabled, textarea[data-disable]:enabled";
+  var formEnableSelector = "input[data-disable-with]:disabled, button[data-disable-with]:disabled, textarea[data-disable-with]:disabled, input[data-disable]:disabled, button[data-disable]:disabled, textarea[data-disable]:disabled";
+  var fileInputSelector = "input[name][type=file]:not([disabled])";
+  var linkDisableSelector = "a[data-disable-with], a[data-disable]";
+  var buttonDisableSelector = "button[data-remote][data-disable-with], button[data-remote][data-disable]";
+  var nonce = null;
+  var loadCSPNonce = () => {
+    const metaTag = document.querySelector("meta[name=csp-nonce]");
+    return nonce = metaTag && metaTag.content;
+  };
+  var cspNonce = () => nonce || loadCSPNonce();
+  var m = Element.prototype.matches || Element.prototype.matchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector || Element.prototype.webkitMatchesSelector;
+  var matches = function(element, selector) {
+    if (selector.exclude) {
+      return m.call(element, selector.selector) && !m.call(element, selector.exclude);
+    } else {
+      return m.call(element, selector);
+    }
+  };
+  var EXPANDO = "_ujsData";
+  var getData = (element, key) => element[EXPANDO] ? element[EXPANDO][key] : void 0;
+  var setData = function(element, key, value) {
+    if (!element[EXPANDO]) {
+      element[EXPANDO] = {};
+    }
+    return element[EXPANDO][key] = value;
+  };
+  var $ = (selector) => Array.prototype.slice.call(document.querySelectorAll(selector));
+  var csrfToken = () => {
+    const meta = document.querySelector("meta[name=csrf-token]");
+    return meta && meta.content;
+  };
+  var csrfParam = () => {
+    const meta = document.querySelector("meta[name=csrf-param]");
+    return meta && meta.content;
+  };
+  var CSRFProtection = (xhr) => {
+    const token = csrfToken();
+    if (token) {
+      return xhr.setRequestHeader("X-CSRF-Token", token);
+    }
+  };
+  var refreshCSRFTokens = () => {
+    const token = csrfToken();
+    const param = csrfParam();
+    if (token && param) {
+      return $('form input[name="' + param + '"]').forEach((input) => input.value = token);
+    }
+  };
+  var AcceptHeaders = {
+    "*": "*/*",
+    text: "text/plain",
+    html: "text/html",
+    xml: "application/xml, text/xml",
+    json: "application/json, text/javascript",
+    script: "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"
+  };
+  var ajax = (options) => {
+    options = prepareOptions(options);
+    var xhr = createXHR(options, function() {
+      const response = processResponse(xhr.response != null ? xhr.response : xhr.responseText, xhr.getResponseHeader("Content-Type"));
+      if (Math.floor(xhr.status / 100) === 2) {
+        if (typeof options.success === "function") {
+          options.success(response, xhr.statusText, xhr);
+        }
+      } else {
+        if (typeof options.error === "function") {
+          options.error(response, xhr.statusText, xhr);
+        }
+      }
+      return typeof options.complete === "function" ? options.complete(xhr, xhr.statusText) : void 0;
+    });
+    if (options.beforeSend && !options.beforeSend(xhr, options)) {
+      return false;
+    }
+    if (xhr.readyState === XMLHttpRequest.OPENED) {
+      return xhr.send(options.data);
+    }
+  };
+  var prepareOptions = function(options) {
+    options.url = options.url || location.href;
+    options.type = options.type.toUpperCase();
+    if (options.type === "GET" && options.data) {
+      if (options.url.indexOf("?") < 0) {
+        options.url += "?" + options.data;
+      } else {
+        options.url += "&" + options.data;
+      }
+    }
+    if (!(options.dataType in AcceptHeaders)) {
+      options.dataType = "*";
+    }
+    options.accept = AcceptHeaders[options.dataType];
+    if (options.dataType !== "*") {
+      options.accept += ", */*; q=0.01";
+    }
+    return options;
+  };
+  var createXHR = function(options, done) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(options.type, options.url, true);
+    xhr.setRequestHeader("Accept", options.accept);
+    if (typeof options.data === "string") {
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+    }
+    if (!options.crossDomain) {
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      CSRFProtection(xhr);
+    }
+    xhr.withCredentials = !!options.withCredentials;
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        return done(xhr);
+      }
+    };
+    return xhr;
+  };
+  var processResponse = function(response, type) {
+    if (typeof response === "string" && typeof type === "string") {
+      if (type.match(/\bjson\b/)) {
+        try {
+          response = JSON.parse(response);
+        } catch (error2) {
+        }
+      } else if (type.match(/\b(?:java|ecma)script\b/)) {
+        const script = document.createElement("script");
+        script.setAttribute("nonce", cspNonce());
+        script.text = response;
+        document.head.appendChild(script).parentNode.removeChild(script);
+      } else if (type.match(/\b(xml|html|svg)\b/)) {
+        const parser = new DOMParser();
+        type = type.replace(/;.+/, "");
+        try {
+          response = parser.parseFromString(response, type);
+        } catch (error1) {
+        }
+      }
+    }
+    return response;
+  };
+  var href = (element) => element.href;
+  var isCrossDomain = function(url) {
+    const originAnchor = document.createElement("a");
+    originAnchor.href = location.href;
+    const urlAnchor = document.createElement("a");
+    try {
+      urlAnchor.href = url;
+      return !((!urlAnchor.protocol || urlAnchor.protocol === ":") && !urlAnchor.host || originAnchor.protocol + "//" + originAnchor.host === urlAnchor.protocol + "//" + urlAnchor.host);
+    } catch (e) {
+      return true;
+    }
+  };
+  var preventDefault;
+  var { CustomEvent: CustomEvent2 } = window;
+  if (typeof CustomEvent2 !== "function") {
+    CustomEvent2 = function(event, params) {
+      const evt = document.createEvent("CustomEvent");
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      return evt;
+    };
+    CustomEvent2.prototype = window.Event.prototype;
+    ({ preventDefault } = CustomEvent2.prototype);
+    CustomEvent2.prototype.preventDefault = function() {
+      const result = preventDefault.call(this);
+      if (this.cancelable && !this.defaultPrevented) {
+        Object.defineProperty(this, "defaultPrevented", {
+          get() {
+            return true;
+          }
+        });
+      }
+      return result;
+    };
+  }
+  var fire = (obj, name, data) => {
+    const event = new CustomEvent2(name, {
+      bubbles: true,
+      cancelable: true,
+      detail: data
+    });
+    obj.dispatchEvent(event);
+    return !event.defaultPrevented;
+  };
+  var stopEverything = (e) => {
+    fire(e.target, "ujs:everythingStopped");
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  };
+  var delegate = (element, selector, eventType, handler) => element.addEventListener(eventType, function(e) {
+    let { target } = e;
+    while (!!(target instanceof Element) && !matches(target, selector)) {
+      target = target.parentNode;
+    }
+    if (target instanceof Element && handler.call(target, e) === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+  var toArray = (e) => Array.prototype.slice.call(e);
+  var serializeElement = (element, additionalParam) => {
+    let inputs = [element];
+    if (matches(element, "form")) {
+      inputs = toArray(element.elements);
+    }
+    const params = [];
+    inputs.forEach(function(input) {
+      if (!input.name || input.disabled) {
+        return;
+      }
+      if (matches(input, "fieldset[disabled] *")) {
+        return;
+      }
+      if (matches(input, "select")) {
+        toArray(input.options).forEach(function(option) {
+          if (option.selected) {
+            params.push({
+              name: input.name,
+              value: option.value
+            });
+          }
+        });
+      } else if (input.checked || ["radio", "checkbox", "submit"].indexOf(input.type) === -1) {
+        params.push({
+          name: input.name,
+          value: input.value
+        });
+      }
+    });
+    if (additionalParam) {
+      params.push(additionalParam);
+    }
+    return params.map(function(param) {
+      if (param.name) {
+        return `${encodeURIComponent(param.name)}=${encodeURIComponent(param.value)}`;
+      } else {
+        return param;
+      }
+    }).join("&");
+  };
+  var formElements = (form, selector) => {
+    if (matches(form, "form")) {
+      return toArray(form.elements).filter((el) => matches(el, selector));
+    } else {
+      return toArray(form.querySelectorAll(selector));
+    }
+  };
+  var handleConfirmWithRails = (rails) => function(e) {
+    if (!allowAction(this, rails)) {
+      stopEverything(e);
+    }
+  };
+  var confirm2 = (message, element) => window.confirm(message);
+  var allowAction = function(element, rails) {
+    let callback;
+    const message = element.getAttribute("data-confirm");
+    if (!message) {
+      return true;
+    }
+    let answer = false;
+    if (fire(element, "confirm")) {
+      try {
+        answer = rails.confirm(message, element);
+      } catch (error2) {
+      }
+      callback = fire(element, "confirm:complete", [answer]);
+    }
+    return answer && callback;
+  };
+  var handleDisabledElement = function(e) {
+    const element = this;
+    if (element.disabled) {
+      stopEverything(e);
+    }
+  };
+  var enableElement = (e) => {
+    let element;
+    if (e instanceof Event) {
+      if (isXhrRedirect(e)) {
+        return;
+      }
+      element = e.target;
+    } else {
+      element = e;
+    }
+    if (matches(element, linkDisableSelector)) {
+      return enableLinkElement(element);
+    } else if (matches(element, buttonDisableSelector) || matches(element, formEnableSelector)) {
+      return enableFormElement(element);
+    } else if (matches(element, formSubmitSelector)) {
+      return enableFormElements(element);
+    }
+  };
+  var disableElement = (e) => {
+    const element = e instanceof Event ? e.target : e;
+    if (matches(element, linkDisableSelector)) {
+      return disableLinkElement(element);
+    } else if (matches(element, buttonDisableSelector) || matches(element, formDisableSelector)) {
+      return disableFormElement(element);
+    } else if (matches(element, formSubmitSelector)) {
+      return disableFormElements(element);
+    }
+  };
+  var disableLinkElement = function(element) {
+    if (getData(element, "ujs:disabled")) {
+      return;
+    }
+    const replacement = element.getAttribute("data-disable-with");
+    if (replacement != null) {
+      setData(element, "ujs:enable-with", element.innerHTML);
+      element.innerHTML = replacement;
+    }
+    element.addEventListener("click", stopEverything);
+    return setData(element, "ujs:disabled", true);
+  };
+  var enableLinkElement = function(element) {
+    const originalText = getData(element, "ujs:enable-with");
+    if (originalText != null) {
+      element.innerHTML = originalText;
+      setData(element, "ujs:enable-with", null);
+    }
+    element.removeEventListener("click", stopEverything);
+    return setData(element, "ujs:disabled", null);
+  };
+  var disableFormElements = (form) => formElements(form, formDisableSelector).forEach(disableFormElement);
+  var disableFormElement = function(element) {
+    if (getData(element, "ujs:disabled")) {
+      return;
+    }
+    const replacement = element.getAttribute("data-disable-with");
+    if (replacement != null) {
+      if (matches(element, "button")) {
+        setData(element, "ujs:enable-with", element.innerHTML);
+        element.innerHTML = replacement;
+      } else {
+        setData(element, "ujs:enable-with", element.value);
+        element.value = replacement;
+      }
+    }
+    element.disabled = true;
+    return setData(element, "ujs:disabled", true);
+  };
+  var enableFormElements = (form) => formElements(form, formEnableSelector).forEach((element) => enableFormElement(element));
+  var enableFormElement = function(element) {
+    const originalText = getData(element, "ujs:enable-with");
+    if (originalText != null) {
+      if (matches(element, "button")) {
+        element.innerHTML = originalText;
+      } else {
+        element.value = originalText;
+      }
+      setData(element, "ujs:enable-with", null);
+    }
+    element.disabled = false;
+    return setData(element, "ujs:disabled", null);
+  };
+  var isXhrRedirect = function(event) {
+    const xhr = event.detail ? event.detail[0] : void 0;
+    return xhr && xhr.getResponseHeader("X-Xhr-Redirect");
+  };
+  var handleMethodWithRails = (rails) => function(e) {
+    const link = this;
+    const method = link.getAttribute("data-method");
+    if (!method) {
+      return;
+    }
+    const href2 = rails.href(link);
+    const csrfToken$1 = csrfToken();
+    const csrfParam$1 = csrfParam();
+    const form = document.createElement("form");
+    let formContent = `<input name='_method' value='${method}' type='hidden' />`;
+    if (csrfParam$1 && csrfToken$1 && !isCrossDomain(href2)) {
+      formContent += `<input name='${csrfParam$1}' value='${csrfToken$1}' type='hidden' />`;
+    }
+    formContent += '<input type="submit" />';
+    form.method = "post";
+    form.action = href2;
+    form.target = link.target;
+    form.innerHTML = formContent;
+    form.style.display = "none";
+    document.body.appendChild(form);
+    form.querySelector('[type="submit"]').click();
+    stopEverything(e);
+  };
+  var isRemote = function(element) {
+    const value = element.getAttribute("data-remote");
+    return value != null && value !== "false";
+  };
+  var handleRemoteWithRails = (rails) => function(e) {
+    let data, method, url;
+    const element = this;
+    if (!isRemote(element)) {
+      return true;
+    }
+    if (!fire(element, "ajax:before")) {
+      fire(element, "ajax:stopped");
+      return false;
+    }
+    const withCredentials = element.getAttribute("data-with-credentials");
+    const dataType = element.getAttribute("data-type") || "script";
+    if (matches(element, formSubmitSelector)) {
+      const button = getData(element, "ujs:submit-button");
+      method = getData(element, "ujs:submit-button-formmethod") || element.getAttribute("method") || "get";
+      url = getData(element, "ujs:submit-button-formaction") || element.getAttribute("action") || location.href;
+      if (method.toUpperCase() === "GET") {
+        url = url.replace(/\?.*$/, "");
+      }
+      if (element.enctype === "multipart/form-data") {
+        data = new FormData(element);
+        if (button != null) {
+          data.append(button.name, button.value);
+        }
+      } else {
+        data = serializeElement(element, button);
+      }
+      setData(element, "ujs:submit-button", null);
+      setData(element, "ujs:submit-button-formmethod", null);
+      setData(element, "ujs:submit-button-formaction", null);
+    } else if (matches(element, buttonClickSelector) || matches(element, inputChangeSelector)) {
+      method = element.getAttribute("data-method");
+      url = element.getAttribute("data-url");
+      data = serializeElement(element, element.getAttribute("data-params"));
+    } else {
+      method = element.getAttribute("data-method");
+      url = rails.href(element);
+      data = element.getAttribute("data-params");
+    }
+    ajax({
+      type: method || "GET",
+      url,
+      data,
+      dataType,
+      beforeSend(xhr, options) {
+        if (fire(element, "ajax:beforeSend", [xhr, options])) {
+          return fire(element, "ajax:send", [xhr]);
+        } else {
+          fire(element, "ajax:stopped");
+          return false;
+        }
+      },
+      success(...args) {
+        return fire(element, "ajax:success", args);
+      },
+      error(...args) {
+        return fire(element, "ajax:error", args);
+      },
+      complete(...args) {
+        return fire(element, "ajax:complete", args);
+      },
+      crossDomain: isCrossDomain(url),
+      withCredentials: withCredentials != null && withCredentials !== "false"
+    });
+    stopEverything(e);
+  };
+  var formSubmitButtonClick = function(e) {
+    const button = this;
+    const { form } = button;
+    if (!form) {
+      return;
+    }
+    if (button.name) {
+      setData(form, "ujs:submit-button", {
+        name: button.name,
+        value: button.value
+      });
+    }
+    setData(form, "ujs:formnovalidate-button", button.formNoValidate);
+    setData(form, "ujs:submit-button-formaction", button.getAttribute("formaction"));
+    return setData(form, "ujs:submit-button-formmethod", button.getAttribute("formmethod"));
+  };
+  var preventInsignificantClick = function(e) {
+    const link = this;
+    const method = (link.getAttribute("data-method") || "GET").toUpperCase();
+    const data = link.getAttribute("data-params");
+    const metaClick = e.metaKey || e.ctrlKey;
+    const insignificantMetaClick = metaClick && method === "GET" && !data;
+    const nonPrimaryMouseClick = e.button != null && e.button !== 0;
+    if (nonPrimaryMouseClick || insignificantMetaClick) {
+      e.stopImmediatePropagation();
+    }
+  };
+  var Rails = {
+    $,
+    ajax,
+    buttonClickSelector,
+    buttonDisableSelector,
+    confirm: confirm2,
+    cspNonce,
+    csrfToken,
+    csrfParam,
+    CSRFProtection,
+    delegate,
+    disableElement,
+    enableElement,
+    fileInputSelector,
+    fire,
+    formElements,
+    formEnableSelector,
+    formDisableSelector,
+    formInputClickSelector,
+    formSubmitButtonClick,
+    formSubmitSelector,
+    getData,
+    handleDisabledElement,
+    href,
+    inputChangeSelector,
+    isCrossDomain,
+    linkClickSelector,
+    linkDisableSelector,
+    loadCSPNonce,
+    matches,
+    preventInsignificantClick,
+    refreshCSRFTokens,
+    serializeElement,
+    setData,
+    stopEverything
+  };
+  var handleConfirm = handleConfirmWithRails(Rails);
+  Rails.handleConfirm = handleConfirm;
+  var handleMethod = handleMethodWithRails(Rails);
+  Rails.handleMethod = handleMethod;
+  var handleRemote = handleRemoteWithRails(Rails);
+  Rails.handleRemote = handleRemote;
+  var start = function() {
+    if (window._rails_loaded) {
+      throw new Error("rails-ujs has already been loaded!");
+    }
+    window.addEventListener("pageshow", function() {
+      $(formEnableSelector).forEach(function(el) {
+        if (getData(el, "ujs:disabled")) {
+          enableElement(el);
+        }
+      });
+      $(linkDisableSelector).forEach(function(el) {
+        if (getData(el, "ujs:disabled")) {
+          enableElement(el);
+        }
+      });
+    });
+    delegate(document, linkDisableSelector, "ajax:complete", enableElement);
+    delegate(document, linkDisableSelector, "ajax:stopped", enableElement);
+    delegate(document, buttonDisableSelector, "ajax:complete", enableElement);
+    delegate(document, buttonDisableSelector, "ajax:stopped", enableElement);
+    delegate(document, linkClickSelector, "click", preventInsignificantClick);
+    delegate(document, linkClickSelector, "click", handleDisabledElement);
+    delegate(document, linkClickSelector, "click", handleConfirm);
+    delegate(document, linkClickSelector, "click", disableElement);
+    delegate(document, linkClickSelector, "click", handleRemote);
+    delegate(document, linkClickSelector, "click", handleMethod);
+    delegate(document, buttonClickSelector, "click", preventInsignificantClick);
+    delegate(document, buttonClickSelector, "click", handleDisabledElement);
+    delegate(document, buttonClickSelector, "click", handleConfirm);
+    delegate(document, buttonClickSelector, "click", disableElement);
+    delegate(document, buttonClickSelector, "click", handleRemote);
+    delegate(document, inputChangeSelector, "change", handleDisabledElement);
+    delegate(document, inputChangeSelector, "change", handleConfirm);
+    delegate(document, inputChangeSelector, "change", handleRemote);
+    delegate(document, formSubmitSelector, "submit", handleDisabledElement);
+    delegate(document, formSubmitSelector, "submit", handleConfirm);
+    delegate(document, formSubmitSelector, "submit", handleRemote);
+    delegate(document, formSubmitSelector, "submit", (e) => setTimeout(() => disableElement(e), 13));
+    delegate(document, formSubmitSelector, "ajax:send", disableElement);
+    delegate(document, formSubmitSelector, "ajax:complete", enableElement);
+    delegate(document, formInputClickSelector, "click", preventInsignificantClick);
+    delegate(document, formInputClickSelector, "click", handleDisabledElement);
+    delegate(document, formInputClickSelector, "click", handleConfirm);
+    delegate(document, formInputClickSelector, "click", formSubmitButtonClick);
+    document.addEventListener("DOMContentLoaded", refreshCSRFTokens);
+    document.addEventListener("DOMContentLoaded", loadCSPNonce);
+    return window._rails_loaded = true;
+  };
+  Rails.start = start;
+  if (typeof jQuery !== "undefined" && jQuery && jQuery.ajax) {
+    if (jQuery.rails) {
+      throw new Error("If you load both jquery_ujs and rails-ujs, use rails-ujs only.");
+    }
+    jQuery.rails = Rails;
+    jQuery.ajaxPrefilter(function(options, originalOptions, xhr) {
+      if (!options.crossDomain) {
+        return CSRFProtection(xhr);
+      }
+    });
+  }
+  if (typeof exports !== "object" && typeof module === "undefined") {
+    window.Rails = Rails;
+    if (fire(document, "rails:attachBindings")) {
+      start();
+    }
+  }
+  var rails_ujs_esm_default = Rails;
 
   // node_modules/@hotwired/turbo/dist/turbo.es2017-esm.js
   (function() {
@@ -10804,9 +10715,9 @@
       return element;
     } else {
       const createdScriptElement = document.createElement("script");
-      const cspNonce = getMetaContent("csp-nonce");
-      if (cspNonce) {
-        createdScriptElement.nonce = cspNonce;
+      const cspNonce2 = getMetaContent("csp-nonce");
+      if (cspNonce2) {
+        createdScriptElement.nonce = cspNonce2;
       }
       createdScriptElement.textContent = element.textContent;
       createdScriptElement.async = false;
@@ -10975,11 +10886,11 @@
     }
   }
   var FetchRequest = class {
-    constructor(delegate, method, location2, body = new URLSearchParams(), target = null) {
+    constructor(delegate2, method, location2, body = new URLSearchParams(), target = null) {
       this.abortController = new AbortController();
       this.resolveRequestPromise = (_value) => {
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.method = method;
       this.headers = this.defaultHeaders;
       this.body = body;
@@ -11083,7 +10994,7 @@
     }
   };
   var AppearanceObserver = class {
-    constructor(delegate, element) {
+    constructor(delegate2, element) {
       this.started = false;
       this.intersect = (entries) => {
         const lastEntry = entries.slice(-1)[0];
@@ -11091,7 +11002,7 @@
           this.delegate.elementAppearedInViewport(this.element);
         }
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.element = element;
       this.intersectionObserver = new IntersectionObserver(this.intersect);
     }
@@ -11160,9 +11071,9 @@
     static confirmMethod(message, _element, _submitter) {
       return Promise.resolve(confirm(message));
     }
-    constructor(delegate, formElement, submitter, mustRedirect = false) {
+    constructor(delegate2, formElement, submitter, mustRedirect = false) {
       this.state = FormSubmissionState.initialized;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.formElement = formElement;
       this.submitter = submitter;
       this.formData = buildFormData(formElement, submitter);
@@ -11403,7 +11314,7 @@
     return node.querySelectorAll("[id][data-turbo-permanent]");
   }
   var FormSubmitObserver = class {
-    constructor(delegate, eventTarget) {
+    constructor(delegate2, eventTarget) {
       this.started = false;
       this.submitCaptured = () => {
         this.eventTarget.removeEventListener("submit", this.submitBubbled, false);
@@ -11420,7 +11331,7 @@
           }
         }
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.eventTarget = eventTarget;
     }
     start() {
@@ -11453,12 +11364,12 @@
     }
   }
   var View = class {
-    constructor(delegate, element) {
+    constructor(delegate2, element) {
       this.resolveRenderPromise = (_value) => {
       };
       this.resolveInterceptionPromise = (_value) => {
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.element = element;
     }
     scrollToAnchor(anchor) {
@@ -11551,7 +11462,7 @@
     }
   };
   var LinkInterceptor = class {
-    constructor(delegate, element) {
+    constructor(delegate2, element) {
       this.clickBubbled = (event) => {
         if (this.respondsToEventTarget(event.target)) {
           this.clickEvent = event;
@@ -11572,7 +11483,7 @@
       this.willVisit = (_event) => {
         delete this.clickEvent;
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.element = element;
     }
     start() {
@@ -11591,7 +11502,7 @@
     }
   };
   var LinkClickObserver = class {
-    constructor(delegate, eventTarget) {
+    constructor(delegate2, eventTarget) {
       this.started = false;
       this.clickCaptured = () => {
         this.eventTarget.removeEventListener("click", this.clickBubbled, false);
@@ -11610,7 +11521,7 @@
           }
         }
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.eventTarget = eventTarget;
     }
     start() {
@@ -11647,8 +11558,8 @@
     }
   }
   var FormLinkClickObserver = class {
-    constructor(delegate, element) {
-      this.delegate = delegate;
+    constructor(delegate2, element) {
+      this.delegate = delegate2;
       this.linkInterceptor = new LinkClickObserver(this, element);
     }
     start() {
@@ -11692,14 +11603,14 @@
     }
   };
   var Bardo = class {
-    static async preservingPermanentElements(delegate, permanentElementMap, callback) {
-      const bardo = new this(delegate, permanentElementMap);
+    static async preservingPermanentElements(delegate2, permanentElementMap, callback) {
+      const bardo = new this(delegate2, permanentElementMap);
       bardo.enter();
       await callback();
       bardo.leave();
     }
-    constructor(delegate, permanentElementMap) {
-      this.delegate = delegate;
+    constructor(delegate2, permanentElementMap) {
+      this.delegate = delegate2;
       this.permanentElementMap = permanentElementMap;
     }
     enter() {
@@ -11818,9 +11729,9 @@
         currentElement.appendChild(sourceRange.extractContents());
       }
     }
-    constructor(delegate, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
+    constructor(delegate2, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
       super(currentSnapshot, newSnapshot, renderElement, isPreview, willRender);
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     get shouldRender() {
       return true;
@@ -12145,7 +12056,7 @@
     SystemStatusCode2[SystemStatusCode2["contentTypeMismatch"] = -2] = "contentTypeMismatch";
   })(SystemStatusCode || (SystemStatusCode = {}));
   var Visit = class {
-    constructor(delegate, location2, restorationIdentifier, options = {}) {
+    constructor(delegate2, location2, restorationIdentifier, options = {}) {
       this.identifier = uuid();
       this.timingMetrics = {};
       this.followedRedirect = false;
@@ -12155,7 +12066,7 @@
       this.acceptsStreamResponse = false;
       this.snapshotCached = false;
       this.state = VisitState.initialized;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.location = location2;
       this.restorationIdentifier = restorationIdentifier || uuid();
       const { action, historyChanged, referrer, snapshot, snapshotHTML, response, visitCachedSnapshot, willRender, updateHistory, shouldCacheSnapshot, acceptsStreamResponse } = Object.assign(Object.assign({}, defaultOptions), options);
@@ -12656,7 +12567,7 @@
     }
   };
   var History = class {
-    constructor(delegate) {
+    constructor(delegate2) {
       this.restorationIdentifier = uuid();
       this.restorationData = {};
       this.started = false;
@@ -12676,7 +12587,7 @@
         await nextMicrotask();
         this.pageLoaded = true;
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     start() {
       if (!this.started) {
@@ -12734,8 +12645,8 @@
     }
   };
   var Navigator = class {
-    constructor(delegate) {
-      this.delegate = delegate;
+    constructor(delegate2) {
+      this.delegate = delegate2;
     }
     proposeVisit(location2, options = {}) {
       if (this.delegate.allowsVisitingLocationWithAction(location2, options.action)) {
@@ -12853,7 +12764,7 @@
     PageStage2[PageStage2["complete"] = 3] = "complete";
   })(PageStage || (PageStage = {}));
   var PageObserver = class {
-    constructor(delegate) {
+    constructor(delegate2) {
       this.stage = PageStage.initial;
       this.started = false;
       this.interpretReadyState = () => {
@@ -12867,7 +12778,7 @@
       this.pageWillUnload = () => {
         this.delegate.pageWillUnload();
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     start() {
       if (!this.started) {
@@ -12904,12 +12815,12 @@
     }
   };
   var ScrollObserver = class {
-    constructor(delegate) {
+    constructor(delegate2) {
       this.started = false;
       this.onScroll = () => {
         this.updatePosition({ x: window.pageXOffset, y: window.pageYOffset });
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     start() {
       if (!this.started) {
@@ -12953,7 +12864,7 @@
     return permanentElementMap;
   }
   var StreamObserver = class {
-    constructor(delegate) {
+    constructor(delegate2) {
       this.sources = /* @__PURE__ */ new Set();
       this.started = false;
       this.inspectFetchResponse = (event) => {
@@ -12968,7 +12879,7 @@
           this.receiveMessageHTML(event.data);
         }
       };
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     start() {
       if (!this.started) {
@@ -13278,9 +13189,9 @@
     }
   };
   var Preloader = class {
-    constructor(delegate) {
+    constructor(delegate2) {
       this.selector = "a[data-turbo-preload]";
-      this.delegate = delegate;
+      this.delegate = delegate2;
     }
     get snapshotCache() {
       return this.delegate.navigator.view.snapshotCache;
@@ -13668,7 +13579,7 @@
   var session = new Session();
   var cache = new Cache(session);
   var { navigator: navigator$1 } = session;
-  function start() {
+  function start2() {
     session.start();
   }
   function registerAdapter(adapter) {
@@ -13707,7 +13618,7 @@
     PageRenderer,
     PageSnapshot,
     FrameRenderer,
-    start,
+    start: start2,
     registerAdapter,
     visit,
     connectStreamSource,
@@ -14335,7 +14246,7 @@
     }
   })();
   window.Turbo = Turbo;
-  start();
+  start2();
 
   // node_modules/@hotwired/turbo-rails/app/javascript/turbo/cable.js
   var consumer;
@@ -14363,7 +14274,7 @@
     if (Array.isArray(obj))
       return obj.map(walk);
     return Object.keys(obj).reduce(function(acc, key) {
-      var camel = key[0].toLowerCase() + key.slice(1).replace(/([A-Z]+)/g, function(m, x) {
+      var camel = key[0].toLowerCase() + key.slice(1).replace(/([A-Z]+)/g, function(m2, x) {
         return "_" + x.toLowerCase();
       });
       acc[camel] = walk(obj[key]);
@@ -14465,9 +14376,9 @@
   var right = "right";
   var left = "left";
   var basePlacements = [top, bottom, right, left];
-  var start2 = "start";
+  var start3 = "start";
   var end = "end";
-  var placements = basePlacements.reduce((acc, placement) => acc.concat([placement, `${placement}-${start2}`, `${placement}-${end}`]), []);
+  var placements = basePlacements.reduce((acc, placement) => acc.concat([placement, `${placement}-${start3}`, `${placement}-${end}`]), []);
 
   // node_modules/popper.js/lib/modifiers/index.js
   var modifiers_exports = {};
@@ -14599,7 +14510,7 @@
     read: () => read2,
     reference: () => reference,
     right: () => right2,
-    start: () => start3,
+    start: () => start4,
     top: () => top2,
     variationPlacements: () => variationPlacements,
     viewport: () => viewport,
@@ -14613,17 +14524,17 @@
   var left2 = "left";
   var auto = "auto";
   var basePlacements2 = [top2, bottom2, right2, left2];
-  var start3 = "start";
+  var start4 = "start";
   var end2 = "end";
   var clippingParents = "clippingParents";
   var viewport = "viewport";
   var popper = "popper";
   var reference = "reference";
   var variationPlacements = /* @__PURE__ */ basePlacements2.reduce(function(acc, placement) {
-    return acc.concat([placement + "-" + start3, placement + "-" + end2]);
+    return acc.concat([placement + "-" + start4, placement + "-" + end2]);
   }, []);
   var placements2 = /* @__PURE__ */ [].concat(basePlacements2, [auto]).reduce(function(acc, placement) {
-    return acc.concat([placement, placement + "-" + start3, placement + "-" + end2]);
+    return acc.concat([placement, placement + "-" + start4, placement + "-" + end2]);
   }, []);
   var beforeRead = "beforeRead";
   var read2 = "read";
@@ -15394,7 +15305,7 @@
     if (mainAxis != null) {
       var len = mainAxis === "y" ? "height" : "width";
       switch (variation) {
-        case start3:
+        case start4:
           offsets[mainAxis] = offsets[mainAxis] - (reference2[len] / 2 - element[len] / 2);
           break;
         case end2:
@@ -15510,7 +15421,7 @@
     for (var i = 0; i < placements3.length; i++) {
       var placement = placements3[i];
       var _basePlacement = getBasePlacement(placement);
-      var isStartVariation = getVariation(placement) === start3;
+      var isStartVariation = getVariation(placement) === start4;
       var isVertical = [top2, bottom2].indexOf(_basePlacement) >= 0;
       var len = isVertical ? "width" : "height";
       var overflow = detectOverflow(state, {
@@ -15741,8 +15652,8 @@
       var min2 = offset2 + overflow[mainSide];
       var max2 = offset2 - overflow[altSide];
       var additive = tether ? -popperRect[len] / 2 : 0;
-      var minLen = variation === start3 ? referenceRect[len] : popperRect[len];
-      var maxLen = variation === start3 ? -popperRect[len] : -referenceRect[len];
+      var minLen = variation === start4 ? referenceRect[len] : popperRect[len];
+      var maxLen = variation === start4 ? -popperRect[len] : -referenceRect[len];
       var arrowElement = state.elements.arrow;
       var arrowRect = tether && arrowElement ? getLayoutRect(arrowElement) : {
         width: 0,
@@ -15966,8 +15877,8 @@
             popper: listScrollParents2(popper2)
           };
           var orderedModifiers = orderModifiers(mergeByName([].concat(defaultModifiers4, state.options.modifiers)));
-          state.orderedModifiers = orderedModifiers.filter(function(m) {
-            return m.enabled;
+          state.orderedModifiers = orderedModifiers.filter(function(m2) {
+            return m2.enabled;
           });
           runModifierEffects();
           return instance.update();
@@ -16238,14 +16149,14 @@
   var isRTL = () => document.documentElement.dir === "rtl";
   var defineJQueryPlugin = (plugin) => {
     onDOMContentLoaded(() => {
-      const $ = getjQuery();
-      if ($) {
+      const $2 = getjQuery();
+      if ($2) {
         const name = plugin.NAME;
-        const JQUERY_NO_CONFLICT = $.fn[name];
-        $.fn[name] = plugin.jQueryInterface;
-        $.fn[name].Constructor = plugin;
-        $.fn[name].noConflict = () => {
-          $.fn[name] = JQUERY_NO_CONFLICT;
+        const JQUERY_NO_CONFLICT = $2.fn[name];
+        $2.fn[name] = plugin.jQueryInterface;
+        $2.fn[name].Constructor = plugin;
+        $2.fn[name].noConflict = () => {
+          $2.fn[name] = JQUERY_NO_CONFLICT;
           return plugin.jQueryInterface;
         };
       }
@@ -16444,16 +16355,16 @@
       if (typeof event !== "string" || !element) {
         return null;
       }
-      const $ = getjQuery();
+      const $2 = getjQuery();
       const typeEvent = getTypeEvent(event);
       const inNamespace = event !== typeEvent;
       let jQueryEvent = null;
       let bubbles = true;
       let nativeDispatch = true;
       let defaultPrevented = false;
-      if (inNamespace && $) {
-        jQueryEvent = $.Event(event, args);
-        $(element).trigger(jQueryEvent);
+      if (inNamespace && $2) {
+        jQueryEvent = $2.Event(event, args);
+        $2(element).trigger(jQueryEvent);
         bubbles = !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
@@ -16577,7 +16488,7 @@
       }
     }
   };
-  var VERSION = "5.3.1";
+  var VERSION = "5.3.2";
   var BaseComponent = class extends Config {
     constructor(element, config) {
       super();
@@ -16636,9 +16547,9 @@
       if (hrefAttribute.includes("#") && !hrefAttribute.startsWith("#")) {
         hrefAttribute = `#${hrefAttribute.split("#")[1]}`;
       }
-      selector = hrefAttribute && hrefAttribute !== "#" ? hrefAttribute.trim() : null;
+      selector = hrefAttribute && hrefAttribute !== "#" ? parseSelector(hrefAttribute.trim()) : null;
     }
-    return parseSelector(selector);
+    return selector;
   };
   var SelectorEngine = {
     find(selector, element = document.documentElement) {
@@ -19370,7 +19281,7 @@
   var CLASS_DROPDOWN = "dropdown";
   var SELECTOR_DROPDOWN_TOGGLE = ".dropdown-toggle";
   var SELECTOR_DROPDOWN_MENU = ".dropdown-menu";
-  var NOT_SELECTOR_DROPDOWN_TOGGLE = ":not(.dropdown-toggle)";
+  var NOT_SELECTOR_DROPDOWN_TOGGLE = `:not(${SELECTOR_DROPDOWN_TOGGLE})`;
   var SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
   var SELECTOR_OUTER = ".nav-item, .list-group-item";
   var SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
@@ -19888,20 +19799,20 @@
   var descriptorPattern = /^(?:(?:([^.]+?)\+)?(.+?)(?:\.(.+?))?(?:@(window|document))?->)?(.+?)(?:#([^:]+?))(?::(.+))?$/;
   function parseActionDescriptorString(descriptorString) {
     const source = descriptorString.trim();
-    const matches = source.match(descriptorPattern) || [];
-    let eventName = matches[2];
-    let keyFilter = matches[3];
+    const matches2 = source.match(descriptorPattern) || [];
+    let eventName = matches2[2];
+    let keyFilter = matches2[3];
     if (keyFilter && !["keydown", "keyup", "keypress"].includes(eventName)) {
       eventName += `.${keyFilter}`;
       keyFilter = "";
     }
     return {
-      eventTarget: parseEventTarget(matches[4]),
+      eventTarget: parseEventTarget(matches2[4]),
       eventName,
-      eventOptions: matches[7] ? parseEventOptions(matches[7]) : {},
-      identifier: matches[5],
-      methodName: matches[6],
-      keyFilter: matches[1] || keyFilter
+      eventOptions: matches2[7] ? parseEventOptions(matches2[7]) : {},
+      identifier: matches2[5],
+      methodName: matches2[6],
+      keyFilter: matches2[1] || keyFilter
     };
   }
   function parseEventTarget(eventTargetName) {
@@ -20130,11 +20041,11 @@
     }
   };
   var ElementObserver = class {
-    constructor(element, delegate) {
+    constructor(element, delegate2) {
       this.mutationObserverInit = { attributes: true, childList: true, subtree: true };
       this.element = element;
       this.started = false;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.elements = /* @__PURE__ */ new Set();
       this.mutationObserver = new MutationObserver((mutations) => this.processMutations(mutations));
     }
@@ -20165,13 +20076,13 @@
     }
     refresh() {
       if (this.started) {
-        const matches = new Set(this.matchElementsInTree());
+        const matches2 = new Set(this.matchElementsInTree());
         for (const element of Array.from(this.elements)) {
-          if (!matches.has(element)) {
+          if (!matches2.has(element)) {
             this.removeElement(element);
           }
         }
-        for (const element of Array.from(matches)) {
+        for (const element of Array.from(matches2)) {
           this.addElement(element);
         }
       }
@@ -20261,9 +20172,9 @@
     }
   };
   var AttributeObserver = class {
-    constructor(element, attributeName, delegate) {
+    constructor(element, attributeName, delegate2) {
       this.attributeName = attributeName;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.elementObserver = new ElementObserver(element, this);
     }
     get element() {
@@ -20292,8 +20203,8 @@
     }
     matchElementsInTree(tree) {
       const match = this.matchElement(tree) ? [tree] : [];
-      const matches = Array.from(tree.querySelectorAll(this.selector));
-      return match.concat(matches);
+      const matches2 = Array.from(tree.querySelectorAll(this.selector));
+      return match.concat(matches2);
     }
     elementMatched(element) {
       if (this.delegate.elementMatchedAttribute) {
@@ -20373,11 +20284,11 @@
     }
   };
   var SelectorObserver = class {
-    constructor(element, selector, delegate, details) {
+    constructor(element, selector, delegate2, details) {
       this._selector = selector;
       this.details = details;
       this.elementObserver = new ElementObserver(element, this);
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.matchesByElement = new Multimap();
     }
     get started() {
@@ -20408,11 +20319,11 @@
     matchElement(element) {
       const { selector } = this;
       if (selector) {
-        const matches = element.matches(selector);
+        const matches2 = element.matches(selector);
         if (this.delegate.selectorMatchElement) {
-          return matches && this.delegate.selectorMatchElement(element, this.details);
+          return matches2 && this.delegate.selectorMatchElement(element, this.details);
         }
-        return matches;
+        return matches2;
       } else {
         return false;
       }
@@ -20421,8 +20332,8 @@
       const { selector } = this;
       if (selector) {
         const match = this.matchElement(tree) ? [tree] : [];
-        const matches = Array.from(tree.querySelectorAll(selector)).filter((match2) => this.matchElement(match2));
-        return match.concat(matches);
+        const matches2 = Array.from(tree.querySelectorAll(selector)).filter((match2) => this.matchElement(match2));
+        return match.concat(matches2);
       } else {
         return [];
       }
@@ -20442,11 +20353,11 @@
     elementAttributeChanged(element, _attributeName) {
       const { selector } = this;
       if (selector) {
-        const matches = this.matchElement(element);
+        const matches2 = this.matchElement(element);
         const matchedBefore = this.matchesByElement.has(selector, element);
-        if (matches && !matchedBefore) {
+        if (matches2 && !matchedBefore) {
           this.selectorMatched(element, selector);
-        } else if (!matches && matchedBefore) {
+        } else if (!matches2 && matchedBefore) {
           this.selectorUnmatched(element, selector);
         }
       }
@@ -20461,9 +20372,9 @@
     }
   };
   var StringMapObserver = class {
-    constructor(element, delegate) {
+    constructor(element, delegate2) {
       this.element = element;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.started = false;
       this.stringMap = /* @__PURE__ */ new Map();
       this.mutationObserver = new MutationObserver((mutations) => this.processMutations(mutations));
@@ -20548,9 +20459,9 @@
     }
   };
   var TokenListObserver = class {
-    constructor(element, attributeName, delegate) {
+    constructor(element, attributeName, delegate2) {
       this.attributeObserver = new AttributeObserver(element, attributeName, this);
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.tokensByElement = new Multimap();
     }
     get started() {
@@ -20626,9 +20537,9 @@
     return left3 && right3 && left3.index == right3.index && left3.content == right3.content;
   }
   var ValueListObserver = class {
-    constructor(element, attributeName, delegate) {
+    constructor(element, attributeName, delegate2) {
       this.tokenListObserver = new TokenListObserver(element, attributeName, this);
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.parseResultsByToken = /* @__PURE__ */ new WeakMap();
       this.valuesByTokenByElement = /* @__PURE__ */ new WeakMap();
     }
@@ -20692,9 +20603,9 @@
     }
   };
   var BindingObserver = class {
-    constructor(context, delegate) {
+    constructor(context, delegate2) {
       this.context = context;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.bindingsByAction = /* @__PURE__ */ new Map();
     }
     start() {
@@ -20848,9 +20759,9 @@
     }
   };
   var TargetObserver = class {
-    constructor(context, delegate) {
+    constructor(context, delegate2) {
       this.context = context;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.targetsByName = new Multimap();
     }
     start() {
@@ -20936,10 +20847,10 @@
     return definition ? Object.keys(definition).map((key) => [key, definition[key]]) : [];
   }
   var OutletObserver = class {
-    constructor(context, delegate) {
+    constructor(context, delegate2) {
       this.started = false;
       this.context = context;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.outletsByName = new Multimap();
       this.outletElementsByName = new Multimap();
       this.selectorObserverMap = /* @__PURE__ */ new Map();
@@ -21073,10 +20984,10 @@
     }
     get outletDependencies() {
       const dependencies = new Multimap();
-      this.router.modules.forEach((module) => {
-        const constructor = module.definition.controllerConstructor;
+      this.router.modules.forEach((module2) => {
+        const constructor = module2.definition.controllerConstructor;
         const outlets = readInheritableStaticArrayValues(constructor, "outlets");
-        outlets.forEach((outlet) => dependencies.add(outlet, module.identifier));
+        outlets.forEach((outlet) => dependencies.add(outlet, module2.identifier));
       });
       return dependencies;
     }
@@ -21116,15 +21027,15 @@
     }
   };
   var Context = class {
-    constructor(module, scope) {
+    constructor(module2, scope) {
       this.logDebugActivity = (functionName, detail = {}) => {
         const { identifier, controller, element } = this;
         detail = Object.assign({ identifier, controller, element }, detail);
         this.application.logDebugActivity(this.identifier, functionName, detail);
       };
-      this.module = module;
+      this.module = module2;
       this.scope = scope;
-      this.controller = new module.controllerConstructor(this);
+      this.controller = new module2.controllerConstructor(this);
       this.bindingObserver = new BindingObserver(this, this.dispatcher);
       this.valueObserver = new ValueObserver(this, this.controller);
       this.targetObserver = new TargetObserver(this, this);
@@ -21553,10 +21464,10 @@
     }
   };
   var ScopeObserver = class {
-    constructor(element, schema, delegate) {
+    constructor(element, schema, delegate2) {
       this.element = element;
       this.schema = schema;
-      this.delegate = delegate;
+      this.delegate = delegate2;
       this.valueListObserver = new ValueListObserver(this.element, this.controllerAttribute, this);
       this.scopesByIdentifierByElement = /* @__PURE__ */ new WeakMap();
       this.scopeReferenceCounts = /* @__PURE__ */ new WeakMap();
@@ -21631,7 +21542,7 @@
       return Array.from(this.modulesByIdentifier.values());
     }
     get contexts() {
-      return this.modules.reduce((contexts, module) => contexts.concat(module.contexts), []);
+      return this.modules.reduce((contexts, module2) => contexts.concat(module2.contexts), []);
     }
     start() {
       this.scopeObserver.start();
@@ -21641,23 +21552,23 @@
     }
     loadDefinition(definition) {
       this.unloadIdentifier(definition.identifier);
-      const module = new Module(this.application, definition);
-      this.connectModule(module);
+      const module2 = new Module(this.application, definition);
+      this.connectModule(module2);
       const afterLoad = definition.controllerConstructor.afterLoad;
       if (afterLoad) {
         afterLoad.call(definition.controllerConstructor, definition.identifier, this.application);
       }
     }
     unloadIdentifier(identifier) {
-      const module = this.modulesByIdentifier.get(identifier);
-      if (module) {
-        this.disconnectModule(module);
+      const module2 = this.modulesByIdentifier.get(identifier);
+      if (module2) {
+        this.disconnectModule(module2);
       }
     }
     getContextForElementAndIdentifier(element, identifier) {
-      const module = this.modulesByIdentifier.get(identifier);
-      if (module) {
-        return module.contexts.find((context) => context.element == element);
+      const module2 = this.modulesByIdentifier.get(identifier);
+      if (module2) {
+        return module2.contexts.find((context) => context.element == element);
       }
     }
     proposeToConnectScopeForElementAndIdentifier(element, identifier) {
@@ -21676,27 +21587,27 @@
     }
     scopeConnected(scope) {
       this.scopesByIdentifier.add(scope.identifier, scope);
-      const module = this.modulesByIdentifier.get(scope.identifier);
-      if (module) {
-        module.connectContextForScope(scope);
+      const module2 = this.modulesByIdentifier.get(scope.identifier);
+      if (module2) {
+        module2.connectContextForScope(scope);
       }
     }
     scopeDisconnected(scope) {
       this.scopesByIdentifier.delete(scope.identifier, scope);
-      const module = this.modulesByIdentifier.get(scope.identifier);
-      if (module) {
-        module.disconnectContextForScope(scope);
+      const module2 = this.modulesByIdentifier.get(scope.identifier);
+      if (module2) {
+        module2.disconnectContextForScope(scope);
       }
     }
-    connectModule(module) {
-      this.modulesByIdentifier.set(module.identifier, module);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
-      scopes.forEach((scope) => module.connectContextForScope(scope));
+    connectModule(module2) {
+      this.modulesByIdentifier.set(module2.identifier, module2);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
+      scopes.forEach((scope) => module2.connectContextForScope(scope));
     }
-    disconnectModule(module) {
-      this.modulesByIdentifier.delete(module.identifier);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
-      scopes.forEach((scope) => module.disconnectContextForScope(scope));
+    disconnectModule(module2) {
+      this.modulesByIdentifier.delete(module2.identifier);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
+      scopes.forEach((scope) => module2.disconnectContextForScope(scope));
     }
   };
   var defaultSchema = {
@@ -22425,8 +22336,8 @@
 
   // app/javascript/application.js
   console.log("Hola Mundo desde ESM");
-  import_ujs.default.start();
-  window.Rails = import_ujs.default;
+  rails_ujs_esm_default.start();
+  window.Rails = rails_ujs_esm_default;
   var esperarRecursosSprocketsYDocumento = function(resolver) {
     if (typeof window.puntomontaje == "undefined") {
       setTimeout(esperarRecursosSprocketsYDocumento, 5, resolver);
@@ -22476,7 +22387,7 @@ bootstrap-datepicker/dist/js/bootstrap-datepicker.js:
 
 bootstrap/dist/js/bootstrap.esm.js:
   (*!
-    * Bootstrap v5.3.1 (https://getbootstrap.com/)
+    * Bootstrap v5.3.2 (https://getbootstrap.com/)
     * Copyright 2011-2023 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
     * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
     *)

@@ -54,7 +54,7 @@ gem "prawnto_2", require: "prawnto"
 
 gem "prawn-table"
 
-gem "rails", "~> 7.0"
+gem "rails", ">= 7.0", "<7.1"
 
 gem "rails-i18n"
 
@@ -85,24 +85,24 @@ gem "will_paginate" # Pagina listados
 # de apilamiento lógico y no alfabético como las gemas anteriores)
 
 gem "msip", # Motor generico
-  git: "https://gitlab.com/pasosdeJesus/msip.git", branch: 'main'
-# path: '../msip'
+  git: "https://gitlab.com/pasosdeJesus/msip.git", branch: "main"
+# path: "../msip"
 
 gem "mr519_gen", # Motor de gestion de formularios y encuestas
-  git: "https://gitlab.com/pasosdeJesus/mr519_gen.git", branch: 'main'
-# path: '../mr519_gen'
+  git: "https://gitlab.com/pasosdeJesus/mr519_gen.git", branch: "main"
+# path: "../mr519_gen"
 
 gem "heb412_gen", # Motor de nube y llenado de plantillas
-  git: "https://gitlab.com/pasosdeJesus/heb412_gen.git", branch: 'main'
-  #path: '../heb412_gen'
+  git: "https://gitlab.com/pasosdeJesus/heb412_gen.git", branch: "main"
+  #path: "../heb412_gen"
 
 gem "sivel2_gen", # Motor de casos de VPS
-  git: "https://gitlab.com/pasosdeJesus/sivel2_gen.git", branch: 'main'
-  #path: '../heb412_gen'
+  git: "https://gitlab.com/pasosdeJesus/sivel2_gen.git", branch: "main"
+  #path: "../heb412_gen"
 
 gem "cor1440_gen", # Motor de proyectos y actividades
-  git: "https://gitlab.com/pasosdeJesus/cor1440_gen.git", branch: 'main'
-  #path: '../cor1440_gen'
+  git: "https://gitlab.com/pasosdeJesus/cor1440_gen.git", branch: "main"
+  #path: "../cor1440_gen"
 
 
 group :development do
