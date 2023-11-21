@@ -314,11 +314,11 @@
       };
       Connection.reopenDelay = 500;
       Connection.prototype.events = {
-        message(event) {
+        message(event2) {
           if (!this.isProtocolSupported()) {
             return;
           }
-          const { identifier, message, reason, reconnect, type } = JSON.parse(event.data);
+          const { identifier, message, reason, reconnect, type } = JSON.parse(event2.data);
           switch (type) {
             case message_types.welcome:
               if (this.triedToReconnect()) {
@@ -353,7 +353,7 @@
             return this.close({ allowReconnect: false });
           }
         },
-        close(event) {
+        close(event2) {
           logger_default.log("WebSocket onclose event");
           if (this.disconnected) {
             return;
@@ -625,11 +625,11 @@
 
   // node_modules/jquery/dist/jquery.js
   var require_jquery = __commonJS({
-    "node_modules/jquery/dist/jquery.js"(exports2, module2) {
+    "node_modules/jquery/dist/jquery.js"(exports, module) {
       (function(global, factory) {
         "use strict";
-        if (typeof module2 === "object" && typeof module2.exports === "object") {
-          module2.exports = global.document ? factory(global, true) : function(w) {
+        if (typeof module === "object" && typeof module.exports === "object") {
+          module.exports = global.document ? factory(global, true) : function(w) {
             if (!w.document) {
               throw new Error("jQuery requires a window with a document");
             }
@@ -638,7 +638,7 @@
         } else {
           factory(global);
         }
-      })(typeof window !== "undefined" ? window : exports2, function(window2, noGlobal) {
+      })(typeof window !== "undefined" ? window : exports, function(window2, noGlobal) {
         "use strict";
         var arr = [];
         var getProto = Object.getPrototypeOf;
@@ -3432,8 +3432,8 @@
           }
           if (one === 1) {
             origFn = fn2;
-            fn2 = function(event) {
-              jQuery2().off(event);
+            fn2 = function(event2) {
+              jQuery2().off(event2);
               return origFn.apply(this, arguments);
             };
             fn2.guid = origFn.guid || (origFn.guid = jQuery2.guid++);
@@ -3560,41 +3560,41 @@
             }
           },
           dispatch: function(nativeEvent) {
-            var i, j, ret, matched, handleObj, handlerQueue, args = new Array(arguments.length), event = jQuery2.event.fix(nativeEvent), handlers = (dataPriv.get(this, "events") || /* @__PURE__ */ Object.create(null))[event.type] || [], special = jQuery2.event.special[event.type] || {};
-            args[0] = event;
+            var i, j, ret, matched, handleObj, handlerQueue, args = new Array(arguments.length), event2 = jQuery2.event.fix(nativeEvent), handlers = (dataPriv.get(this, "events") || /* @__PURE__ */ Object.create(null))[event2.type] || [], special = jQuery2.event.special[event2.type] || {};
+            args[0] = event2;
             for (i = 1; i < arguments.length; i++) {
               args[i] = arguments[i];
             }
-            event.delegateTarget = this;
-            if (special.preDispatch && special.preDispatch.call(this, event) === false) {
+            event2.delegateTarget = this;
+            if (special.preDispatch && special.preDispatch.call(this, event2) === false) {
               return;
             }
-            handlerQueue = jQuery2.event.handlers.call(this, event, handlers);
+            handlerQueue = jQuery2.event.handlers.call(this, event2, handlers);
             i = 0;
-            while ((matched = handlerQueue[i++]) && !event.isPropagationStopped()) {
-              event.currentTarget = matched.elem;
+            while ((matched = handlerQueue[i++]) && !event2.isPropagationStopped()) {
+              event2.currentTarget = matched.elem;
               j = 0;
-              while ((handleObj = matched.handlers[j++]) && !event.isImmediatePropagationStopped()) {
-                if (!event.rnamespace || handleObj.namespace === false || event.rnamespace.test(handleObj.namespace)) {
-                  event.handleObj = handleObj;
-                  event.data = handleObj.data;
+              while ((handleObj = matched.handlers[j++]) && !event2.isImmediatePropagationStopped()) {
+                if (!event2.rnamespace || handleObj.namespace === false || event2.rnamespace.test(handleObj.namespace)) {
+                  event2.handleObj = handleObj;
+                  event2.data = handleObj.data;
                   ret = ((jQuery2.event.special[handleObj.origType] || {}).handle || handleObj.handler).apply(matched.elem, args);
                   if (ret !== void 0) {
-                    if ((event.result = ret) === false) {
-                      event.preventDefault();
-                      event.stopPropagation();
+                    if ((event2.result = ret) === false) {
+                      event2.preventDefault();
+                      event2.stopPropagation();
                     }
                   }
                 }
               }
             }
             if (special.postDispatch) {
-              special.postDispatch.call(this, event);
+              special.postDispatch.call(this, event2);
             }
-            return event.result;
+            return event2.result;
           },
-          handlers: function(event, handlers) {
-            var i, handleObj, sel, matchedHandlers, matchedSelectors, handlerQueue = [], delegateCount = handlers.delegateCount, cur = event.target;
+          handlers: function(event2, handlers) {
+            var i, handleObj, sel, matchedHandlers, matchedSelectors, handlerQueue = [], delegateCount = handlers.delegateCount, cur = event2.target;
             if (delegateCount && // Support: IE <=9
             // Black-hole SVG <use> instance trees (trac-13180)
             cur.nodeType && // Support: Firefox <=42
@@ -3602,9 +3602,9 @@
             // https://www.w3.org/TR/DOM-Level-3-Events/#event-type-click
             // Support: IE 11 only
             // ...but not arrow key "clicks" of radio inputs, which can have `button` -1 (gh-2343)
-            !(event.type === "click" && event.button >= 1)) {
+            !(event2.type === "click" && event2.button >= 1)) {
               for (; cur !== this; cur = cur.parentNode || this) {
-                if (cur.nodeType === 1 && !(event.type === "click" && cur.disabled === true)) {
+                if (cur.nodeType === 1 && !(event2.type === "click" && cur.disabled === true)) {
                   matchedHandlers = [];
                   matchedSelectors = {};
                   for (i = 0; i < delegateCount; i++) {
@@ -3678,15 +3678,15 @@
               },
               // For cross-browser consistency, suppress native .click() on links
               // Also prevent it if we're currently inside a leveraged native-event stack
-              _default: function(event) {
-                var target = event.target;
+              _default: function(event2) {
+                var target = event2.target;
                 return rcheckableType.test(target.type) && target.click && nodeName(target, "input") && dataPriv.get(target, "click") || nodeName(target, "a");
               }
             },
             beforeunload: {
-              postDispatch: function(event) {
-                if (event.result !== void 0 && event.originalEvent) {
-                  event.originalEvent.returnValue = event.result;
+              postDispatch: function(event2) {
+                if (event2.result !== void 0 && event2.originalEvent) {
+                  event2.originalEvent.returnValue = event2.result;
                 }
               }
             }
@@ -3702,9 +3702,9 @@
           dataPriv.set(el, type, false);
           jQuery2.event.add(el, type, {
             namespace: false,
-            handler: function(event) {
+            handler: function(event2) {
               var result, saved = dataPriv.get(this, type);
-              if (event.isTrigger & 1 && this[type]) {
+              if (event2.isTrigger & 1 && this[type]) {
                 if (!saved) {
                   saved = slice.call(arguments);
                   dataPriv.set(this, type, saved);
@@ -3712,12 +3712,12 @@
                   result = dataPriv.get(this, type);
                   dataPriv.set(this, type, false);
                   if (saved !== result) {
-                    event.stopImmediatePropagation();
-                    event.preventDefault();
+                    event2.stopImmediatePropagation();
+                    event2.preventDefault();
                     return result;
                   }
                 } else if ((jQuery2.event.special[type] || {}).delegateType) {
-                  event.stopPropagation();
+                  event2.stopPropagation();
                 }
               } else if (saved) {
                 dataPriv.set(this, type, jQuery2.event.trigger(
@@ -3725,8 +3725,8 @@
                   saved.slice(1),
                   this
                 ));
-                event.stopPropagation();
-                event.isImmediatePropagationStopped = returnTrue;
+                event2.stopPropagation();
+                event2.isImmediatePropagationStopped = returnTrue;
               }
             }
           });
@@ -3822,12 +3822,12 @@
         jQuery2.each({ focus: "focusin", blur: "focusout" }, function(type, delegateType) {
           function focusMappedHandler(nativeEvent) {
             if (document2.documentMode) {
-              var handle = dataPriv.get(this, "handle"), event = jQuery2.event.fix(nativeEvent);
-              event.type = nativeEvent.type === "focusin" ? "focus" : "blur";
-              event.isSimulated = true;
+              var handle = dataPriv.get(this, "handle"), event2 = jQuery2.event.fix(nativeEvent);
+              event2.type = nativeEvent.type === "focusin" ? "focus" : "blur";
+              event2.isSimulated = true;
               handle(nativeEvent);
-              if (event.target === event.currentTarget) {
-                handle(event);
+              if (event2.target === event2.currentTarget) {
+                handle(event2);
               }
             } else {
               jQuery2.event.simulate(
@@ -3872,8 +3872,8 @@
             },
             // Suppress native focus or blur if we're currently inside
             // a leveraged native-event stack
-            _default: function(event) {
-              return dataPriv.get(event.target, type);
+            _default: function(event2) {
+              return dataPriv.get(event2.target, type);
             },
             delegateType
           };
@@ -3913,12 +3913,12 @@
           jQuery2.event.special[orig] = {
             delegateType: fix,
             bindType: fix,
-            handle: function(event) {
-              var ret, target = this, related = event.relatedTarget, handleObj = event.handleObj;
+            handle: function(event2) {
+              var ret, target = this, related = event2.relatedTarget, handleObj = event2.handleObj;
               if (!related || related !== target && !jQuery2.contains(target, related)) {
-                event.type = handleObj.origType;
+                event2.type = handleObj.origType;
                 ret = handleObj.handler.apply(this, arguments);
-                event.type = fix;
+                event2.type = fix;
               }
               return ret;
             }
@@ -5676,8 +5676,8 @@
           e.stopPropagation();
         };
         jQuery2.extend(jQuery2.event, {
-          trigger: function(event, data, elem, onlyHandlers) {
-            var i, cur, tmp, bubbleType, ontype, handle, special, lastElement, eventPath = [elem || document2], type = hasOwn.call(event, "type") ? event.type : event, namespaces = hasOwn.call(event, "namespace") ? event.namespace.split(".") : [];
+          trigger: function(event2, data, elem, onlyHandlers) {
+            var i, cur, tmp, bubbleType, ontype, handle, special, lastElement, eventPath = [elem || document2], type = hasOwn.call(event2, "type") ? event2.type : event2, namespaces = hasOwn.call(event2, "namespace") ? event2.namespace.split(".") : [];
             cur = lastElement = tmp = elem = elem || document2;
             if (elem.nodeType === 3 || elem.nodeType === 8) {
               return;
@@ -5691,15 +5691,15 @@
               namespaces.sort();
             }
             ontype = type.indexOf(":") < 0 && "on" + type;
-            event = event[jQuery2.expando] ? event : new jQuery2.Event(type, typeof event === "object" && event);
-            event.isTrigger = onlyHandlers ? 2 : 3;
-            event.namespace = namespaces.join(".");
-            event.rnamespace = event.namespace ? new RegExp("(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)") : null;
-            event.result = void 0;
-            if (!event.target) {
-              event.target = elem;
+            event2 = event2[jQuery2.expando] ? event2 : new jQuery2.Event(type, typeof event2 === "object" && event2);
+            event2.isTrigger = onlyHandlers ? 2 : 3;
+            event2.namespace = namespaces.join(".");
+            event2.rnamespace = event2.namespace ? new RegExp("(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)") : null;
+            event2.result = void 0;
+            if (!event2.target) {
+              event2.target = elem;
             }
-            data = data == null ? [event] : jQuery2.makeArray(data, [event]);
+            data = data == null ? [event2] : jQuery2.makeArray(data, [event2]);
             special = jQuery2.event.special[type] || {};
             if (!onlyHandlers && special.trigger && special.trigger.apply(elem, data) === false) {
               return;
@@ -5718,23 +5718,23 @@
               }
             }
             i = 0;
-            while ((cur = eventPath[i++]) && !event.isPropagationStopped()) {
+            while ((cur = eventPath[i++]) && !event2.isPropagationStopped()) {
               lastElement = cur;
-              event.type = i > 1 ? bubbleType : special.bindType || type;
-              handle = (dataPriv.get(cur, "events") || /* @__PURE__ */ Object.create(null))[event.type] && dataPriv.get(cur, "handle");
+              event2.type = i > 1 ? bubbleType : special.bindType || type;
+              handle = (dataPriv.get(cur, "events") || /* @__PURE__ */ Object.create(null))[event2.type] && dataPriv.get(cur, "handle");
               if (handle) {
                 handle.apply(cur, data);
               }
               handle = ontype && cur[ontype];
               if (handle && handle.apply && acceptData(cur)) {
-                event.result = handle.apply(cur, data);
-                if (event.result === false) {
-                  event.preventDefault();
+                event2.result = handle.apply(cur, data);
+                if (event2.result === false) {
+                  event2.preventDefault();
                 }
               }
             }
-            event.type = type;
-            if (!onlyHandlers && !event.isDefaultPrevented()) {
+            event2.type = type;
+            if (!onlyHandlers && !event2.isDefaultPrevented()) {
               if ((!special._default || special._default.apply(eventPath.pop(), data) === false) && acceptData(elem)) {
                 if (ontype && isFunction(elem[type]) && !isWindow(elem)) {
                   tmp = elem[ontype];
@@ -5742,11 +5742,11 @@
                     elem[ontype] = null;
                   }
                   jQuery2.event.triggered = type;
-                  if (event.isPropagationStopped()) {
+                  if (event2.isPropagationStopped()) {
                     lastElement.addEventListener(type, stopPropagationCallback);
                   }
                   elem[type]();
-                  if (event.isPropagationStopped()) {
+                  if (event2.isPropagationStopped()) {
                     lastElement.removeEventListener(type, stopPropagationCallback);
                   }
                   jQuery2.event.triggered = void 0;
@@ -5756,14 +5756,14 @@
                 }
               }
             }
-            return event.result;
+            return event2.result;
           },
           // Piggyback on a donor event to simulate a different one
           // Used only for `focus(in | out)` events
-          simulate: function(type, elem, event) {
+          simulate: function(type, elem, event2) {
             var e = jQuery2.extend(
               new jQuery2.Event(),
-              event,
+              event2,
               {
                 type,
                 isSimulated: true
@@ -6975,7 +6975,7 @@
 
   // node_modules/chosen-js/chosen.jquery.js
   var require_chosen_jquery = __commonJS({
-    "node_modules/chosen-js/chosen.jquery.js"(exports2) {
+    "node_modules/chosen-js/chosen.jquery.js"(exports) {
       (function() {
         var $2, AbstractChosen, Chosen, SelectParser, bind = function(fn2, me) {
           return function() {
@@ -8236,17 +8236,17 @@
           };
           return Chosen2;
         }(AbstractChosen);
-      }).call(exports2);
+      }).call(exports);
     }
   });
 
   // node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js
   var require_bootstrap_datepicker = __commonJS({
-    "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"(exports2) {
+    "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"(exports) {
       (function(factory) {
         if (typeof define === "function" && define.amd) {
           define(["jquery"], factory);
-        } else if (typeof exports2 === "object") {
+        } else if (typeof exports === "object") {
           factory(require_jquery());
         } else {
           factory(jQuery);
@@ -8607,10 +8607,10 @@
           _detachSecondaryEvents: function() {
             this._unapplyEvents(this._secondaryEvents);
           },
-          _trigger: function(event, altdate) {
+          _trigger: function(event2, altdate) {
             var date = altdate || this.dates.get(-1), local_date = this._utc_to_local(date);
             this.element.trigger({
-              type: event,
+              type: event2,
               date: local_date,
               viewMode: this.viewMode,
               dates: $2.map(this.dates, this._utc_to_local),
@@ -9888,6 +9888,17 @@
     return element[EXPANDO][key] = value;
   };
   var $ = (selector) => Array.prototype.slice.call(document.querySelectorAll(selector));
+  var isContentEditable = function(element) {
+    var isEditable = false;
+    do {
+      if (element.isContentEditable) {
+        isEditable = true;
+        break;
+      }
+      element = element.parentElement;
+    } while (element);
+    return isEditable;
+  };
   var csrfToken = () => {
     const meta = document.querySelector("meta[name=csrf-token]");
     return meta && meta.content;
@@ -10015,9 +10026,9 @@
   var preventDefault;
   var { CustomEvent: CustomEvent2 } = window;
   if (typeof CustomEvent2 !== "function") {
-    CustomEvent2 = function(event, params) {
+    CustomEvent2 = function(event2, params) {
       const evt = document.createEvent("CustomEvent");
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      evt.initCustomEvent(event2, params.bubbles, params.cancelable, params.detail);
       return evt;
     };
     CustomEvent2.prototype = window.Event.prototype;
@@ -10035,13 +10046,13 @@
     };
   }
   var fire = (obj, name, data) => {
-    const event = new CustomEvent2(name, {
+    const event2 = new CustomEvent2(name, {
       bubbles: true,
       cancelable: true,
       detail: data
     });
-    obj.dispatchEvent(event);
-    return !event.defaultPrevented;
+    obj.dispatchEvent(event2);
+    return !event2.defaultPrevented;
   };
   var stopEverything = (e) => {
     fire(e.target, "ujs:everythingStopped");
@@ -10145,6 +10156,9 @@
     } else {
       element = e;
     }
+    if (isContentEditable(element)) {
+      return;
+    }
     if (matches(element, linkDisableSelector)) {
       return enableLinkElement(element);
     } else if (matches(element, buttonDisableSelector) || matches(element, formEnableSelector)) {
@@ -10155,6 +10169,9 @@
   };
   var disableElement = (e) => {
     const element = e instanceof Event ? e.target : e;
+    if (isContentEditable(element)) {
+      return;
+    }
     if (matches(element, linkDisableSelector)) {
       return disableLinkElement(element);
     } else if (matches(element, buttonDisableSelector) || matches(element, formDisableSelector)) {
@@ -10216,14 +10233,17 @@
     element.disabled = false;
     return setData(element, "ujs:disabled", null);
   };
-  var isXhrRedirect = function(event) {
-    const xhr = event.detail ? event.detail[0] : void 0;
+  var isXhrRedirect = function(event2) {
+    const xhr = event2.detail ? event2.detail[0] : void 0;
     return xhr && xhr.getResponseHeader("X-Xhr-Redirect");
   };
   var handleMethodWithRails = (rails) => function(e) {
     const link = this;
     const method = link.getAttribute("data-method");
     if (!method) {
+      return;
+    }
+    if (isContentEditable(this)) {
       return;
     }
     const href2 = rails.href(link);
@@ -10255,6 +10275,10 @@
       return true;
     }
     if (!fire(element, "ajax:before")) {
+      fire(element, "ajax:stopped");
+      return false;
+    }
+    if (isContentEditable(element)) {
       fire(element, "ajax:stopped");
       return false;
     }
@@ -10443,13 +10467,6 @@
       }
     });
   }
-  if (typeof exports !== "object" && typeof module === "undefined") {
-    window.Rails = Rails;
-    if (fire(document, "rails:attachBindings")) {
-      start();
-    }
-  }
-  var rails_ujs_esm_default = Rails;
 
   // node_modules/@hotwired/turbo/dist/turbo.es2017-esm.js
   (function() {
@@ -10498,8 +10515,8 @@
     const candidate = element ? element.closest("input, button") : null;
     return (candidate === null || candidate === void 0 ? void 0 : candidate.type) == "submit" ? candidate : null;
   }
-  function clickCaptured(event) {
-    const submitter = findSubmitterFromClickTarget(event.target);
+  function clickCaptured(event2) {
+    const submitter = findSubmitterFromClickTarget(event2.target);
     if (submitter && submitter.form) {
       submittersByForm.set(submitter.form, submitter);
     }
@@ -10736,18 +10753,18 @@
     return template.content;
   }
   function dispatch(eventName, { target, cancelable, detail } = {}) {
-    const event = new CustomEvent(eventName, {
+    const event2 = new CustomEvent(eventName, {
       cancelable,
       bubbles: true,
       composed: true,
       detail
     });
     if (target && target.isConnected) {
-      target.dispatchEvent(event);
+      target.dispatchEvent(event2);
     } else {
-      document.documentElement.dispatchEvent(event);
+      document.documentElement.dispatchEvent(event2);
     }
-    return event;
+    return event2;
   }
   function nextAnimationFrame() {
     return new Promise((resolve) => requestAnimationFrame(() => resolve()));
@@ -10930,12 +10947,12 @@
     }
     async receive(response) {
       const fetchResponse = new FetchResponse(response);
-      const event = dispatch("turbo:before-fetch-response", {
+      const event2 = dispatch("turbo:before-fetch-response", {
         cancelable: true,
         detail: { fetchResponse },
         target: this.target
       });
-      if (event.defaultPrevented) {
+      if (event2.defaultPrevented) {
         this.delegate.requestPreventedHandlingResponse(this, fetchResponse);
       } else if (fetchResponse.succeeded) {
         this.delegate.requestSucceededWithResponse(this, fetchResponse);
@@ -10972,7 +10989,7 @@
     }
     async allowRequestToBeIntercepted(fetchOptions) {
       const requestInterception = new Promise((resolve) => this.resolveRequestPromise = resolve);
-      const event = dispatch("turbo:before-fetch-request", {
+      const event2 = dispatch("turbo:before-fetch-request", {
         cancelable: true,
         detail: {
           fetchOptions,
@@ -10981,16 +10998,16 @@
         },
         target: this.target
       });
-      if (event.defaultPrevented)
+      if (event2.defaultPrevented)
         await requestInterception;
     }
     willDelegateErrorHandling(error2) {
-      const event = dispatch("turbo:fetch-request-error", {
+      const event2 = dispatch("turbo:fetch-request-error", {
         target: this.target,
         cancelable: true,
         detail: { request: this, error: error2 }
       });
-      return !event.defaultPrevented;
+      return !event2.defaultPrevented;
     }
   };
   var AppearanceObserver = class {
@@ -11320,13 +11337,13 @@
         this.eventTarget.removeEventListener("submit", this.submitBubbled, false);
         this.eventTarget.addEventListener("submit", this.submitBubbled, false);
       };
-      this.submitBubbled = (event) => {
-        if (!event.defaultPrevented) {
-          const form = event.target instanceof HTMLFormElement ? event.target : void 0;
-          const submitter = event.submitter || void 0;
+      this.submitBubbled = (event2) => {
+        if (!event2.defaultPrevented) {
+          const form = event2.target instanceof HTMLFormElement ? event2.target : void 0;
+          const submitter = event2.submitter || void 0;
           if (form && submissionDoesNotDismissDialog(form, submitter) && submissionDoesNotTargetIFrame(form, submitter) && this.delegate.willSubmitForm(form, submitter)) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
+            event2.preventDefault();
+            event2.stopImmediatePropagation();
             this.delegate.formSubmitted(form, submitter);
           }
         }
@@ -11463,19 +11480,19 @@
   };
   var LinkInterceptor = class {
     constructor(delegate2, element) {
-      this.clickBubbled = (event) => {
-        if (this.respondsToEventTarget(event.target)) {
-          this.clickEvent = event;
+      this.clickBubbled = (event2) => {
+        if (this.respondsToEventTarget(event2.target)) {
+          this.clickEvent = event2;
         } else {
           delete this.clickEvent;
         }
       };
-      this.linkClicked = (event) => {
-        if (this.clickEvent && this.respondsToEventTarget(event.target) && event.target instanceof Element) {
-          if (this.delegate.shouldInterceptLinkClick(event.target, event.detail.url, event.detail.originalEvent)) {
+      this.linkClicked = (event2) => {
+        if (this.clickEvent && this.respondsToEventTarget(event2.target) && event2.target instanceof Element) {
+          if (this.delegate.shouldInterceptLinkClick(event2.target, event2.detail.url, event2.detail.originalEvent)) {
             this.clickEvent.preventDefault();
-            event.preventDefault();
-            this.delegate.linkClickIntercepted(event.target, event.detail.url, event.detail.originalEvent);
+            event2.preventDefault();
+            this.delegate.linkClickIntercepted(event2.target, event2.detail.url, event2.detail.originalEvent);
           }
         }
         delete this.clickEvent;
@@ -11508,14 +11525,14 @@
         this.eventTarget.removeEventListener("click", this.clickBubbled, false);
         this.eventTarget.addEventListener("click", this.clickBubbled, false);
       };
-      this.clickBubbled = (event) => {
-        if (event instanceof MouseEvent && this.clickEventIsSignificant(event)) {
-          const target = event.composedPath && event.composedPath()[0] || event.target;
+      this.clickBubbled = (event2) => {
+        if (event2 instanceof MouseEvent && this.clickEventIsSignificant(event2)) {
+          const target = event2.composedPath && event2.composedPath()[0] || event2.target;
           const link = this.findLinkFromClickTarget(target);
           if (link && doesNotTargetIFrame(link)) {
             const location2 = this.getLocationForLink(link);
-            if (this.delegate.willFollowLinkToLocation(link, location2, event)) {
-              event.preventDefault();
+            if (this.delegate.willFollowLinkToLocation(link, location2, event2)) {
+              event2.preventDefault();
               this.delegate.followedLinkToLocation(link, location2);
             }
           }
@@ -11536,8 +11553,8 @@
         this.started = false;
       }
     }
-    clickEventIsSignificant(event) {
-      return !(event.target && event.target.isContentEditable || event.defaultPrevented || event.which > 1 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey);
+    clickEventIsSignificant(event2) {
+      return !(event2.target && event2.target.isContentEditable || event2.defaultPrevented || event2.which > 1 || event2.altKey || event2.ctrlKey || event2.metaKey || event2.shiftKey);
     }
     findLinkFromClickTarget(target) {
       return findClosestRecursively(target, "a[href]:not([target^=_]):not([download])");
@@ -12525,10 +12542,10 @@
     shouldInterceptLinkClick(element, _location, _event) {
       return this.shouldRedirect(element);
     }
-    linkClickIntercepted(element, url, event) {
+    linkClickIntercepted(element, url, event2) {
       const frame = this.findFrameElement(element);
       if (frame) {
-        frame.delegate.linkClickIntercepted(element, url, event);
+        frame.delegate.linkClickIntercepted(element, url, event2);
       }
     }
     willSubmitForm(element, submitter) {
@@ -12572,9 +12589,9 @@
       this.restorationData = {};
       this.started = false;
       this.pageLoaded = false;
-      this.onPopState = (event) => {
+      this.onPopState = (event2) => {
         if (this.shouldHandlePopState()) {
-          const { turbo } = event.state || {};
+          const { turbo } = event2.state || {};
           if (turbo) {
             this.location = new URL(window.location.href);
             const { restorationIdentifier } = turbo;
@@ -12867,16 +12884,16 @@
     constructor(delegate2) {
       this.sources = /* @__PURE__ */ new Set();
       this.started = false;
-      this.inspectFetchResponse = (event) => {
-        const response = fetchResponseFromEvent(event);
+      this.inspectFetchResponse = (event2) => {
+        const response = fetchResponseFromEvent(event2);
         if (response && fetchResponseIsStream(response)) {
-          event.preventDefault();
+          event2.preventDefault();
           this.receiveMessageResponse(response);
         }
       };
-      this.receiveMessageEvent = (event) => {
-        if (this.started && typeof event.data == "string") {
-          this.receiveMessageHTML(event.data);
+      this.receiveMessageEvent = (event2) => {
+        if (this.started && typeof event2.data == "string") {
+          this.receiveMessageHTML(event2.data);
         }
       };
       this.delegate = delegate2;
@@ -12918,9 +12935,9 @@
       this.delegate.receivedMessageFromStream(StreamMessage.wrap(html));
     }
   };
-  function fetchResponseFromEvent(event) {
+  function fetchResponseFromEvent(event2) {
     var _a;
-    const fetchResponse = (_a = event.detail) === null || _a === void 0 ? void 0 : _a.fetchResponse;
+    const fetchResponse = (_a = event2.detail) === null || _a === void 0 ? void 0 : _a.fetchResponse;
     if (fetchResponse instanceof FetchResponse) {
       return fetchResponse;
     }
@@ -13335,8 +13352,8 @@
     }
     submittedFormLinkToLocation() {
     }
-    willFollowLinkToLocation(link, location2, event) {
-      return this.elementIsNavigatable(link) && locationIsVisitable(location2, this.snapshot.rootLocation) && this.applicationAllowsFollowingLinkToLocation(link, location2, event);
+    willFollowLinkToLocation(link, location2, event2) {
+      return this.elementIsNavigatable(link) && locationIsVisitable(location2, this.snapshot.rootLocation) && this.applicationAllowsFollowingLinkToLocation(link, location2, event2);
     }
     followedLinkToLocation(link, location2) {
       const action = this.getActionForLink(link);
@@ -13396,8 +13413,8 @@
       }
     }
     allowsImmediateRender({ element }, options) {
-      const event = this.notifyApplicationBeforeRender(element, options);
-      const { defaultPrevented, detail: { render } } = event;
+      const event2 = this.notifyApplicationBeforeRender(element, options);
+      const { defaultPrevented, detail: { render } } = event2;
       if (this.view.renderer && render) {
         this.view.renderer.renderElement = render;
       }
@@ -13420,17 +13437,17 @@
       this.notifyApplicationAfterFrameRender(fetchResponse, frame);
     }
     applicationAllowsFollowingLinkToLocation(link, location2, ev) {
-      const event = this.notifyApplicationAfterClickingLinkToLocation(link, location2, ev);
-      return !event.defaultPrevented;
+      const event2 = this.notifyApplicationAfterClickingLinkToLocation(link, location2, ev);
+      return !event2.defaultPrevented;
     }
     applicationAllowsVisitingLocation(location2) {
-      const event = this.notifyApplicationBeforeVisitingLocation(location2);
-      return !event.defaultPrevented;
+      const event2 = this.notifyApplicationBeforeVisitingLocation(location2);
+      return !event2.defaultPrevented;
     }
-    notifyApplicationAfterClickingLinkToLocation(link, location2, event) {
+    notifyApplicationAfterClickingLinkToLocation(link, location2, event2) {
       return dispatch("turbo:click", {
         target: link,
-        detail: { url: location2.href, originalEvent: event },
+        detail: { url: location2.href, originalEvent: event2 },
         cancelable: true
       });
     }
@@ -13825,12 +13842,12 @@
       clearBusyState(formElement, this.findFrameElement(formElement));
     }
     allowsImmediateRender({ element: newFrame }, options) {
-      const event = dispatch("turbo:before-frame-render", {
+      const event2 = dispatch("turbo:before-frame-render", {
         target: this.element,
         detail: Object.assign({ newFrame }, options),
         cancelable: true
       });
-      const { defaultPrevented, detail: { render } } = event;
+      const { defaultPrevented, detail: { render } } = event2;
       if (this.view.renderer && render) {
         this.view.renderer.renderElement = render;
       }
@@ -13930,12 +13947,12 @@
           session.visit(url, options);
         }
       };
-      const event = dispatch("turbo:frame-missing", {
+      const event2 = dispatch("turbo:frame-missing", {
         target: this.element,
         detail: { response, visit: visit2 },
         cancelable: true
       });
-      return !event.defaultPrevented;
+      return !event2.defaultPrevented;
     }
     handleFrameMissingFromResponse(fetchResponse) {
       this.view.missing();
@@ -14098,10 +14115,10 @@
     async render() {
       var _a;
       return (_a = this.renderPromise) !== null && _a !== void 0 ? _a : this.renderPromise = (async () => {
-        const event = this.beforeRenderEvent;
-        if (this.dispatchEvent(event)) {
+        const event2 = this.beforeRenderEvent;
+        if (this.dispatchEvent(event2)) {
           await nextAnimationFrame();
-          await event.detail.render(this);
+          await event2.detail.render(this);
         }
       })();
     }
@@ -14298,8 +14315,8 @@
         this.subscription.unsubscribe();
     }
     dispatchMessageEvent(data) {
-      const event = new MessageEvent("message", { data });
-      return this.dispatchEvent(event);
+      const event2 = new MessageEvent("message", { data });
+      return this.dispatchEvent(event2);
     }
     subscriptionConnected() {
       this.setAttribute("connected", "");
@@ -14318,9 +14335,9 @@
   }
 
   // node_modules/@hotwired/turbo-rails/app/javascript/turbo/fetch_requests.js
-  function encodeMethodIntoRequestBody(event) {
-    if (event.target instanceof HTMLFormElement) {
-      const { target: form, detail: { fetchOptions } } = event;
+  function encodeMethodIntoRequestBody(event2) {
+    if (event2.target instanceof HTMLFormElement) {
+      const { target: form, detail: { fetchOptions } } = event2;
       form.addEventListener("turbo:submit-start", ({ detail: { formSubmission: { submitter } } }) => {
         const body = isBodyInit(fetchOptions.body) ? fetchOptions.body : new URLSearchParams();
         const method = determineFetchMethod(submitter, body, form);
@@ -16222,39 +16239,39 @@
     return eventRegistry[uid];
   }
   function bootstrapHandler(element, fn2) {
-    return function handler(event) {
-      hydrateObj(event, {
+    return function handler(event2) {
+      hydrateObj(event2, {
         delegateTarget: element
       });
       if (handler.oneOff) {
-        EventHandler.off(element, event.type, fn2);
+        EventHandler.off(element, event2.type, fn2);
       }
-      return fn2.apply(element, [event]);
+      return fn2.apply(element, [event2]);
     };
   }
   function bootstrapDelegationHandler(element, selector, fn2) {
-    return function handler(event) {
+    return function handler(event2) {
       const domElements = element.querySelectorAll(selector);
       for (let {
         target
-      } = event; target && target !== this; target = target.parentNode) {
+      } = event2; target && target !== this; target = target.parentNode) {
         for (const domElement of domElements) {
           if (domElement !== target) {
             continue;
           }
-          hydrateObj(event, {
+          hydrateObj(event2, {
             delegateTarget: target
           });
           if (handler.oneOff) {
-            EventHandler.off(element, event.type, selector, fn2);
+            EventHandler.off(element, event2.type, selector, fn2);
           }
-          return fn2.apply(target, [event]);
+          return fn2.apply(target, [event2]);
         }
       }
     };
   }
   function findHandler(events, callable, delegationSelector = null) {
-    return Object.values(events).find((event) => event.callable === callable && event.delegationSelector === delegationSelector);
+    return Object.values(events).find((event2) => event2.callable === callable && event2.delegationSelector === delegationSelector);
   }
   function normalizeParameters(originalTypeEvent, handler, delegationFunction) {
     const isDelegated = typeof handler === "string";
@@ -16272,9 +16289,9 @@
     let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
     if (originalTypeEvent in customEvents) {
       const wrapFunction = (fn3) => {
-        return function(event) {
-          if (!event.relatedTarget || event.relatedTarget !== event.delegateTarget && !event.delegateTarget.contains(event.relatedTarget)) {
-            return fn3.call(this, event);
+        return function(event2) {
+          if (!event2.relatedTarget || event2.relatedTarget !== event2.delegateTarget && !event2.delegateTarget.contains(event2.relatedTarget)) {
+            return fn3.call(this, event2);
           }
         };
       };
@@ -16306,22 +16323,22 @@
   }
   function removeNamespacedHandlers(element, events, typeEvent, namespace) {
     const storeElementEvent = events[typeEvent] || {};
-    for (const [handlerKey, event] of Object.entries(storeElementEvent)) {
+    for (const [handlerKey, event2] of Object.entries(storeElementEvent)) {
       if (handlerKey.includes(namespace)) {
-        removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+        removeHandler(element, events, typeEvent, event2.callable, event2.delegationSelector);
       }
     }
   }
-  function getTypeEvent(event) {
-    event = event.replace(stripNameRegex, "");
-    return customEvents[event] || event;
+  function getTypeEvent(event2) {
+    event2 = event2.replace(stripNameRegex, "");
+    return customEvents[event2] || event2;
   }
   var EventHandler = {
-    on(element, event, handler, delegationFunction) {
-      addHandler(element, event, handler, delegationFunction, false);
+    on(element, event2, handler, delegationFunction) {
+      addHandler(element, event2, handler, delegationFunction, false);
     },
-    one(element, event, handler, delegationFunction) {
-      addHandler(element, event, handler, delegationFunction, true);
+    one(element, event2, handler, delegationFunction) {
+      addHandler(element, event2, handler, delegationFunction, true);
     },
     off(element, originalTypeEvent, handler, delegationFunction) {
       if (typeof originalTypeEvent !== "string" || !element) {
@@ -16344,32 +16361,32 @@
           removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
         }
       }
-      for (const [keyHandlers, event] of Object.entries(storeElementEvent)) {
+      for (const [keyHandlers, event2] of Object.entries(storeElementEvent)) {
         const handlerKey = keyHandlers.replace(stripUidRegex, "");
         if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
-          removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+          removeHandler(element, events, typeEvent, event2.callable, event2.delegationSelector);
         }
       }
     },
-    trigger(element, event, args) {
-      if (typeof event !== "string" || !element) {
+    trigger(element, event2, args) {
+      if (typeof event2 !== "string" || !element) {
         return null;
       }
       const $2 = getjQuery();
-      const typeEvent = getTypeEvent(event);
-      const inNamespace = event !== typeEvent;
+      const typeEvent = getTypeEvent(event2);
+      const inNamespace = event2 !== typeEvent;
       let jQueryEvent = null;
       let bubbles = true;
       let nativeDispatch = true;
       let defaultPrevented = false;
       if (inNamespace && $2) {
-        jQueryEvent = $2.Event(event, args);
+        jQueryEvent = $2.Event(event2, args);
         $2(element).trigger(jQueryEvent);
         bubbles = !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
       }
-      const evt = hydrateObj(new Event(event, {
+      const evt = hydrateObj(new Event(event2, {
         bubbles,
         cancelable: true
       }), args);
@@ -16614,9 +16631,9 @@
   var enableDismissTrigger = (component, method = "hide") => {
     const clickEvent = `click.dismiss${component.EVENT_KEY}`;
     const name = component.NAME;
-    EventHandler.on(document, clickEvent, `[data-bs-dismiss="${name}"]`, function(event) {
+    EventHandler.on(document, clickEvent, `[data-bs-dismiss="${name}"]`, function(event2) {
       if (["A", "AREA"].includes(this.tagName)) {
-        event.preventDefault();
+        event2.preventDefault();
       }
       if (isDisabled(this)) {
         return;
@@ -16696,9 +16713,9 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API$6, SELECTOR_DATA_TOGGLE$5, (event) => {
-    event.preventDefault();
-    const button = event.target.closest(SELECTOR_DATA_TOGGLE$5);
+  EventHandler.on(document, EVENT_CLICK_DATA_API$6, SELECTOR_DATA_TOGGLE$5, (event2) => {
+    event2.preventDefault();
+    const button = event2.target.closest(SELECTOR_DATA_TOGGLE$5);
     const data = Button.getOrCreateInstance(button);
     data.toggle();
   });
@@ -16751,24 +16768,24 @@
       EventHandler.off(this._element, EVENT_KEY$9);
     }
     // Private
-    _start(event) {
+    _start(event2) {
       if (!this._supportPointerEvents) {
-        this._deltaX = event.touches[0].clientX;
+        this._deltaX = event2.touches[0].clientX;
         return;
       }
-      if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX;
+      if (this._eventIsPointerPenTouch(event2)) {
+        this._deltaX = event2.clientX;
       }
     }
-    _end(event) {
-      if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX - this._deltaX;
+    _end(event2) {
+      if (this._eventIsPointerPenTouch(event2)) {
+        this._deltaX = event2.clientX - this._deltaX;
       }
       this._handleSwipe();
       execute(this._config.endCallback);
     }
-    _move(event) {
-      this._deltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this._deltaX;
+    _move(event2) {
+      this._deltaX = event2.touches && event2.touches.length > 1 ? 0 : event2.touches[0].clientX - this._deltaX;
     }
     _handleSwipe() {
       const absDeltaX = Math.abs(this._deltaX);
@@ -16784,17 +16801,17 @@
     }
     _initEvents() {
       if (this._supportPointerEvents) {
-        EventHandler.on(this._element, EVENT_POINTERDOWN, (event) => this._start(event));
-        EventHandler.on(this._element, EVENT_POINTERUP, (event) => this._end(event));
+        EventHandler.on(this._element, EVENT_POINTERDOWN, (event2) => this._start(event2));
+        EventHandler.on(this._element, EVENT_POINTERUP, (event2) => this._end(event2));
         this._element.classList.add(CLASS_NAME_POINTER_EVENT);
       } else {
-        EventHandler.on(this._element, EVENT_TOUCHSTART, (event) => this._start(event));
-        EventHandler.on(this._element, EVENT_TOUCHMOVE, (event) => this._move(event));
-        EventHandler.on(this._element, EVENT_TOUCHEND, (event) => this._end(event));
+        EventHandler.on(this._element, EVENT_TOUCHSTART, (event2) => this._start(event2));
+        EventHandler.on(this._element, EVENT_TOUCHMOVE, (event2) => this._move(event2));
+        EventHandler.on(this._element, EVENT_TOUCHEND, (event2) => this._end(event2));
       }
     }
-    _eventIsPointerPenTouch(event) {
-      return this._supportPointerEvents && (event.pointerType === POINTER_TYPE_PEN || event.pointerType === POINTER_TYPE_TOUCH);
+    _eventIsPointerPenTouch(event2) {
+      return this._supportPointerEvents && (event2.pointerType === POINTER_TYPE_PEN || event2.pointerType === POINTER_TYPE_TOUCH);
     }
     // Static
     static isSupported() {
@@ -16941,7 +16958,7 @@
     }
     _addEventListeners() {
       if (this._config.keyboard) {
-        EventHandler.on(this._element, EVENT_KEYDOWN$1, (event) => this._keydown(event));
+        EventHandler.on(this._element, EVENT_KEYDOWN$1, (event2) => this._keydown(event2));
       }
       if (this._config.pause === "hover") {
         EventHandler.on(this._element, EVENT_MOUSEENTER$1, () => this.pause());
@@ -16953,7 +16970,7 @@
     }
     _addTouchEventListeners() {
       for (const img of SelectorEngine.find(SELECTOR_ITEM_IMG, this._element)) {
-        EventHandler.on(img, EVENT_DRAG_START, (event) => event.preventDefault());
+        EventHandler.on(img, EVENT_DRAG_START, (event2) => event2.preventDefault());
       }
       const endCallBack = () => {
         if (this._config.pause !== "hover") {
@@ -16972,13 +16989,13 @@
       };
       this._swipeHelper = new Swipe(this._element, swipeConfig);
     }
-    _keydown(event) {
-      if (/input|textarea/i.test(event.target.tagName)) {
+    _keydown(event2) {
+      if (/input|textarea/i.test(event2.target.tagName)) {
         return;
       }
-      const direction = KEY_TO_DIRECTION[event.key];
+      const direction = KEY_TO_DIRECTION[event2.key];
       if (direction) {
-        event.preventDefault();
+        event2.preventDefault();
         this._slide(this._directionToOrder(direction));
       }
     }
@@ -17099,12 +17116,12 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API$5, SELECTOR_DATA_SLIDE, function(event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$5, SELECTOR_DATA_SLIDE, function(event2) {
     const target = SelectorEngine.getElementFromSelector(this);
     if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
       return;
     }
-    event.preventDefault();
+    event2.preventDefault();
     const carousel = Carousel.getOrCreateInstance(target);
     const slideIndex = this.getAttribute("data-bs-slide-to");
     if (slideIndex) {
@@ -17314,9 +17331,9 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$4, function(event) {
-    if (event.target.tagName === "A" || event.delegateTarget && event.delegateTarget.tagName === "A") {
-      event.preventDefault();
+  EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$4, function(event2) {
+    if (event2.target.tagName === "A" || event2.delegateTarget && event2.delegateTarget.tagName === "A") {
+      event2.preventDefault();
     }
     for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
       Collapse.getOrCreateInstance(element, {
@@ -17573,8 +17590,8 @@
         data[config]();
       });
     }
-    static clearMenus(event) {
-      if (event.button === RIGHT_MOUSE_BUTTON || event.type === "keyup" && event.key !== TAB_KEY$1) {
+    static clearMenus(event2) {
+      if (event2.button === RIGHT_MOUSE_BUTTON || event2.type === "keyup" && event2.key !== TAB_KEY$1) {
         return;
       }
       const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN);
@@ -17583,44 +17600,44 @@
         if (!context || context._config.autoClose === false) {
           continue;
         }
-        const composedPath = event.composedPath();
+        const composedPath = event2.composedPath();
         const isMenuTarget = composedPath.includes(context._menu);
         if (composedPath.includes(context._element) || context._config.autoClose === "inside" && !isMenuTarget || context._config.autoClose === "outside" && isMenuTarget) {
           continue;
         }
-        if (context._menu.contains(event.target) && (event.type === "keyup" && event.key === TAB_KEY$1 || /input|select|option|textarea|form/i.test(event.target.tagName))) {
+        if (context._menu.contains(event2.target) && (event2.type === "keyup" && event2.key === TAB_KEY$1 || /input|select|option|textarea|form/i.test(event2.target.tagName))) {
           continue;
         }
         const relatedTarget = {
           relatedTarget: context._element
         };
-        if (event.type === "click") {
-          relatedTarget.clickEvent = event;
+        if (event2.type === "click") {
+          relatedTarget.clickEvent = event2;
         }
         context._completeHide(relatedTarget);
       }
     }
-    static dataApiKeydownHandler(event) {
-      const isInput = /input|textarea/i.test(event.target.tagName);
-      const isEscapeEvent = event.key === ESCAPE_KEY$2;
-      const isUpOrDownEvent = [ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key);
+    static dataApiKeydownHandler(event2) {
+      const isInput = /input|textarea/i.test(event2.target.tagName);
+      const isEscapeEvent = event2.key === ESCAPE_KEY$2;
+      const isUpOrDownEvent = [ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event2.key);
       if (!isUpOrDownEvent && !isEscapeEvent) {
         return;
       }
       if (isInput && !isEscapeEvent) {
         return;
       }
-      event.preventDefault();
-      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$3) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$3, event.delegateTarget.parentNode);
+      event2.preventDefault();
+      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$3) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$3, event2.delegateTarget.parentNode);
       const instance = Dropdown.getOrCreateInstance(getToggleButton);
       if (isUpOrDownEvent) {
-        event.stopPropagation();
+        event2.stopPropagation();
         instance.show();
-        instance._selectMenuItem(event);
+        instance._selectMenuItem(event2);
         return;
       }
       if (instance._isShown()) {
-        event.stopPropagation();
+        event2.stopPropagation();
         instance.hide();
         getToggleButton.focus();
       }
@@ -17630,8 +17647,8 @@
   EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_MENU, Dropdown.dataApiKeydownHandler);
   EventHandler.on(document, EVENT_CLICK_DATA_API$3, Dropdown.clearMenus);
   EventHandler.on(document, EVENT_KEYUP_DATA_API, Dropdown.clearMenus);
-  EventHandler.on(document, EVENT_CLICK_DATA_API$3, SELECTOR_DATA_TOGGLE$3, function(event) {
-    event.preventDefault();
+  EventHandler.on(document, EVENT_CLICK_DATA_API$3, SELECTOR_DATA_TOGGLE$3, function(event2) {
+    event2.preventDefault();
     Dropdown.getOrCreateInstance(this).toggle();
   });
   defineJQueryPlugin(Dropdown);
@@ -17781,8 +17798,8 @@
         this._config.trapElement.focus();
       }
       EventHandler.off(document, EVENT_KEY$5);
-      EventHandler.on(document, EVENT_FOCUSIN$2, (event) => this._handleFocusin(event));
-      EventHandler.on(document, EVENT_KEYDOWN_TAB, (event) => this._handleKeydown(event));
+      EventHandler.on(document, EVENT_FOCUSIN$2, (event2) => this._handleFocusin(event2));
+      EventHandler.on(document, EVENT_KEYDOWN_TAB, (event2) => this._handleKeydown(event2));
       this._isActive = true;
     }
     deactivate() {
@@ -17793,11 +17810,11 @@
       EventHandler.off(document, EVENT_KEY$5);
     }
     // Private
-    _handleFocusin(event) {
+    _handleFocusin(event2) {
       const {
         trapElement
       } = this._config;
-      if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+      if (event2.target === document || event2.target === trapElement || trapElement.contains(event2.target)) {
         return;
       }
       const elements = SelectorEngine.focusableChildren(trapElement);
@@ -17809,11 +17826,11 @@
         elements[0].focus();
       }
     }
-    _handleKeydown(event) {
-      if (event.key !== TAB_KEY) {
+    _handleKeydown(event2) {
+      if (event2.key !== TAB_KEY) {
         return;
       }
-      this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
+      this._lastTabNavDirection = event2.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
     }
   };
   var SELECTOR_FIXED_CONTENT = ".fixed-top, .fixed-bottom, .is-fixed, .sticky-top";
@@ -18029,8 +18046,8 @@
       this._queueCallback(transitionComplete, this._dialog, this._isAnimated());
     }
     _addEventListeners() {
-      EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS$1, (event) => {
-        if (event.key !== ESCAPE_KEY$1) {
+      EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS$1, (event2) => {
+        if (event2.key !== ESCAPE_KEY$1) {
           return;
         }
         if (this._config.keyboard) {
@@ -18044,9 +18061,9 @@
           this._adjustDialog();
         }
       });
-      EventHandler.on(this._element, EVENT_MOUSEDOWN_DISMISS, (event) => {
-        EventHandler.one(this._element, EVENT_CLICK_DISMISS, (event2) => {
-          if (this._element !== event.target || this._element !== event2.target) {
+      EventHandler.on(this._element, EVENT_MOUSEDOWN_DISMISS, (event2) => {
+        EventHandler.one(this._element, EVENT_CLICK_DISMISS, (event22) => {
+          if (this._element !== event2.target || this._element !== event22.target) {
             return;
           }
           if (this._config.backdrop === "static") {
@@ -18131,10 +18148,10 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, function(event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, function(event2) {
     const target = SelectorEngine.getElementFromSelector(this);
     if (["A", "AREA"].includes(this.tagName)) {
-      event.preventDefault();
+      event2.preventDefault();
     }
     EventHandler.one(target, EVENT_SHOW$4, (showEvent) => {
       if (showEvent.defaultPrevented) {
@@ -18290,8 +18307,8 @@
       });
     }
     _addEventListeners() {
-      EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, (event) => {
-        if (event.key !== ESCAPE_KEY) {
+      EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, (event2) => {
+        if (event2.key !== ESCAPE_KEY) {
           return;
         }
         if (this._config.keyboard) {
@@ -18315,10 +18332,10 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function(event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function(event2) {
     const target = SelectorEngine.getElementFromSelector(this);
     if (["A", "AREA"].includes(this.tagName)) {
-      event.preventDefault();
+      event2.preventDefault();
     }
     if (isDisabled(this)) {
       return;
@@ -18791,8 +18808,8 @@
       return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute("data-bs-original-title");
     }
     // Private
-    _initializeOnDelegatedTarget(event) {
-      return this.constructor.getOrCreateInstance(event.delegateTarget, this._getDelegateConfig());
+    _initializeOnDelegatedTarget(event2) {
+      return this.constructor.getOrCreateInstance(event2.delegateTarget, this._getDelegateConfig());
     }
     _isAnimated() {
       return this._config.animation || this.tip && this.tip.classList.contains(CLASS_NAME_FADE$2);
@@ -18861,21 +18878,21 @@
       const triggers = this._config.trigger.split(" ");
       for (const trigger of triggers) {
         if (trigger === "click") {
-          EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$1), this._config.selector, (event) => {
-            const context = this._initializeOnDelegatedTarget(event);
+          EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$1), this._config.selector, (event2) => {
+            const context = this._initializeOnDelegatedTarget(event2);
             context.toggle();
           });
         } else if (trigger !== TRIGGER_MANUAL) {
           const eventIn = trigger === TRIGGER_HOVER ? this.constructor.eventName(EVENT_MOUSEENTER) : this.constructor.eventName(EVENT_FOCUSIN$1);
           const eventOut = trigger === TRIGGER_HOVER ? this.constructor.eventName(EVENT_MOUSELEAVE) : this.constructor.eventName(EVENT_FOCUSOUT$1);
-          EventHandler.on(this._element, eventIn, this._config.selector, (event) => {
-            const context = this._initializeOnDelegatedTarget(event);
-            context._activeTrigger[event.type === "focusin" ? TRIGGER_FOCUS : TRIGGER_HOVER] = true;
+          EventHandler.on(this._element, eventIn, this._config.selector, (event2) => {
+            const context = this._initializeOnDelegatedTarget(event2);
+            context._activeTrigger[event2.type === "focusin" ? TRIGGER_FOCUS : TRIGGER_HOVER] = true;
             context._enter();
           });
-          EventHandler.on(this._element, eventOut, this._config.selector, (event) => {
-            const context = this._initializeOnDelegatedTarget(event);
-            context._activeTrigger[event.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = context._element.contains(event.relatedTarget);
+          EventHandler.on(this._element, eventOut, this._config.selector, (event2) => {
+            const context = this._initializeOnDelegatedTarget(event2);
+            context._activeTrigger[event2.type === "focusout" ? TRIGGER_FOCUS : TRIGGER_HOVER] = context._element.contains(event2.relatedTarget);
             context._leave();
           });
         }
@@ -19140,10 +19157,10 @@
         return;
       }
       EventHandler.off(this._config.target, EVENT_CLICK);
-      EventHandler.on(this._config.target, EVENT_CLICK, SELECTOR_TARGET_LINKS, (event) => {
-        const observableSection = this._observableSections.get(event.target.hash);
+      EventHandler.on(this._config.target, EVENT_CLICK, SELECTOR_TARGET_LINKS, (event2) => {
+        const observableSection = this._observableSections.get(event2.target.hash);
         if (observableSection) {
-          event.preventDefault();
+          event2.preventDefault();
           const root = this._rootElement || window;
           const height = observableSection.offsetTop - this._element.offsetTop;
           if (root.scrollTo) {
@@ -19296,7 +19313,7 @@
         return;
       }
       this._setInitialAttributes(this._parent, this._getChildren());
-      EventHandler.on(this._element, EVENT_KEYDOWN, (event) => this._keydown(event));
+      EventHandler.on(this._element, EVENT_KEYDOWN, (event2) => this._keydown(event2));
     }
     // Getters
     static get NAME() {
@@ -19363,19 +19380,19 @@
       };
       this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE$1));
     }
-    _keydown(event) {
-      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key)) {
+    _keydown(event2) {
+      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event2.key)) {
         return;
       }
-      event.stopPropagation();
-      event.preventDefault();
+      event2.stopPropagation();
+      event2.preventDefault();
       const children = this._getChildren().filter((element) => !isDisabled(element));
       let nextActiveElement;
-      if ([HOME_KEY, END_KEY].includes(event.key)) {
-        nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
+      if ([HOME_KEY, END_KEY].includes(event2.key)) {
+        nextActiveElement = children[event2.key === HOME_KEY ? 0 : children.length - 1];
       } else {
-        const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
-        nextActiveElement = getNextActiveElement(children, event.target, isNext, true);
+        const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event2.key);
+        nextActiveElement = getNextActiveElement(children, event2.target, isNext, true);
       }
       if (nextActiveElement) {
         nextActiveElement.focus({
@@ -19465,9 +19482,9 @@
       });
     }
   };
-  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event2) {
     if (["A", "AREA"].includes(this.tagName)) {
-      event.preventDefault();
+      event2.preventDefault();
     }
     if (isDisabled(this)) {
       return;
@@ -19581,8 +19598,8 @@
         this.hide();
       }, this._config.delay);
     }
-    _onInteraction(event, isInteracting) {
-      switch (event.type) {
+    _onInteraction(event2, isInteracting) {
+      switch (event2.type) {
         case "mouseover":
         case "mouseout": {
           this._hasMouseInteraction = isInteracting;
@@ -19598,17 +19615,17 @@
         this._clearTimeout();
         return;
       }
-      const nextElement = event.relatedTarget;
+      const nextElement = event2.relatedTarget;
       if (this._element === nextElement || this._element.contains(nextElement)) {
         return;
       }
       this._maybeScheduleHide();
     }
     _setListeners() {
-      EventHandler.on(this._element, EVENT_MOUSEOVER, (event) => this._onInteraction(event, true));
-      EventHandler.on(this._element, EVENT_MOUSEOUT, (event) => this._onInteraction(event, false));
-      EventHandler.on(this._element, EVENT_FOCUSIN, (event) => this._onInteraction(event, true));
-      EventHandler.on(this._element, EVENT_FOCUSOUT, (event) => this._onInteraction(event, false));
+      EventHandler.on(this._element, EVENT_MOUSEOVER, (event2) => this._onInteraction(event2, true));
+      EventHandler.on(this._element, EVENT_MOUSEOUT, (event2) => this._onInteraction(event2, false));
+      EventHandler.on(this._element, EVENT_FOCUSIN, (event2) => this._onInteraction(event2, true));
+      EventHandler.on(this._element, EVENT_FOCUSOUT, (event2) => this._onInteraction(event2, false));
     }
     _clearTimeout() {
       clearTimeout(this._timeout);
@@ -19659,8 +19676,8 @@
     bindingDisconnected(binding) {
       this.unorderedBindings.delete(binding);
     }
-    handleEvent(event) {
-      const extendedEvent = extendEvent(event);
+    handleEvent(event2) {
+      const extendedEvent = extendEvent(event2);
       for (const binding of this.bindings) {
         if (extendedEvent.immediatePropagationStopped) {
           break;
@@ -19679,12 +19696,12 @@
       });
     }
   };
-  function extendEvent(event) {
-    if ("immediatePropagationStopped" in event) {
-      return event;
+  function extendEvent(event2) {
+    if ("immediatePropagationStopped" in event2) {
+      return event2;
     } else {
-      const { stopImmediatePropagation } = event;
-      return Object.assign(event, {
+      const { stopImmediatePropagation } = event2;
+      return Object.assign(event2, {
         immediatePropagationStopped: false,
         stopImmediatePropagation() {
           this.immediatePropagationStopped = true;
@@ -19778,19 +19795,19 @@
     }
   };
   var defaultActionDescriptorFilters = {
-    stop({ event, value }) {
+    stop({ event: event2, value }) {
       if (value)
-        event.stopPropagation();
+        event2.stopPropagation();
       return true;
     },
-    prevent({ event, value }) {
+    prevent({ event: event2, value }) {
       if (value)
-        event.preventDefault();
+        event2.preventDefault();
       return true;
     },
-    self({ event, value, element }) {
+    self({ event: event2, value, element }) {
       if (value) {
-        return element === event.target;
+        return element === event2.target;
       } else {
         return true;
       }
@@ -19874,12 +19891,12 @@
       const eventTarget = this.eventTargetName ? `@${this.eventTargetName}` : "";
       return `${this.eventName}${eventFilter}${eventTarget}->${this.identifier}#${this.methodName}`;
     }
-    shouldIgnoreKeyboardEvent(event) {
+    shouldIgnoreKeyboardEvent(event2) {
       if (!this.keyFilter) {
         return false;
       }
       const filters = this.keyFilter.split("+");
-      if (this.keyFilterDissatisfied(event, filters)) {
+      if (this.keyFilterDissatisfied(event2, filters)) {
         return true;
       }
       const standardFilter = filters.filter((key) => !allModifiers.includes(key))[0];
@@ -19889,14 +19906,14 @@
       if (!hasProperty(this.keyMappings, standardFilter)) {
         error(`contains unknown key filter: ${this.keyFilter}`);
       }
-      return this.keyMappings[standardFilter].toLowerCase() !== event.key.toLowerCase();
+      return this.keyMappings[standardFilter].toLowerCase() !== event2.key.toLowerCase();
     }
-    shouldIgnoreMouseEvent(event) {
+    shouldIgnoreMouseEvent(event2) {
       if (!this.keyFilter) {
         return false;
       }
       const filters = [this.keyFilter];
-      if (this.keyFilterDissatisfied(event, filters)) {
+      if (this.keyFilterDissatisfied(event2, filters)) {
         return true;
       }
       return false;
@@ -19919,9 +19936,9 @@
     get keyMappings() {
       return this.schema.keyMappings;
     }
-    keyFilterDissatisfied(event, filters) {
+    keyFilterDissatisfied(event2, filters) {
       const [meta, ctrl, alt, shift] = allModifiers.map((modifier) => filters.includes(modifier));
-      return event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift;
+      return event2.metaKey !== meta || event2.ctrlKey !== ctrl || event2.altKey !== alt || event2.shiftKey !== shift;
     }
   };
   var defaultEventNames = {
@@ -19966,9 +19983,9 @@
     get identifier() {
       return this.context.identifier;
     }
-    handleEvent(event) {
-      const actionEvent = this.prepareActionEvent(event);
-      if (this.willBeInvokedByEvent(event) && this.applyEventModifiers(actionEvent)) {
+    handleEvent(event2) {
+      const actionEvent = this.prepareActionEvent(event2);
+      if (this.willBeInvokedByEvent(event2) && this.applyEventModifiers(actionEvent)) {
         this.invokeWithEvent(actionEvent);
       }
     }
@@ -19982,7 +19999,7 @@
       }
       throw new Error(`Action "${this.action}" references undefined method "${this.methodName}"`);
     }
-    applyEventModifiers(event) {
+    applyEventModifiers(event2) {
       const { element } = this.action;
       const { actionDescriptorFilters } = this.context.application;
       const { controller } = this.context;
@@ -19990,33 +20007,33 @@
       for (const [name, value] of Object.entries(this.eventOptions)) {
         if (name in actionDescriptorFilters) {
           const filter = actionDescriptorFilters[name];
-          passes = passes && filter({ name, value, event, element, controller });
+          passes = passes && filter({ name, value, event: event2, element, controller });
         } else {
           continue;
         }
       }
       return passes;
     }
-    prepareActionEvent(event) {
-      return Object.assign(event, { params: this.action.params });
+    prepareActionEvent(event2) {
+      return Object.assign(event2, { params: this.action.params });
     }
-    invokeWithEvent(event) {
-      const { target, currentTarget } = event;
+    invokeWithEvent(event2) {
+      const { target, currentTarget } = event2;
       try {
-        this.method.call(this.controller, event);
-        this.context.logDebugActivity(this.methodName, { event, target, currentTarget, action: this.methodName });
+        this.method.call(this.controller, event2);
+        this.context.logDebugActivity(this.methodName, { event: event2, target, currentTarget, action: this.methodName });
       } catch (error2) {
         const { identifier, controller, element, index } = this;
-        const detail = { identifier, controller, element, index, event };
+        const detail = { identifier, controller, element, index, event: event2 };
         this.context.handleError(error2, `invoking action "${this.action}"`, detail);
       }
     }
-    willBeInvokedByEvent(event) {
-      const eventTarget = event.target;
-      if (event instanceof KeyboardEvent && this.action.shouldIgnoreKeyboardEvent(event)) {
+    willBeInvokedByEvent(event2) {
+      const eventTarget = event2.target;
+      if (event2 instanceof KeyboardEvent && this.action.shouldIgnoreKeyboardEvent(event2)) {
         return false;
       }
-      if (event instanceof MouseEvent && this.action.shouldIgnoreMouseEvent(event)) {
+      if (event2 instanceof MouseEvent && this.action.shouldIgnoreMouseEvent(event2)) {
         return false;
       }
       if (this.element === eventTarget) {
@@ -20984,10 +21001,10 @@
     }
     get outletDependencies() {
       const dependencies = new Multimap();
-      this.router.modules.forEach((module2) => {
-        const constructor = module2.definition.controllerConstructor;
+      this.router.modules.forEach((module) => {
+        const constructor = module.definition.controllerConstructor;
         const outlets = readInheritableStaticArrayValues(constructor, "outlets");
-        outlets.forEach((outlet) => dependencies.add(outlet, module2.identifier));
+        outlets.forEach((outlet) => dependencies.add(outlet, module.identifier));
       });
       return dependencies;
     }
@@ -21027,15 +21044,15 @@
     }
   };
   var Context = class {
-    constructor(module2, scope) {
+    constructor(module, scope) {
       this.logDebugActivity = (functionName, detail = {}) => {
         const { identifier, controller, element } = this;
         detail = Object.assign({ identifier, controller, element }, detail);
         this.application.logDebugActivity(this.identifier, functionName, detail);
       };
-      this.module = module2;
+      this.module = module;
       this.scope = scope;
-      this.controller = new module2.controllerConstructor(this);
+      this.controller = new module.controllerConstructor(this);
       this.bindingObserver = new BindingObserver(this, this.dispatcher);
       this.valueObserver = new ValueObserver(this, this.controller);
       this.targetObserver = new TargetObserver(this, this);
@@ -21542,7 +21559,7 @@
       return Array.from(this.modulesByIdentifier.values());
     }
     get contexts() {
-      return this.modules.reduce((contexts, module2) => contexts.concat(module2.contexts), []);
+      return this.modules.reduce((contexts, module) => contexts.concat(module.contexts), []);
     }
     start() {
       this.scopeObserver.start();
@@ -21552,23 +21569,23 @@
     }
     loadDefinition(definition) {
       this.unloadIdentifier(definition.identifier);
-      const module2 = new Module(this.application, definition);
-      this.connectModule(module2);
+      const module = new Module(this.application, definition);
+      this.connectModule(module);
       const afterLoad = definition.controllerConstructor.afterLoad;
       if (afterLoad) {
         afterLoad.call(definition.controllerConstructor, definition.identifier, this.application);
       }
     }
     unloadIdentifier(identifier) {
-      const module2 = this.modulesByIdentifier.get(identifier);
-      if (module2) {
-        this.disconnectModule(module2);
+      const module = this.modulesByIdentifier.get(identifier);
+      if (module) {
+        this.disconnectModule(module);
       }
     }
     getContextForElementAndIdentifier(element, identifier) {
-      const module2 = this.modulesByIdentifier.get(identifier);
-      if (module2) {
-        return module2.contexts.find((context) => context.element == element);
+      const module = this.modulesByIdentifier.get(identifier);
+      if (module) {
+        return module.contexts.find((context) => context.element == element);
       }
     }
     proposeToConnectScopeForElementAndIdentifier(element, identifier) {
@@ -21587,27 +21604,27 @@
     }
     scopeConnected(scope) {
       this.scopesByIdentifier.add(scope.identifier, scope);
-      const module2 = this.modulesByIdentifier.get(scope.identifier);
-      if (module2) {
-        module2.connectContextForScope(scope);
+      const module = this.modulesByIdentifier.get(scope.identifier);
+      if (module) {
+        module.connectContextForScope(scope);
       }
     }
     scopeDisconnected(scope) {
       this.scopesByIdentifier.delete(scope.identifier, scope);
-      const module2 = this.modulesByIdentifier.get(scope.identifier);
-      if (module2) {
-        module2.disconnectContextForScope(scope);
+      const module = this.modulesByIdentifier.get(scope.identifier);
+      if (module) {
+        module.disconnectContextForScope(scope);
       }
     }
-    connectModule(module2) {
-      this.modulesByIdentifier.set(module2.identifier, module2);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
-      scopes.forEach((scope) => module2.connectContextForScope(scope));
+    connectModule(module) {
+      this.modulesByIdentifier.set(module.identifier, module);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
+      scopes.forEach((scope) => module.connectContextForScope(scope));
     }
-    disconnectModule(module2) {
-      this.modulesByIdentifier.delete(module2.identifier);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
-      scopes.forEach((scope) => module2.disconnectContextForScope(scope));
+    disconnectModule(module) {
+      this.modulesByIdentifier.delete(module.identifier);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
+      scopes.forEach((scope) => module.disconnectContextForScope(scope));
     }
   };
   var defaultSchema = {
@@ -22072,9 +22089,9 @@
     }
     dispatch(eventName, { target = this.element, detail = {}, prefix = this.identifier, bubbles = true, cancelable = true } = {}) {
       const type = prefix ? `${prefix}:${eventName}` : eventName;
-      const event = new CustomEvent(type, { detail, bubbles, cancelable });
-      target.dispatchEvent(event);
-      return event;
+      const event2 = new CustomEvent(type, { detail, bubbles, cancelable });
+      target.dispatchEvent(event2);
+      return event2;
     }
   };
   Controller.blessings = [
@@ -22094,71 +22111,6 @@
 
   // app/javascript/controllers/msip/bitacoraap_controller.js
   var bitacoraap_controller_default = class extends Controller {
-    /*!
-     * Serializa valores de un formulario en un arreglo
-     * Idea de serializeArray de jQuery, implemantación basada en
-     * https://vanillajstoolkit.com/helpers/serializearray/
-     * FormData debería dejar esto obsoleto
-     **/
-    static serializarFormularioEnArreglo(formulario) {
-      var arr = [];
-      Array.prototype.slice.call(formulario.elements).forEach(function(campo) {
-        if (!campo.name || campo.disabled || ["file", "reset", "submit", "button"].indexOf(campo.type) > -1) {
-          return;
-        }
-        if (campo.type === "select-multiple") {
-          Array.prototype.slice.call(campo.options).forEach(function(opcion) {
-            if (!opcion.selected)
-              return;
-            arr.push({
-              name: campo.name,
-              value: opcion.value
-            });
-          });
-          return;
-        }
-        if (["checkbox", "radio"].indexOf(campo.type) > -1 && !campo.checked) {
-          return;
-        }
-        arr.push({
-          name: campo.name,
-          value: campo.value
-        });
-      });
-      return arr;
-    }
-    static calcularCambiosParaBitacora() {
-      let bitacora = document.querySelector("input.bitacora_cambio");
-      if (bitacora == null) {
-        return { vacio: false };
-      }
-      window.bitacora_estado_final_formulario = this.serializarFormularioEnArreglo(
-        bitacora.closest("form")
-      );
-      if (typeof window.bitacora_estado_inicial_formulario != "object") {
-        return { vacio: false };
-      }
-      let cambio = {};
-      let di = {};
-      window.bitacora_estado_inicial_formulario.forEach(
-        (v) => di[v.name] = v.value
-      );
-      let df = {};
-      window.bitacora_estado_final_formulario.forEach((v) => {
-        df[v.name] = v.value;
-        if (typeof di[v.name] == "undefined") {
-          cambio[v.name] = [null, v.value];
-        }
-      });
-      for (const i in di) {
-        if (typeof df[i] == "undefined") {
-          cambio[i] = [di[i], null];
-        } else if (df[i] != di[i] && i.search(/\[bitacora_cambio\]/) < 0) {
-          cambio[i] = [di[i], df[i]];
-        }
-      }
-      return cambio;
-    }
     initialize() {
       console.log("inicializa controlador bitacoraap");
     }
@@ -22166,7 +22118,7 @@
       console.log("conectado controlador bitacoraap");
       let campo = document.querySelector("input.bitacora_cambio");
       if (campo != null) {
-        window.bitacora_estado_inicial_formulario = this.constructor.serializarFormularioEnArreglo(
+        window.bitacora_estado_inicial_formulario = MsipSerializarFormularioEnArreglo(
           campo.closest("form")
         );
       }
@@ -22176,7 +22128,7 @@
       if (campo == null) {
         return;
       }
-      let cambio = this.constructor.calcularCambiosParaBitacora();
+      let cambio = MsipCalcularCambiosParaBitacora();
       campo.value = JSON.stringify(cambio);
     }
   };
@@ -22328,16 +22280,140 @@
     "id"
   ]);
 
+  // app/javascript/controllers/sivel2_gen/edad_controller.js
+  var edad_controller_default = class extends Controller {
+    connect() {
+      console.log("Conexion de controlador edades establecida");
+    }
+    actualizarEdad(event2) {
+      const targetPersona = event2.target.closest(".div-edad");
+      const campo_anionac = targetPersona.querySelector('[data-edad-target="anionac"]');
+      const campo_mesnac = targetPersona.querySelector('[data-edad-target="mesnac"]');
+      const campo_dianac = targetPersona.querySelector('[data-edad-target="dianac"]');
+      let anio = parseInt(campo_anionac.value);
+      let mes = parseInt(campo_mesnac.value) - 1;
+      let dia = parseInt(campo_dianac.value);
+      if (isNaN(mes)) {
+        mes = 0;
+      }
+      if (isNaN(dia)) {
+        dia = 1;
+      }
+      const campo_fecha_caso = document.querySelector("#caso_fecha_localizada");
+      const campo_edad = targetPersona.querySelector('[data-edad-target="edad"]');
+      const campo_edadactual = targetPersona.querySelector('[data-edad-target="edadactual"]');
+      const campo_rangoedad = targetPersona.querySelector('[data-edad-target="rangoedad"]');
+      const anio_caso = parseInt(campo_fecha_caso.value.split("/")[2]);
+      const mes_caso = parseInt(obtenerNumeroMes(campo_fecha_caso.value.split("/")[1]));
+      const dia_caso = parseInt(campo_fecha_caso.value.split("/")[0]);
+      const hoy = /* @__PURE__ */ new Date();
+      let fechaCaso = new Date(anio_caso, mes_caso, dia_caso);
+      let fechaNacimiento = new Date(anio, mes, dia);
+      if (event2.target.dataset.edadTarget == "edad") {
+        let edad2 = parseInt(campo_edad.value);
+        anio = fechaCaso.getFullYear() - edad2;
+        mes = 0;
+        dia = 1;
+        campo_anionac.value = anio;
+        campo_mesnac.value = mes + 1;
+        campo_dianac.value = dia;
+      }
+      if (event2.target.dataset.edadTarget == "edadactual") {
+        let edadactual2 = parseInt(campo_edadactual.value);
+        debugger;
+        anio = hoy.getFullYear() - edadactual2;
+        mes = 0;
+        dia = 1;
+        campo_anionac.value = anio;
+        campo_mesnac.value = mes + 1;
+        campo_dianac.value = dia;
+      }
+      fechaNacimiento = new Date(anio, mes, dia);
+      let edadactual = hoy.getFullYear() - anio;
+      let edad = fechaCaso.getFullYear() - anio;
+      if (hoy.getMonth() < fechaNacimiento.getMonth() || hoy.getMonth() === fechaNacimiento.getMonth() && hoy.getDate() < fechaNacimiento.getDate()) {
+        edadactual--;
+      }
+      if (fechaCaso.getMonth() < fechaNacimiento.getMonth() || fechaCaso.getMonth() === fechaNacimiento.getMonth() && fechaCaso.getDate() < fechaNacimiento.getDate()) {
+        edad--;
+      }
+      if (edad > 0) {
+        campo_edad.value = edad;
+      } else {
+        campo_edad.value = 0;
+      }
+      if (edadactual > 0) {
+        campo_edadactual.value = edadactual;
+      } else {
+        campo_edadactual.value = 0;
+      }
+      function obtenerNumeroMes(nombreMes) {
+        const meses = [
+          "ene",
+          "feb",
+          "mar",
+          "abr",
+          "may",
+          "jun",
+          "jul",
+          "ago",
+          "sep",
+          "oct",
+          "nov",
+          "dic"
+        ];
+        return meses.indexOf(nombreMes.toLowerCase());
+      }
+      const opciones_rangoedad = campo_rangoedad.options;
+      for (var i = 0; i < opciones_rangoedad.length; i++) {
+        var opcion = campo_rangoedad.options[i].text;
+        var rango = opcion.match(/\d+/g).map(Number);
+        if (rango.length == 2 && edadactual >= rango[0] && edadactual <= rango[1]) {
+          campo_rangoedad.selectedIndex = i;
+          break;
+        }
+        if (rango.length == 1 && edadactual >= rango[0]) {
+          campo_rangoedad.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    blanquearFechanac() {
+      const targetPersona = event.target.closest(".div-edad");
+      const campo_anionac = targetPersona.querySelector('[data-edad-target="anionac"]');
+      const campo_mesnac = targetPersona.querySelector('[data-edad-target="mesnac"]');
+      const campo_dianac = targetPersona.querySelector('[data-edad-target="dianac"]');
+      const campo_rangoedad = targetPersona.querySelector('[data-edad-target="rangoedad"]');
+      const campo_edad = targetPersona.querySelector('[data-edad-target="edad"]');
+      const campo_edadactual = targetPersona.querySelector('[data-edad-target="edadactual"]');
+      if (event.target.dataset.edadTarget == "rangoedad") {
+        campo_edad.value = null;
+        campo_edadactual.value = null;
+      }
+      if (event.target.dataset.edadTarget == "edad") {
+        campo_rangoedad.value = null;
+        campo_edadactual.value = null;
+      }
+      if (event.target.dataset.edadTarget == "edadactual") {
+        campo_edad.value = null;
+        campo_rangoedad.value = null;
+      }
+      campo_anionac.value = null;
+    }
+  };
+  __publicField(edad_controller_default, "targets", ["anionac", "mesnac", "dianac", "edad", "edadactual"]);
+
   // app/javascript/controllers/index.js
   application.register("msip--bitacoraap", bitacoraap_controller_default);
   application.register("msip--cancelar-vacio-es-eliminar", cancelar_vacio_es_eliminar_controller_default);
   application.register("msip--filtro-tan", filtro_tan_controller_default);
   application.register("msip--sindocaut", sindocaut_controller_default);
+  application.register("sivel2-gen--edad", edad_controller_default);
 
   // app/javascript/application.js
   console.log("Hola Mundo desde ESM");
-  rails_ujs_esm_default.start();
-  window.Rails = rails_ujs_esm_default;
+  Rails.start();
+  window.Rails = Rails;
   var esperarRecursosSprocketsYDocumento = function(resolver) {
     if (typeof window.puntomontaje == "undefined") {
       setTimeout(esperarRecursosSprocketsYDocumento, 5, resolver);
