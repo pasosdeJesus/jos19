@@ -143,7 +143,7 @@ module Jos19
     # Autorizaciones con CanCanCan
     def initialize_sivel2_sjr(usuario = nil)
       # Sin autenticación puede consultarse información geográfica 
-      can :read, [Msip::Pais, Msip::Departamento, Msip::Municipio, Msip::Clase]
+      can :read, [Msip::Pais, Msip::Departamento, Msip::Municipio, Msip::Centropoblado]
       if !usuario || usuario.fechadeshabilitacion
         return
       end

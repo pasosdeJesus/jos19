@@ -603,7 +603,7 @@ module Jos19
               [ :anionac, :mesnac, :dianac,
                 :numerodocumento, :tdocumento_id,
                 :departamento_id, :municipio_id,
-                :clase_id, :nacionalde, :pais_id
+                :centropoblado_id, :nacionalde, :pais_id
               ].each do |c|
                 if !p1[c] && p2[c]
                   p1[c] = p2[c]
@@ -684,7 +684,7 @@ module Jos19
                 "* Pais nac.: #{p2.pais_id ? p2.pais.nombre : ''}\n"\
                 "* Departamento nac.: #{p2.departamento_id ? p2.departamento.nombre : ''}\n"\
                 "* Muncipio nac.: #{p2.municipio_id ? p2.municipio.nombre : ''}\n"\
-                "* Centro poblado nac.: #{p2.clase_id ? p2.clase.nombre : ''}\n"\
+                "* Centro poblado nac.: #{p2.centropoblado_id ? p2.centropoblado.nombre : ''}\n"\
                 "* Nacional de: #{p2.nacionalde ? p2.nacional.nombre : ''}\n"\
                 "* Fecha creación: #{p2.created_at.to_s}\n"\
                 "* Fecha actualización: #{p2.updated_at.to_s}.\n"
@@ -806,7 +806,7 @@ module Jos19
               :pais_id,
               :departamento_id,
               :municipio_id,
-              :clase_id,
+              :centropoblado_id,
               :numerodocumento,
               :tdocumento_id,
               :ultimoperfilorgsocial_id,
