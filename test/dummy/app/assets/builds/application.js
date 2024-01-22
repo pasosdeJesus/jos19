@@ -42,8 +42,8 @@
   var init_adapters = __esm({
     "node_modules/@rails/actioncable/src/adapters.js"() {
       adapters_default = {
-        logger: self.console,
-        WebSocket: self.WebSocket
+        logger: typeof console !== "undefined" ? console : void 0,
+        WebSocket: typeof WebSocket !== "undefined" ? WebSocket : void 0
       };
     }
   });
@@ -2184,11 +2184,11 @@
         };
         jQuery2.fn.extend({
           find: function(selector) {
-            var i, ret, len = this.length, self2 = this;
+            var i, ret, len = this.length, self = this;
             if (typeof selector !== "string") {
               return this.pushStack(jQuery2(selector).filter(function() {
                 for (i = 0; i < len; i++) {
-                  if (jQuery2.contains(self2[i], this)) {
+                  if (jQuery2.contains(self[i], this)) {
                     return true;
                   }
                 }
@@ -2196,7 +2196,7 @@
             }
             ret = this.pushStack([]);
             for (i = 0; i < len; i++) {
-              jQuery2.find(selector, self2[i], ret);
+              jQuery2.find(selector, self[i], ret);
             }
             return len > 1 ? jQuery2.uniqueSort(ret) : ret;
           },
@@ -2440,7 +2440,7 @@
                 list = "";
               }
             }
-          }, self2 = {
+          }, self = {
             // Add a callback or a collection of callbacks to the list
             add: function() {
               if (list) {
@@ -2451,7 +2451,7 @@
                 (function add2(args) {
                   jQuery2.each(args, function(_, arg) {
                     if (isFunction(arg)) {
-                      if (!options.unique || !self2.has(arg)) {
+                      if (!options.unique || !self.has(arg)) {
                         list.push(arg);
                       }
                     } else if (arg && arg.length && toType2(arg) !== "string") {
@@ -2528,7 +2528,7 @@
             },
             // Call all the callbacks with the given arguments
             fire: function() {
-              self2.fireWith(this, arguments);
+              self.fireWith(this, arguments);
               return this;
             },
             // To know if the callbacks have already been called at least once
@@ -2536,7 +2536,7 @@
               return !!fired;
             }
           };
-          return self2;
+          return self;
         };
         function Identity(v) {
           return v;
@@ -4015,11 +4015,11 @@
           var fragment, first, scripts, hasScripts, node, doc, i = 0, l = collection.length, iNoClone = l - 1, value = args[0], valueIsFunction = isFunction(value);
           if (valueIsFunction || l > 1 && typeof value === "string" && !support.checkClone && rchecked.test(value)) {
             return collection.each(function(index) {
-              var self2 = collection.eq(index);
+              var self = collection.eq(index);
               if (valueIsFunction) {
-                args[0] = value.call(this, index, self2.html());
+                args[0] = value.call(this, index, self.html());
               }
-              domManip(self2, args, callback, ignored);
+              domManip(self, args, callback, ignored);
             });
           }
           if (l) {
@@ -5493,7 +5493,7 @@
             return this;
           },
           toggleClass: function(value, stateVal) {
-            var classNames, className, i, self2, type = typeof value, isValidValue = type === "string" || Array.isArray(value);
+            var classNames, className, i, self, type = typeof value, isValidValue = type === "string" || Array.isArray(value);
             if (isFunction(value)) {
               return this.each(function(i2) {
                 jQuery2(this).toggleClass(
@@ -5508,13 +5508,13 @@
             classNames = classesToArray(value);
             return this.each(function() {
               if (isValidValue) {
-                self2 = jQuery2(this);
+                self = jQuery2(this);
                 for (i = 0; i < classNames.length; i++) {
                   className = classNames[i];
-                  if (self2.hasClass(className)) {
-                    self2.removeClass(className);
+                  if (self.hasClass(className)) {
+                    self.removeClass(className);
                   } else {
-                    self2.addClass(className);
+                    self.addClass(className);
                   }
                 }
               } else if (value === void 0 || type === "boolean") {
@@ -6392,11 +6392,11 @@
               });
             }
             return this.each(function() {
-              var self2 = jQuery2(this), contents = self2.contents();
+              var self = jQuery2(this), contents = self.contents();
               if (contents.length) {
                 contents.wrapAll(html);
               } else {
-                self2.append(html);
+                self.append(html);
               }
             });
           },
@@ -6655,7 +6655,7 @@
           return jQuery2.merge([], parsed.childNodes);
         };
         jQuery2.fn.load = function(url, params, callback) {
-          var selector, type, response, self2 = this, off = url.indexOf(" ");
+          var selector, type, response, self = this, off = url.indexOf(" ");
           if (off > -1) {
             selector = stripAndCollapse(url.slice(off));
             url = url.slice(0, off);
@@ -6666,7 +6666,7 @@
           } else if (params && typeof params === "object") {
             type = "POST";
           }
-          if (self2.length > 0) {
+          if (self.length > 0) {
             jQuery2.ajax({
               url,
               // If "type" variable is undefined, then "GET" method will be used.
@@ -6677,7 +6677,7 @@
               data: params
             }).done(function(responseText) {
               response = arguments;
-              self2.html(selector ? (
+              self.html(selector ? (
                 // If a selector was specified, locate the right elements in a dummy div
                 // Exclude scripts to avoid IE 'Permission Denied' errors
                 jQuery2("<div>").append(jQuery2.parseHTML(responseText)).find(selector)
@@ -6686,7 +6686,7 @@
                 responseText
               ));
             }).always(callback && function(jqXHR, status) {
-              self2.each(function() {
+              self.each(function() {
                 callback.apply(this, response || [jqXHR.responseText, status, jqXHR]);
               });
             });
@@ -6977,7 +6977,7 @@
   var require_chosen_jquery = __commonJS({
     "node_modules/chosen-js/chosen.jquery.js"(exports) {
       (function() {
-        var $2, AbstractChosen, Chosen, SelectParser, bind = function(fn2, me) {
+        var $3, AbstractChosen, Chosen, SelectParser, bind = function(fn2, me) {
           return function() {
             return fn2.apply(me, arguments);
           };
@@ -7551,15 +7551,15 @@
           AbstractChosen2.default_no_result_text = "No results match";
           return AbstractChosen2;
         }();
-        $2 = jQuery;
-        $2.fn.extend({
+        $3 = jQuery;
+        $3.fn.extend({
           chosen: function(options) {
             if (!AbstractChosen.browser_is_supported()) {
               return this;
             }
             return this.each(function(input_field) {
               var $this, chosen;
-              $this = $2(this);
+              $this = $3(this);
               chosen = $this.data("chosen");
               if (options === "destroy") {
                 if (chosen instanceof Chosen) {
@@ -7579,7 +7579,7 @@
             return Chosen2.__super__.constructor.apply(this, arguments);
           }
           Chosen2.prototype.setup = function() {
-            this.form_field_jq = $2(this.form_field);
+            this.form_field_jq = $3(this.form_field);
             return this.current_selectedIndex = this.form_field.selectedIndex;
           };
           Chosen2.prototype.set_up_html = function() {
@@ -7599,7 +7599,7 @@
             if (this.form_field.id.length) {
               container_props.id = this.form_field.id.replace(/[^\w]/g, "_") + "_chosen";
             }
-            this.container = $2("<div />", container_props);
+            this.container = $3("<div />", container_props);
             this.container.width(this.container_width());
             if (this.is_multiple) {
               this.container.html(this.get_multi_html());
@@ -7757,7 +7757,7 @@
             }
           };
           Chosen2.prototype.destroy = function() {
-            $2(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
+            $3(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
             if (this.form_field_label.length > 0) {
               this.form_field_label.off("click.chosen");
             }
@@ -7789,14 +7789,14 @@
             if (evt && ((ref = evt.type) === "mousedown" || ref === "touchstart") && !this.results_showing) {
               evt.preventDefault();
             }
-            if (!(evt != null && $2(evt.target).hasClass("search-choice-close"))) {
+            if (!(evt != null && $3(evt.target).hasClass("search-choice-close"))) {
               if (!this.active_field) {
                 if (this.is_multiple) {
                   this.search_field.val("");
                 }
-                $2(this.container[0].ownerDocument).on("click.chosen", this.click_test_action);
+                $3(this.container[0].ownerDocument).on("click.chosen", this.click_test_action);
                 this.results_show();
-              } else if (!this.is_multiple && evt && ($2(evt.target)[0] === this.selected_item[0] || $2(evt.target).parents("a.chosen-single").length)) {
+              } else if (!this.is_multiple && evt && ($3(evt.target)[0] === this.selected_item[0] || $3(evt.target).parents("a.chosen-single").length)) {
                 evt.preventDefault();
                 this.results_toggle();
               }
@@ -7827,7 +7827,7 @@
             }
           };
           Chosen2.prototype.close_field = function() {
-            $2(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
+            $3(this.container[0].ownerDocument).off("click.chosen", this.click_test_action);
             this.active_field = false;
             this.results_hide();
             this.container.removeClass("chosen-container-active");
@@ -7847,7 +7847,7 @@
           };
           Chosen2.prototype.test_active_click = function(evt) {
             var active_container;
-            active_container = $2(evt.target).closest(".chosen-container");
+            active_container = $3(evt.target).closest(".chosen-container");
             if (active_container.length && this.container[0] === active_container[0]) {
               return this.active_field = true;
             } else {
@@ -7942,7 +7942,7 @@
           Chosen2.prototype.set_label_behavior = function() {
             this.form_field_label = this.form_field_jq.parents("label");
             if (!this.form_field_label.length && this.form_field.id.length) {
-              this.form_field_label = $2("label[for='" + this.form_field.id + "']");
+              this.form_field_label = $3("label[for='" + this.form_field.id + "']");
             }
             if (this.form_field_label.length > 0) {
               return this.form_field_label.on("click.chosen", this.label_click_handler);
@@ -7959,7 +7959,7 @@
           };
           Chosen2.prototype.search_results_mouseup = function(evt) {
             var target;
-            target = $2(evt.target).hasClass("active-result") ? $2(evt.target) : $2(evt.target).parents(".active-result").first();
+            target = $3(evt.target).hasClass("active-result") ? $3(evt.target) : $3(evt.target).parents(".active-result").first();
             if (target.length) {
               this.result_highlight = target;
               this.result_select(evt);
@@ -7968,25 +7968,25 @@
           };
           Chosen2.prototype.search_results_mouseover = function(evt) {
             var target;
-            target = $2(evt.target).hasClass("active-result") ? $2(evt.target) : $2(evt.target).parents(".active-result").first();
+            target = $3(evt.target).hasClass("active-result") ? $3(evt.target) : $3(evt.target).parents(".active-result").first();
             if (target) {
               return this.result_do_highlight(target);
             }
           };
           Chosen2.prototype.search_results_mouseout = function(evt) {
-            if ($2(evt.target).hasClass("active-result") || $2(evt.target).parents(".active-result").first()) {
+            if ($3(evt.target).hasClass("active-result") || $3(evt.target).parents(".active-result").first()) {
               return this.result_clear_highlight();
             }
           };
           Chosen2.prototype.choice_build = function(item) {
             var choice, close_link;
-            choice = $2("<li />", {
+            choice = $3("<li />", {
               "class": "search-choice"
             }).html("<span>" + this.choice_label(item) + "</span>");
             if (item.disabled) {
               choice.addClass("search-choice-disabled");
             } else {
-              close_link = $2("<a />", {
+              close_link = $3("<a />", {
                 "class": "search-choice-close",
                 "data-option-array-index": item.array_index
               });
@@ -8003,7 +8003,7 @@
             evt.preventDefault();
             evt.stopPropagation();
             if (!this.is_disabled) {
-              return this.choice_destroy($2(evt.target));
+              return this.choice_destroy($3(evt.target));
             }
           };
           Chosen2.prototype.choice_destroy = function(link) {
@@ -8129,10 +8129,10 @@
             return this.search_field.val();
           };
           Chosen2.prototype.get_search_text = function() {
-            return $2.trim(this.get_search_field_value());
+            return $3.trim(this.get_search_field_value());
           };
           Chosen2.prototype.escape_html = function(text) {
-            return $2("<div/>").text(text).html();
+            return $3("<div/>").text(text).html();
           };
           Chosen2.prototype.winnow_results_set_highlight = function() {
             var do_high, selected_results;
@@ -8220,9 +8220,9 @@
               style = styles[i];
               style_block[style] = this.search_field.css(style);
             }
-            div = $2("<div />").css(style_block);
+            div = $3("<div />").css(style_block);
             div.text(this.get_search_field_value());
-            $2("body").append(div);
+            $3("body").append(div);
             width = div.width() + 25;
             div.remove();
             if (this.container.is(":visible")) {
@@ -8251,7 +8251,7 @@
         } else {
           factory(jQuery);
         }
-      })(function($2, undefined2) {
+      })(function($3, undefined2) {
         function UTCDate() {
           return new Date(Date.UTC.apply(Date, arguments));
         }
@@ -8265,7 +8265,7 @@
         function alias(method, deprecationMsg) {
           return function() {
             if (deprecationMsg !== undefined2) {
-              $2.fn.datepicker.deprecated(deprecationMsg);
+              $3.fn.datepicker.deprecated(deprecationMsg);
             }
             return this[method].apply(this, arguments);
           };
@@ -8308,19 +8308,19 @@
           return function() {
             var a = [];
             a.push.apply(a, arguments);
-            $2.extend(a, extras);
+            $3.extend(a, extras);
             return a;
           };
         }();
         var Datepicker = function(element, options) {
-          $2.data(element, "datepicker", this);
+          $3.data(element, "datepicker", this);
           this._events = [];
           this._secondaryEvents = [];
           this._process_options(options);
           this.dates = new DateArray();
           this.viewDate = this.o.defaultViewDate;
           this.focusDate = null;
-          this.element = $2(element);
+          this.element = $3(element);
           this.isInput = this.element.is("input");
           this.inputField = this.isInput ? this.element : this.element.find("input");
           this.component = this.element.hasClass("date") ? this.element.find(".add-on, .input-group-addon, .input-group-append, .input-group-prepend, .btn") : false;
@@ -8332,7 +8332,7 @@
           } else {
             this.isInline = this.o.isInline;
           }
-          this.picker = $2(DPGlobal.template);
+          this.picker = $3(DPGlobal.template);
           if (this._check_template(this.o.templates.leftArrow)) {
             this.picker.find(".prev").html(this.o.templates.leftArrow);
           }
@@ -8374,8 +8374,8 @@
         Datepicker.prototype = {
           constructor: Datepicker,
           _resolveViewName: function(view) {
-            $2.each(DPGlobal.viewModes, function(i, viewMode) {
-              if (view === i || $2.inArray(view, viewMode.names) !== -1) {
+            $3.each(DPGlobal.viewModes, function(i, viewMode) {
+              if (view === i || $3.inArray(view, viewMode.names) !== -1) {
                 view = i;
                 return false;
               }
@@ -8385,7 +8385,7 @@
           _resolveDaysOfWeek: function(daysOfWeek) {
             if (!Array.isArray(daysOfWeek))
               daysOfWeek = daysOfWeek.split(/[,\s]*/);
-            return $2.map(daysOfWeek, Number);
+            return $3.map(daysOfWeek, Number);
           },
           _check_template: function(tmp) {
             try {
@@ -8395,15 +8395,15 @@
               if ((tmp.match(/[<>]/g) || []).length <= 0) {
                 return true;
               }
-              var jDom = $2(tmp);
+              var jDom = $3(tmp);
               return jDom.length > 0;
             } catch (ex) {
               return false;
             }
           },
           _process_options: function(opts) {
-            this._o = $2.extend({}, this._o, opts);
-            var o = this.o = $2.extend({}, this._o);
+            this._o = $3.extend({}, this._o, opts);
+            var o = this.o = $3.extend({}, this._o);
             var lang = o.language;
             if (!dates[lang]) {
               lang = lang.split("-")[0];
@@ -8450,11 +8450,11 @@
             if (!Array.isArray(o.datesDisabled)) {
               o.datesDisabled = o.datesDisabled.split(",");
             }
-            o.datesDisabled = $2.map(o.datesDisabled, function(d) {
+            o.datesDisabled = $3.map(o.datesDisabled, function(d) {
               return DPGlobal.parseDate(d, format, o.language, o.assumeNearbyYear);
             });
             var plc = String(o.orientation).toLowerCase().split(/\s+/g), _plc = o.orientation.toLowerCase();
-            plc = $2.grep(plc, function(word) {
+            plc = $3.grep(plc, function(word) {
               return /^auto|left|right|top|bottom$/.test(word);
             });
             o.orientation = { x: "auto", y: "auto" };
@@ -8472,11 +8472,11 @@
                   break;
               }
             } else {
-              _plc = $2.grep(plc, function(word) {
+              _plc = $3.grep(plc, function(word) {
                 return /^left|right$/.test(word);
               });
               o.orientation.x = _plc[0] || "auto";
-              _plc = $2.grep(plc, function(word) {
+              _plc = $3.grep(plc, function(word) {
                 return /^top|bottom$/.test(word);
               });
               o.orientation.y = _plc[0] || "auto";
@@ -8520,15 +8520,15 @@
           },
           _buildEvents: function() {
             var events = {
-              keyup: $2.proxy(function(e) {
-                if ($2.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
+              keyup: $3.proxy(function(e) {
+                if ($3.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
                   this.update();
               }, this),
-              keydown: $2.proxy(this.keydown, this),
-              paste: $2.proxy(this.paste, this)
+              keydown: $3.proxy(this.keydown, this),
+              paste: $3.proxy(this.paste, this)
             };
             if (this.o.showOnFocus === true) {
-              events.focus = $2.proxy(this.show, this);
+              events.focus = $3.proxy(this.show, this);
             }
             if (this.isInput) {
               this._events = [
@@ -8539,53 +8539,53 @@
                 // For components that are not readonly, allow keyboard nav
                 [this.inputField, events],
                 [this.component, {
-                  click: $2.proxy(this.show, this)
+                  click: $3.proxy(this.show, this)
                 }]
               ];
             } else {
               this._events = [
                 [this.element, {
-                  click: $2.proxy(this.show, this),
-                  keydown: $2.proxy(this.keydown, this)
+                  click: $3.proxy(this.show, this),
+                  keydown: $3.proxy(this.keydown, this)
                 }]
               ];
             }
             this._events.push(
               // Component: listen for blur on element descendants
               [this.element, "*", {
-                blur: $2.proxy(function(e) {
+                blur: $3.proxy(function(e) {
                   this._focused_from = e.target;
                 }, this)
               }],
               // Input: listen for blur on element
               [this.element, {
-                blur: $2.proxy(function(e) {
+                blur: $3.proxy(function(e) {
                   this._focused_from = e.target;
                 }, this)
               }]
             );
             if (this.o.immediateUpdates) {
               this._events.push([this.element, {
-                "changeYear changeMonth": $2.proxy(function(e) {
+                "changeYear changeMonth": $3.proxy(function(e) {
                   this.update(e.date);
                 }, this)
               }]);
             }
             this._secondaryEvents = [
               [this.picker, {
-                click: $2.proxy(this.click, this)
+                click: $3.proxy(this.click, this)
               }],
               [this.picker, ".prev, .next", {
-                click: $2.proxy(this.navArrowsClick, this)
+                click: $3.proxy(this.navArrowsClick, this)
               }],
               [this.picker, ".day:not(.disabled)", {
-                click: $2.proxy(this.dayCellClick, this)
+                click: $3.proxy(this.dayCellClick, this)
               }],
-              [$2(window), {
-                resize: $2.proxy(this.place, this)
+              [$3(window), {
+                resize: $3.proxy(this.place, this)
               }],
-              [$2(document), {
-                "mousedown touchstart": $2.proxy(function(e) {
+              [$3(document), {
+                "mousedown touchstart": $3.proxy(function(e) {
                   if (!(this.element.is(e.target) || this.element.find(e.target).length || this.picker.is(e.target) || this.picker.find(e.target).length || this.isInline)) {
                     this.hide();
                   }
@@ -8613,8 +8613,8 @@
               type: event2,
               date: local_date,
               viewMode: this.viewMode,
-              dates: $2.map(this.dates, this._utc_to_local),
-              format: $2.proxy(function(ix, format) {
+              dates: $3.map(this.dates, this._utc_to_local),
+              format: $3.proxy(function(ix, format) {
                 if (arguments.length === 0) {
                   ix = this.dates.length - 1;
                   format = this.o.format;
@@ -8638,7 +8638,7 @@
             this._attachSecondaryEvents();
             this._trigger("show");
             if ((window.navigator.msMaxTouchPoints || "ontouchstart" in document) && this.o.disableTouchKeyboard) {
-              $2(this.element).blur();
+              $3(this.element).blur();
             }
             return this;
           },
@@ -8667,7 +8667,7 @@
           },
           paste: function(e) {
             var dateString;
-            if (e.originalEvent.clipboardData && e.originalEvent.clipboardData.types && $2.inArray("text/plain", e.originalEvent.clipboardData.types) !== -1) {
+            if (e.originalEvent.clipboardData && e.originalEvent.clipboardData.types && $3.inArray("text/plain", e.originalEvent.clipboardData.types) !== -1) {
               dateString = e.originalEvent.clipboardData.getData("text/plain");
             } else if (window.clipboardData) {
               dateString = window.clipboardData.getData("Text");
@@ -8698,10 +8698,10 @@
             return utc && UTCDate(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
           },
           getDates: function() {
-            return $2.map(this.dates, this._utc_to_local);
+            return $3.map(this.dates, this._utc_to_local);
           },
           getUTCDates: function() {
-            return $2.map(this.dates, function(d) {
+            return $3.map(this.dates, function(d) {
               return new Date(d);
             });
           },
@@ -8733,7 +8733,7 @@
           },
           setUTCDates: function() {
             var args = Array.isArray(arguments[0]) ? arguments[0] : arguments;
-            this.setDates.apply(this, $2.map(args, this._utc_to_local));
+            this.setDates.apply(this, $3.map(args, this._utc_to_local));
             return this;
           },
           setDate: alias("setDates"),
@@ -8748,7 +8748,7 @@
             if (format === undefined2)
               format = this.o.format;
             var lang = this.o.language;
-            return $2.map(this.dates, function(d) {
+            return $3.map(this.dates, function(d) {
               return DPGlobal.formatDate(d, format, lang);
             }).join(this.o.multidateSeparator);
           },
@@ -8788,10 +8788,10 @@
           place: function() {
             if (this.isInline)
               return this;
-            var calendarWidth = this.picker.outerWidth(), calendarHeight = this.picker.outerHeight(), visualPadding = 10, container = $2(this.o.container), windowWidth = container.width(), scrollTop = this.o.container === "body" ? $2(document).scrollTop() : container.scrollTop(), appendOffset = container.offset();
+            var calendarWidth = this.picker.outerWidth(), calendarHeight = this.picker.outerHeight(), visualPadding = 10, container = $3(this.o.container), windowWidth = container.width(), scrollTop = this.o.container === "body" ? $3(document).scrollTop() : container.scrollTop(), appendOffset = container.offset();
             var parentsZindex = [0];
             this.element.parents().each(function() {
-              var itemZIndex = $2(this).css("z-index");
+              var itemZIndex = $3(this).css("z-index");
               if (itemZIndex !== "auto" && Number(itemZIndex) !== 0)
                 parentsZindex.push(Number(itemZIndex));
             });
@@ -8858,7 +8858,7 @@
               return this;
             var oldDates = this.dates.copy(), dates2 = [], fromArgs = false;
             if (arguments.length) {
-              $2.each(arguments, $2.proxy(function(i, date) {
+              $3.each(arguments, $3.proxy(function(i, date) {
                 if (date instanceof Date)
                   date = this._local_to_utc(date);
                 dates2.push(date);
@@ -8872,10 +8872,10 @@
                 dates2 = [dates2];
               delete this.element.data().date;
             }
-            dates2 = $2.map(dates2, $2.proxy(function(date) {
+            dates2 = $3.map(dates2, $3.proxy(function(date) {
               return DPGlobal.parseDate(date, this.o.format, this.o.language, this.o.assumeNearbyYear);
             }, this));
-            dates2 = $2.grep(dates2, $2.proxy(function(date) {
+            dates2 = $3.grep(dates2, $3.proxy(function(date) {
               return !this.dateWithinRange(date) || !date;
             }, this), true);
             this.dates.replace(dates2);
@@ -8913,7 +8913,7 @@
               }
               while (dowCnt < this.o.weekStart + 7) {
                 html += '<th class="dow';
-                if ($2.inArray(dowCnt, this.o.daysOfWeekDisabled) !== -1)
+                if ($3.inArray(dowCnt, this.o.daysOfWeekDisabled) !== -1)
                   html += " disabled";
                 html += '">' + dates[this.o.language].daysMin[dowCnt++ % 7] + "</th>";
               }
@@ -8935,7 +8935,7 @@
             if (!range || !range.length)
               delete this.range;
             else
-              this.range = $2.map(range, function(d) {
+              this.range = $3.map(range, function(d) {
                 return d.valueOf();
               });
             this.fill();
@@ -8960,14 +8960,14 @@
             if (this.dateIsDisabled(date)) {
               cls.push("disabled", "disabled-date");
             }
-            if ($2.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1) {
+            if ($3.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1) {
               cls.push("highlighted");
             }
             if (this.range) {
               if (date > this.range[0] && date < this.range[this.range.length - 1]) {
                 cls.push("range");
               }
-              if ($2.inArray(date.valueOf(), this.range) !== -1) {
+              if ($3.inArray(date.valueOf(), this.range) !== -1) {
                 cls.push("selected");
               }
               if (date.valueOf() === this.range[0]) {
@@ -8986,7 +8986,7 @@
             var startVal = Math.floor(year / factor) * factor;
             var endVal = startVal + step * 9;
             var focusedVal = Math.floor(this.viewDate.getFullYear() / step) * step;
-            var selected = $2.map(this.dates, function(d) {
+            var selected = $3.map(this.dates, function(d) {
               return Math.floor(d.getUTCFullYear() / step) * step;
             });
             var classes, tooltip, before;
@@ -8998,7 +8998,7 @@
               } else if (currVal === endVal + step) {
                 classes.push("new");
               }
-              if ($2.inArray(currVal, selected) !== -1) {
+              if ($3.inArray(currVal, selected) !== -1) {
                 classes.push("active");
               }
               if (currVal < startYear || currVal > endYear) {
@@ -9007,7 +9007,7 @@
               if (currVal === focusedVal) {
                 classes.push("focused");
               }
-              if (beforeFn !== $2.noop) {
+              if (beforeFn !== $3.noop) {
                 before = beforeFn(new Date(currVal, 0, 1));
                 if (before === undefined2) {
                   before = {};
@@ -9063,7 +9063,7 @@
               clsName = this.getClassNames(prevMonth);
               clsName.push("day");
               var content = prevMonth.getUTCDate();
-              if (this.o.beforeShowDay !== $2.noop) {
+              if (this.o.beforeShowDay !== $3.noop) {
                 before = this.o.beforeShowDay(this._utc_to_local(prevMonth));
                 if (before === undefined2)
                   before = {};
@@ -9080,10 +9080,10 @@
                 if (before.content)
                   content = before.content;
               }
-              if (typeof $2.uniqueSort === "function") {
-                clsName = $2.uniqueSort(clsName);
+              if (typeof $3.uniqueSort === "function") {
+                clsName = $3.uniqueSort(clsName);
               } else {
-                clsName = $2.unique(clsName);
+                clsName = $3.unique(clsName);
               }
               html.push('<td class="' + clsName.join(" ") + '"' + (tooltip ? ' title="' + tooltip + '"' : "") + ' data-date="' + prevMonth.getTime().toString() + '">' + content + "</td>");
               tooltip = null;
@@ -9095,7 +9095,7 @@
             this.picker.find(".datepicker-days tbody").html(html.join(""));
             var monthsTitle = dates[this.o.language].monthsTitle || dates["en"].monthsTitle || "Months";
             var months = this.picker.find(".datepicker-months").find(".datepicker-switch").text(this.o.maxViewMode < 2 ? monthsTitle : year).end().find("tbody span").removeClass("active");
-            $2.each(this.dates, function(i, d2) {
+            $3.each(this.dates, function(i, d2) {
               if (d2.getUTCFullYear() === year)
                 months.eq(d2.getUTCMonth()).addClass("active");
             });
@@ -9108,9 +9108,9 @@
             if (year === endYear) {
               months.slice(endMonth + 1).addClass("disabled");
             }
-            if (this.o.beforeShowMonth !== $2.noop) {
+            if (this.o.beforeShowMonth !== $3.noop) {
               var that = this;
-              $2.each(months, function(i, month2) {
+              $3.each(months, function(i, month2) {
                 var moDate = new Date(year, i, 1);
                 var before2 = that.o.beforeShowMonth(moDate);
                 if (before2 === undefined2)
@@ -9119,12 +9119,12 @@
                   before2 = { enabled: before2 };
                 else if (typeof before2 === "string")
                   before2 = { classes: before2 };
-                if (before2.enabled === false && !$2(month2).hasClass("disabled"))
-                  $2(month2).addClass("disabled");
+                if (before2.enabled === false && !$3(month2).hasClass("disabled"))
+                  $3(month2).addClass("disabled");
                 if (before2.classes)
-                  $2(month2).addClass(before2.classes);
+                  $3(month2).addClass(before2.classes);
                 if (before2.tooltip)
-                  $2(month2).prop("title", before2.tooltip);
+                  $3(month2).prop("title", before2.tooltip);
               });
             }
             this._fill_yearsView(
@@ -9182,7 +9182,7 @@
             e.preventDefault();
             e.stopPropagation();
             var target, dir, day, year, month;
-            target = $2(e.target);
+            target = $3(e.target);
             if (target.hasClass("datepicker-switch") && this.viewMode !== this.o.maxViewMode) {
               this.setViewMode(this.viewMode + 1);
             }
@@ -9221,7 +9221,7 @@
             delete this._focused_from;
           },
           dayCellClick: function(e) {
-            var $target = $2(e.currentTarget);
+            var $target = $3(e.currentTarget);
             var timestamp = $target.data("date");
             var date = new Date(timestamp);
             if (this.o.updateViewDate) {
@@ -9236,7 +9236,7 @@
           },
           // Clicked on prev or next
           navArrowsClick: function(e) {
-            var $target = $2(e.currentTarget);
+            var $target = $3(e.currentTarget);
             var dir = $target.hasClass("prev") ? -1 : 1;
             if (this.viewMode !== 0) {
               dir *= DPGlobal.viewModes[this.viewMode].navStep * 12;
@@ -9331,10 +9331,10 @@
             return date;
           },
           weekOfDateIsDisabled: function(date) {
-            return $2.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
+            return $3.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
           },
           dateIsDisabled: function(date) {
-            return this.weekOfDateIsDisabled(date) || $2.grep(this.o.datesDisabled, function(d) {
+            return this.weekOfDateIsDisabled(date) || $3.grep(this.o.datesDisabled, function(d) {
               return isUTCEquals(date, d);
             }).length > 0;
           },
@@ -9442,37 +9442,37 @@
           }
         };
         var DateRangePicker = function(element, options) {
-          $2.data(element, "datepicker", this);
-          this.element = $2(element);
-          this.inputs = $2.map(options.inputs, function(i) {
+          $3.data(element, "datepicker", this);
+          this.element = $3(element);
+          this.inputs = $3.map(options.inputs, function(i) {
             return i.jquery ? i[0] : i;
           });
           delete options.inputs;
           this.keepEmptyValues = options.keepEmptyValues;
           delete options.keepEmptyValues;
-          datepickerPlugin.call($2(this.inputs), options).on("changeDate", $2.proxy(this.dateUpdated, this));
-          this.pickers = $2.map(this.inputs, function(i) {
-            return $2.data(i, "datepicker");
+          datepickerPlugin.call($3(this.inputs), options).on("changeDate", $3.proxy(this.dateUpdated, this));
+          this.pickers = $3.map(this.inputs, function(i) {
+            return $3.data(i, "datepicker");
           });
           this.updateDates();
         };
         DateRangePicker.prototype = {
           updateDates: function() {
-            this.dates = $2.map(this.pickers, function(i) {
+            this.dates = $3.map(this.pickers, function(i) {
               return i.getUTCDate();
             });
             this.updateRanges();
           },
           updateRanges: function() {
-            var range = $2.map(this.dates, function(d) {
+            var range = $3.map(this.dates, function(d) {
               return d.valueOf();
             });
-            $2.each(this.pickers, function(i, p) {
+            $3.each(this.pickers, function(i, p) {
               p.setRange(range);
             });
           },
           clearDates: function() {
-            $2.each(this.pickers, function(i, p) {
+            $3.each(this.pickers, function(i, p) {
               p.clearDates();
             });
           },
@@ -9480,14 +9480,14 @@
             if (this.updating)
               return;
             this.updating = true;
-            var dp = $2.data(e.target, "datepicker");
+            var dp = $3.data(e.target, "datepicker");
             if (dp === undefined2) {
               return;
             }
-            var new_date = dp.getUTCDate(), keep_empty_values = this.keepEmptyValues, i = $2.inArray(e.target, this.inputs), j = i - 1, k = i + 1, l = this.inputs.length;
+            var new_date = dp.getUTCDate(), keep_empty_values = this.keepEmptyValues, i = $3.inArray(e.target, this.inputs), j = i - 1, k = i + 1, l = this.inputs.length;
             if (i === -1)
               return;
-            $2.each(this.pickers, function(i2, p) {
+            $3.each(this.pickers, function(i2, p) {
               if (!p.getUTCDate() && (p === dp || !keep_empty_values))
                 p.setUTCDate(new_date);
             });
@@ -9504,16 +9504,16 @@
             delete this.updating;
           },
           destroy: function() {
-            $2.map(this.pickers, function(p) {
+            $3.map(this.pickers, function(p) {
               p.destroy();
             });
-            $2(this.inputs).off("changeDate", this.dateUpdated);
+            $3(this.inputs).off("changeDate", this.dateUpdated);
             delete this.element.data().datepicker;
           },
           remove: alias("destroy", "Method `remove` is deprecated and will be removed in version 2.0. Use `destroy` instead")
         };
         function opts_from_el(el, prefix) {
-          var data = $2(el).data(), out = {}, inkey, replace = new RegExp("^" + prefix.toLowerCase() + "([A-Z])");
+          var data = $3(el).data(), out = {}, inkey, replace = new RegExp("^" + prefix.toLowerCase() + "([A-Z])");
           prefix = new RegExp("^" + prefix.toLowerCase());
           function re_lower(_, a) {
             return a.toLowerCase();
@@ -9533,23 +9533,23 @@
               return;
           }
           var d = dates[lang];
-          $2.each(locale_opts, function(i, k) {
+          $3.each(locale_opts, function(i, k) {
             if (k in d)
               out[k] = d[k];
           });
           return out;
         }
-        var old = $2.fn.datepicker;
+        var old = $3.fn.datepicker;
         var datepickerPlugin = function(option) {
           var args = Array.apply(null, arguments);
           args.shift();
           var internal_return;
           this.each(function() {
-            var $this = $2(this), data = $this.data("datepicker"), options = typeof option === "object" && option;
+            var $this = $3(this), data = $this.data("datepicker"), options = typeof option === "object" && option;
             if (!data) {
-              var elopts = opts_from_el(this, "date"), xopts = $2.extend({}, defaults, elopts, options), locopts = opts_from_locale(xopts.language), opts = $2.extend({}, defaults, locopts, elopts, options);
+              var elopts = opts_from_el(this, "date"), xopts = $3.extend({}, defaults, elopts, options), locopts = opts_from_locale(xopts.language), opts = $3.extend({}, defaults, locopts, elopts, options);
               if ($this.hasClass("input-daterange") || opts.inputs) {
-                $2.extend(opts, {
+                $3.extend(opts, {
                   inputs: opts.inputs || $this.find("input").toArray()
                 });
                 data = new DateRangePicker(this, opts);
@@ -9569,15 +9569,15 @@
           else
             return internal_return;
         };
-        $2.fn.datepicker = datepickerPlugin;
-        var defaults = $2.fn.datepicker.defaults = {
+        $3.fn.datepicker = datepickerPlugin;
+        var defaults = $3.fn.datepicker.defaults = {
           assumeNearbyYear: false,
           autoclose: false,
-          beforeShowDay: $2.noop,
-          beforeShowMonth: $2.noop,
-          beforeShowYear: $2.noop,
-          beforeShowDecade: $2.noop,
-          beforeShowCentury: $2.noop,
+          beforeShowDay: $3.noop,
+          beforeShowMonth: $3.noop,
+          beforeShowYear: $3.noop,
+          beforeShowDecade: $3.noop,
+          beforeShowCentury: $3.noop,
           calendarWeeks: false,
           clearBtn: false,
           toggleActive: false,
@@ -9616,13 +9616,13 @@
           },
           showWeekDays: true
         };
-        var locale_opts = $2.fn.datepicker.locale_opts = [
+        var locale_opts = $3.fn.datepicker.locale_opts = [
           "format",
           "rtl",
           "weekStart"
         ];
-        $2.fn.datepicker.Constructor = Datepicker;
-        var dates = $2.fn.datepicker.dates = {
+        $3.fn.datepicker.Constructor = Datepicker;
+        var dates = $3.fn.datepicker.dates = {
           en: {
             days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -9748,8 +9748,8 @@
             date = UTCToday();
             var fparts = format.parts.slice();
             if (parts.length !== fparts.length) {
-              fparts = $2(fparts).filter(function(i2, p) {
-                return $2.inArray(p, setters_order) !== -1;
+              fparts = $3(fparts).filter(function(i2, p) {
+                return $3.inArray(p, setters_order) !== -1;
               }).toArray();
             }
             function match_part() {
@@ -9764,12 +9764,12 @@
                 if (isNaN(val)) {
                   switch (part) {
                     case "MM":
-                      filtered = $2(dates[language].months).filter(match_part);
-                      val = $2.inArray(filtered[0], dates[language].months) + 1;
+                      filtered = $3(dates[language].months).filter(match_part);
+                      val = $3.inArray(filtered[0], dates[language].months) + 1;
                       break;
                     case "M":
-                      filtered = $2(dates[language].monthsShort).filter(match_part);
-                      val = $2.inArray(filtered[0], dates[language].monthsShort) + 1;
+                      filtered = $3(dates[language].monthsShort).filter(match_part);
+                      val = $3.inArray(filtered[0], dates[language].monthsShort) + 1;
                       break;
                   }
                 }
@@ -9808,7 +9808,7 @@
             val.dd = (val.d < 10 ? "0" : "") + val.d;
             val.mm = (val.m < 10 ? "0" : "") + val.m;
             date = [];
-            var seps = $2.extend([], format.separators);
+            var seps = $3.extend([], format.separators);
             for (var i = 0, cnt = format.parts.length; i <= cnt; i++) {
               if (seps.length)
                 date.push(seps.shift());
@@ -9821,31 +9821,31 @@
           footTemplate: '<tfoot><tr><th colspan="7" class="today"></th></tr><tr><th colspan="7" class="clear"></th></tr></tfoot>'
         };
         DPGlobal.template = '<div class="datepicker"><div class="datepicker-days"><table class="table-condensed">' + DPGlobal.headTemplate + "<tbody></tbody>" + DPGlobal.footTemplate + '</table></div><div class="datepicker-months"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-years"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-decades"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + '</table></div><div class="datepicker-centuries"><table class="table-condensed">' + DPGlobal.headTemplate + DPGlobal.contTemplate + DPGlobal.footTemplate + "</table></div></div>";
-        $2.fn.datepicker.DPGlobal = DPGlobal;
-        $2.fn.datepicker.noConflict = function() {
-          $2.fn.datepicker = old;
+        $3.fn.datepicker.DPGlobal = DPGlobal;
+        $3.fn.datepicker.noConflict = function() {
+          $3.fn.datepicker = old;
           return this;
         };
-        $2.fn.datepicker.version = "1.10.0";
-        $2.fn.datepicker.deprecated = function(msg) {
+        $3.fn.datepicker.version = "1.10.0";
+        $3.fn.datepicker.deprecated = function(msg) {
           var console2 = window.console;
           if (console2 && console2.warn) {
             console2.warn("DEPRECATED: " + msg);
           }
         };
-        $2(document).on(
+        $3(document).on(
           "focus.datepicker.data-api click.datepicker.data-api",
           '[data-provide="datepicker"]',
           function(e) {
-            var $this = $2(this);
+            var $this = $3(this);
             if ($this.data("datepicker"))
               return;
             e.preventDefault();
             datepickerPlugin.call($this, "show");
           }
         );
-        $2(function() {
-          datepickerPlugin.call($2('[data-provide="datepicker-inline"]'));
+        $3(function() {
+          datepickerPlugin.call($3('[data-provide="datepicker-inline"]'));
         });
       });
     }
@@ -9887,7 +9887,7 @@
     }
     return element[EXPANDO][key] = value;
   };
-  var $ = (selector) => Array.prototype.slice.call(document.querySelectorAll(selector));
+  var $2 = (selector) => Array.prototype.slice.call(document.querySelectorAll(selector));
   var isContentEditable = function(element) {
     var isEditable = false;
     do {
@@ -9917,7 +9917,7 @@
     const token = csrfToken();
     const param = csrfParam();
     if (token && param) {
-      return $('form input[name="' + param + '"]').forEach((input) => input.value = token);
+      return $2('form input[name="' + param + '"]').forEach((input) => input.value = token);
     }
   };
   var AcceptHeaders = {
@@ -10365,8 +10365,8 @@
       e.stopImmediatePropagation();
     }
   };
-  var Rails = {
-    $,
+  var Rails2 = {
+    $: $2,
     ajax,
     buttonClickSelector,
     buttonDisableSelector,
@@ -10401,23 +10401,23 @@
     setData,
     stopEverything
   };
-  var handleConfirm = handleConfirmWithRails(Rails);
-  Rails.handleConfirm = handleConfirm;
-  var handleMethod = handleMethodWithRails(Rails);
-  Rails.handleMethod = handleMethod;
-  var handleRemote = handleRemoteWithRails(Rails);
-  Rails.handleRemote = handleRemote;
+  var handleConfirm = handleConfirmWithRails(Rails2);
+  Rails2.handleConfirm = handleConfirm;
+  var handleMethod = handleMethodWithRails(Rails2);
+  Rails2.handleMethod = handleMethod;
+  var handleRemote = handleRemoteWithRails(Rails2);
+  Rails2.handleRemote = handleRemote;
   var start = function() {
     if (window._rails_loaded) {
       throw new Error("rails-ujs has already been loaded!");
     }
     window.addEventListener("pageshow", function() {
-      $(formEnableSelector).forEach(function(el) {
+      $2(formEnableSelector).forEach(function(el) {
         if (getData(el, "ujs:disabled")) {
           enableElement(el);
         }
       });
-      $(linkDisableSelector).forEach(function(el) {
+      $2(linkDisableSelector).forEach(function(el) {
         if (getData(el, "ujs:disabled")) {
           enableElement(el);
         }
@@ -10455,12 +10455,12 @@
     document.addEventListener("DOMContentLoaded", loadCSPNonce);
     return window._rails_loaded = true;
   };
-  Rails.start = start;
+  Rails2.start = start;
   if (typeof jQuery !== "undefined" && jQuery && jQuery.ajax) {
     if (jQuery.rails) {
       throw new Error("If you load both jquery_ujs and rails-ujs, use rails-ujs only.");
     }
-    jQuery.rails = Rails;
+    jQuery.rails = Rails2;
     jQuery.ajaxPrefilter(function(options, originalOptions, xhr) {
       if (!options.crossDomain) {
         return CSRFProtection(xhr);
@@ -16166,14 +16166,14 @@
   var isRTL = () => document.documentElement.dir === "rtl";
   var defineJQueryPlugin = (plugin) => {
     onDOMContentLoaded(() => {
-      const $2 = getjQuery();
-      if ($2) {
+      const $3 = getjQuery();
+      if ($3) {
         const name = plugin.NAME;
-        const JQUERY_NO_CONFLICT = $2.fn[name];
-        $2.fn[name] = plugin.jQueryInterface;
-        $2.fn[name].Constructor = plugin;
-        $2.fn[name].noConflict = () => {
-          $2.fn[name] = JQUERY_NO_CONFLICT;
+        const JQUERY_NO_CONFLICT = $3.fn[name];
+        $3.fn[name] = plugin.jQueryInterface;
+        $3.fn[name].Constructor = plugin;
+        $3.fn[name].noConflict = () => {
+          $3.fn[name] = JQUERY_NO_CONFLICT;
           return plugin.jQueryInterface;
         };
       }
@@ -16372,16 +16372,16 @@
       if (typeof event2 !== "string" || !element) {
         return null;
       }
-      const $2 = getjQuery();
+      const $3 = getjQuery();
       const typeEvent = getTypeEvent(event2);
       const inNamespace = event2 !== typeEvent;
       let jQueryEvent = null;
       let bubbles = true;
       let nativeDispatch = true;
       let defaultPrevented = false;
-      if (inNamespace && $2) {
-        jQueryEvent = $2.Event(event2, args);
-        $2(element).trigger(jQueryEvent);
+      if (inNamespace && $3) {
+        jQueryEvent = $3.Event(event2, args);
+        $3(element).trigger(jQueryEvent);
         bubbles = !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
@@ -22117,7 +22117,7 @@
     connect() {
       console.log("conectado controlador bitacoraap");
       let campo = document.querySelector("input.bitacora_cambio");
-      if (campo != null) {
+      if (campo != null && typeof MsipSerializarFormularioEnArreglo == "function") {
         window.bitacora_estado_inicial_formulario = MsipSerializarFormularioEnArreglo(
           campo.closest("form")
         );
@@ -22238,9 +22238,12 @@
       }
       console.log("numerodocumento ahora es", this.numerodocumentoTarget.value);
       if (e.target.value == "11" && this.numerodocumentoTarget.value == "") {
+        let indice = this.idTarget.id.match(
+          new RegExp("attributes_([0-9]+)_persona")
+        );
         window.Rails.ajax({
           type: "GET",
-          url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value,
+          url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value + "&indice=" + indice[1],
           data: null,
           success: (resp, estado, xhr) => {
             this.numerodocumentoTarget.value = resp;
@@ -22280,53 +22283,91 @@
     "id"
   ]);
 
+  // app/javascript/controllers/msip/motor.js
+  var _MsipMotor = class {
+    static partirFechaLocalizada(fechaLocalizada, formato) {
+      let anio = 1900;
+      let dia = 15;
+      let mes = 6;
+      if (formato == "dd/M/yyyy" || formato == "dd-M-yyyy") {
+        anio = +fechaLocalizada.slice(7, 11);
+        dia = +fechaLocalizada.slice(0, 2);
+        let nmes = fechaLocalizada.slice(3, 6);
+        if (typeof nmes != "undefined" && _MsipMotor.MESES.includes(nmes.toLowerCase())) {
+          mes = _MsipMotor.MESES.indexOf(nmes.toLowerCase()) + 1;
+        } else {
+          mes = 6;
+        }
+      } else {
+        if (typeof fechaLocalizada == "string") {
+          anio = +fechaLocalizada.slice(0, 4);
+          mes = +fechaLocalizada.slice(5, 7);
+          dia = +fechaLocalizada.slice(8, 10);
+        } else {
+          anio = 1900;
+          mes = 1;
+          dia = 1;
+        }
+      }
+      return [anio, mes, dia];
+    }
+  };
+  var MsipMotor = _MsipMotor;
+  /* 
+   * Aunque este no es un controlador lo dejamos dentro del directorio
+   * controllers para aprovechar lo avanzado para compartir controladores
+   * Stimulus de motores.
+   */
+  __publicField(MsipMotor, "MESES", ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]);
+
   // app/javascript/controllers/sivel2_gen/edad_controller.js
   var edad_controller_default = class extends Controller {
     connect() {
       console.log("Conexion de controlador edades establecida");
     }
+    obtenerNumeroMes(nombreMes) {
+      return MsipMotor.MESES.indexOf(nombreMes.toLowerCase());
+    }
     actualizarEdad(event2) {
-      const targetPersona = event2.target.closest(".div-edad");
-      const campo_anionac = targetPersona.querySelector('[data-edad-target="anionac"]');
-      const campo_mesnac = targetPersona.querySelector('[data-edad-target="mesnac"]');
-      const campo_dianac = targetPersona.querySelector('[data-edad-target="dianac"]');
-      let anio = parseInt(campo_anionac.value);
-      let mes = parseInt(campo_mesnac.value) - 1;
-      let dia = parseInt(campo_dianac.value);
+      let anio = parseInt(this.anionacTarget.value);
+      let mes = parseInt(this.mesnacTarget.value) - 1;
+      let dia = parseInt(this.dianacTarget.value);
       if (isNaN(mes)) {
         mes = 0;
       }
       if (isNaN(dia)) {
         dia = 1;
       }
-      const campo_fecha_caso = document.querySelector("#caso_fecha_localizada");
-      const campo_edad = targetPersona.querySelector('[data-edad-target="edad"]');
-      const campo_edadactual = targetPersona.querySelector('[data-edad-target="edadactual"]');
-      const campo_rangoedad = targetPersona.querySelector('[data-edad-target="rangoedad"]');
-      const anio_caso = parseInt(campo_fecha_caso.value.split("/")[2]);
-      const mes_caso = parseInt(obtenerNumeroMes(campo_fecha_caso.value.split("/")[1]));
-      const dia_caso = parseInt(campo_fecha_caso.value.split("/")[0]);
+      let formatoFecha = window.formato_fecha;
+      let campoFechaCaso = document.querySelector("#caso_fecha_localizada");
+      if (campoFechaCaso == null) {
+        campoFechaCaso = document.querySelector("#caso_fecha");
+        formatoFecha = "yyyy-mm-dd";
+      }
+      if (campoFechaCaso == null) {
+        alert("No se encontr\xF3 campo con la fecha del caso");
+      }
+      let anioCaso, mesCaso, diaCaso;
+      [anioCaso, mesCaso, diaCaso] = MsipMotor.partirFechaLocalizada(
+        campoFechaCaso.value,
+        formatoFecha
+      );
       const hoy = /* @__PURE__ */ new Date();
-      let fechaCaso = new Date(anio_caso, mes_caso, dia_caso);
+      let fechaCaso = new Date(anioCaso, mesCaso, diaCaso);
       let fechaNacimiento = new Date(anio, mes, dia);
-      if (event2.target.dataset.edadTarget == "edad") {
-        let edad2 = parseInt(campo_edad.value);
+      if (event2.target.dataset["sivel2Gen-EdadTarget"] == "edad") {
+        let edad2 = parseInt(this.edadTarget.value);
         anio = fechaCaso.getFullYear() - edad2;
         mes = 0;
         dia = 1;
-        campo_anionac.value = anio;
-        campo_mesnac.value = mes + 1;
-        campo_dianac.value = dia;
+        this.anionacTarget.value = anio;
       }
-      if (event2.target.dataset.edadTarget == "edadactual") {
-        let edadactual2 = parseInt(campo_edadactual.value);
-        debugger;
+      if (event2.target.dataset["sivel2Gen-EdadTarget"] == "edadactual") {
+        let edadactual2 = parseInt(this.edadactualTarget.value);
         anio = hoy.getFullYear() - edadactual2;
         mes = 0;
         dia = 1;
-        campo_anionac.value = anio;
-        campo_mesnac.value = mes + 1;
-        campo_dianac.value = dia;
+        this.anionacTarget.value = anio;
       }
       fechaNacimiento = new Date(anio, mes, dia);
       let edadactual = hoy.getFullYear() - anio;
@@ -22338,70 +22379,204 @@
         edad--;
       }
       if (edad > 0) {
-        campo_edad.value = edad;
+        this.edadTarget.value = edad;
       } else {
-        campo_edad.value = 0;
+        this.edadTarget.value = 0;
       }
       if (edadactual > 0) {
-        campo_edadactual.value = edadactual;
+        this.edadactualTarget.value = edadactual;
       } else {
-        campo_edadactual.value = 0;
+        this.edadactualTarget.value = 0;
       }
-      function obtenerNumeroMes(nombreMes) {
-        const meses = [
-          "ene",
-          "feb",
-          "mar",
-          "abr",
-          "may",
-          "jun",
-          "jul",
-          "ago",
-          "sep",
-          "oct",
-          "nov",
-          "dic"
-        ];
-        return meses.indexOf(nombreMes.toLowerCase());
-      }
-      const opciones_rangoedad = campo_rangoedad.options;
-      for (var i = 0; i < opciones_rangoedad.length; i++) {
-        var opcion = campo_rangoedad.options[i].text;
-        var rango = opcion.match(/\d+/g).map(Number);
+      const opcionesRangoedad = this.rangoedadTarget.options;
+      for (let i = 0; i < opcionesRangoedad.length; i++) {
+        let opcion = this.rangoedadTarget.options[i].text;
+        let rango = opcion.match(/\d+/g).map(Number);
         if (rango.length == 2 && edadactual >= rango[0] && edadactual <= rango[1]) {
-          campo_rangoedad.selectedIndex = i;
+          this.rangoedadTarget.selectedIndex = i;
           break;
         }
         if (rango.length == 1 && edadactual >= rango[0]) {
-          campo_rangoedad.selectedIndex = i;
+          this.rangoedadTarget.selectedIndex = i;
           break;
         }
       }
     }
     blanquearFechanac() {
-      const targetPersona = event.target.closest(".div-edad");
-      const campo_anionac = targetPersona.querySelector('[data-edad-target="anionac"]');
-      const campo_mesnac = targetPersona.querySelector('[data-edad-target="mesnac"]');
-      const campo_dianac = targetPersona.querySelector('[data-edad-target="dianac"]');
-      const campo_rangoedad = targetPersona.querySelector('[data-edad-target="rangoedad"]');
-      const campo_edad = targetPersona.querySelector('[data-edad-target="edad"]');
-      const campo_edadactual = targetPersona.querySelector('[data-edad-target="edadactual"]');
-      if (event.target.dataset.edadTarget == "rangoedad") {
-        campo_edad.value = null;
-        campo_edadactual.value = null;
+      if (event.target.dataset["sivel2Gen-EdadTarget"] == "rangoedad") {
+        this.edadTarget.value = null;
+        this.edadactualTarget.value = null;
       }
-      if (event.target.dataset.edadTarget == "edad") {
-        campo_rangoedad.value = null;
-        campo_edadactual.value = null;
+      if (event.target.dataset["sivel2Gen-EdadTarget"] == "edad") {
+        this.rangoedadTarget.value = null;
+        this.edadactualTarget.value = null;
       }
-      if (event.target.dataset.edadTarget == "edadactual") {
-        campo_edad.value = null;
-        campo_rangoedad.value = null;
+      if (event.target.dataset["sivel2Gen-EdadTarget"] == "edadactual") {
+        this.edadTarget.value = null;
+        this.rangoedadTarget.value = null;
       }
-      campo_anionac.value = null;
+      this.anionacTarget.value = null;
     }
   };
-  __publicField(edad_controller_default, "targets", ["anionac", "mesnac", "dianac", "edad", "edadactual"]);
+  __publicField(edad_controller_default, "targets", [
+    "anionac",
+    "dianac",
+    "edad",
+    "edadactual",
+    "mesnac",
+    "rangoedad"
+  ]);
+
+  // app/javascript/controllers/sivel2_gen/enviar_ficha_caso_controller.js
+  var enviar_ficha_caso_controller_default = class extends Controller {
+    connect() {
+      console.log("Conexion de controlador enviar ficha caso establecida");
+      const pestanias = document.querySelectorAll(".fichacambia");
+      pestanias.forEach(function(pestania) {
+        pestania.setAttribute("data-enviar-ficha-caso-target", pestania.id);
+        pestania.setAttribute("data-action", "click->sivel2-gen--enviar-ficha-caso#cambiarficha");
+      });
+      const pestanaActiva = localStorage.getItem("pestanaActiva");
+      if (pestanaActiva != null) {
+        pestanias.forEach(function(pestania) {
+          if (pestania.id == pestanaActiva) {
+            pestania.classList.add("active");
+            const atributoId = pestania.getAttribute("data-bs-target");
+            const atributo = document.querySelector(atributoId);
+            if (atributo) {
+              atributo.classList.add("show", "active");
+            }
+          } else {
+            pestania.classList.remove("active");
+            const atributoId = pestania.getAttribute("data-bs-target");
+            const atributo = document.querySelector(atributoId);
+            if (atributo) {
+              atributo.classList.remove("show", "active");
+            }
+          }
+        });
+        localStorage.removeItem("pestanaActiva");
+      }
+    }
+    cambiarficha() {
+      if (event.target.dataset.enviarFichaCasoTarget == "actos-pestana") {
+        let casoId = this.idcasoTarget.value;
+        let puntomontaje = window.puntomontaje;
+        let url = puntomontaje + "casos/" + casoId + "/guardar_y_editar";
+        let datosFormulario = new FormData(document.querySelector("form"));
+        let objetoFormulario = Object.fromEntries(datosFormulario);
+        for (let [key, value] of datosFormulario.entries()) {
+          let coincidencia = key.match(/^caso\[(.+?)\]$/);
+          if (coincidencia) {
+            let ruta = coincidencia[1].split(/\]\[|\[|\]/).filter((p) => p !== "");
+            let actual = objetoFormulario;
+            for (let i = 0; i < ruta.length; i++) {
+              if (i === ruta.length - 1) {
+                actual[ruta[i]] = value;
+              } else {
+                if (!actual[ruta[i]]) {
+                  actual[ruta[i]] = ruta[i + 1].match(/^\d+$/) ? [] : {};
+                }
+                actual = actual[ruta[i]];
+              }
+            }
+          }
+        }
+        let datosCaso = { caso: objetoFormulario };
+        fetch(url, {
+          method: "PATCH",
+          headers: {
+            "X-CSRF-Token": Rails.csrfToken(),
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(datosCaso)
+        }).then((response) => {
+          if (response.ok) {
+            localStorage.setItem("pestanaActiva", "actos-pestana");
+            window.location = puntomontaje + "casos/" + casoId + "/edita";
+          }
+        });
+      }
+      const campo_presponsables_acto = document.querySelector("#caso_acto_presponsable_id");
+      const campo_presponsables_actocol = document.querySelector("#caso_actocolectivo_presponsable_id");
+      const campo_victimas_acto = document.querySelector("#caso_acto_persona_id");
+      const campo_victimascol_acto = document.querySelector("#caso_actocolectivo_grupoper_id");
+      actualizarPresponsables(campo_presponsables_acto);
+      actualizarPresponsables(campo_presponsables_actocol);
+      actualizarVictimas(campo_victimas_acto);
+      function actualizarPresponsables(s) {
+        var sel = s.value;
+        var cadena = "";
+        var campo = document.querySelectorAll('#presponsables .control-group:not([style="display: none;"])');
+        campo.forEach(function(v) {
+          var id = v.querySelector('select[data-actualiza="presponsable"]').value;
+          cadena += "<option value='" + id + "'";
+          if (id === sel) {
+            cadena += " selected";
+          }
+          var tx = v.querySelector('select[data-actualiza="presponsable"] option[value="' + id + '"]').textContent;
+          cadena += ">" + tx + "</option>";
+        });
+        s.innerHTML = cadena;
+      }
+      function actualizarVictimas(s) {
+        var sel = s.value;
+        var cadena = "";
+        var sinid = 0;
+        var marcosTurbo = document.querySelectorAll('#victimas_frame turbo-frame[id^="victima"]');
+        marcosTurbo.forEach(function(frame) {
+          var inputId = frame.querySelector('input[id^="caso_victima_attributes_"][id$="_persona_attributes_id"]');
+          var id = inputId ? inputId.value : "";
+          var inputNombre = frame.querySelector('input[id^="caso_victima_attributes_"][id$="_persona_attributes_nombres"]');
+          var nom = inputNombre ? inputNombre.value : "";
+          var inputApellido = frame.querySelector('input[id^="caso_victima_attributes_"][id$="_persona_attributes_apellidos"]');
+          var ap = inputApellido ? inputApellido.value : "";
+          cadena += "<option value='" + id + "'";
+          var tx;
+          if (nom === "N" && ap === "N") {
+            sinid += 1;
+            tx = "PERSONA SIN IDENTIFICAR " + sinid;
+          } else {
+            tx = (nom + " " + ap).trim();
+          }
+          cadena += ">" + tx + "</option>";
+        });
+        s.innerHTML = cadena;
+      }
+      function actualizarGruposper(s) {
+        var sel = s.value;
+        var cadena = "";
+        var campo = document.querySelectorAll('#victimascolectivas .control-group[style!="display: none;"]');
+        campo.each(function(k, v) {
+          var id = $(v).find("div").filter(function() {
+            return this.attributes.class.value.match(/caso_victimacolectiva[_0-9]*grupoper_id/);
+          }).find("input").val();
+          if (typeof id === "undefined") {
+            id = $(v).find("div").filter(function() {
+              return this.attributes.class.value.match(/grupoper_id/);
+            }).find("input").val();
+          }
+          cadena += "<option value='" + id + "'";
+          if (id === sel) {
+            cadena += " selected";
+          }
+          var nom = $(v).find("div").filter(function() {
+            return this.attributes.class.value.match(/caso_victimacolectiva[_0-9]*grupoper_nombre/);
+          }).find("input").val();
+          if (typeof nom === "undefined") {
+            nom = $(v).find("div").filter(function() {
+              return this.attributes.class.value.match(/grupoper_nombre/);
+            }).find("input").val();
+          }
+          var tx = nom.trim();
+          cadena += ">" + tx + "</option>";
+        });
+        s.innerHTML = cadena;
+      }
+      ;
+    }
+  };
+  __publicField(enviar_ficha_caso_controller_default, "targets", ["idcaso"]);
 
   // app/javascript/controllers/index.js
   application.register("msip--bitacoraap", bitacoraap_controller_default);
@@ -22409,11 +22584,12 @@
   application.register("msip--filtro-tan", filtro_tan_controller_default);
   application.register("msip--sindocaut", sindocaut_controller_default);
   application.register("sivel2-gen--edad", edad_controller_default);
+  application.register("sivel2-gen--enviar-ficha-caso", enviar_ficha_caso_controller_default);
 
   // app/javascript/application.js
   console.log("Hola Mundo desde ESM");
-  Rails.start();
-  window.Rails = Rails;
+  Rails2.start();
+  window.Rails = Rails2;
   var esperarRecursosSprocketsYDocumento = function(resolver) {
     if (typeof window.puntomontaje == "undefined") {
       setTimeout(esperarRecursosSprocketsYDocumento, 5, resolver);
