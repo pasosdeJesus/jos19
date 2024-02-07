@@ -22241,6 +22241,9 @@
         let indice = this.idTarget.id.match(
           new RegExp("attributes_([0-9]+)_persona")
         );
+        if (indice == null) {
+          indice = [0, 0];
+        }
         window.Rails.ajax({
           type: "GET",
           url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value + "&indice=" + indice[1],
@@ -22430,6 +22433,7 @@
   // app/javascript/controllers/sivel2_gen/enviar_ficha_caso_controller.js
   var enviar_ficha_caso_controller_default = class extends Controller {
     connect() {
+      document.getElementById("cargando").style.display = "none";
       console.log("Conexion de controlador enviar ficha caso establecida");
       const pestanias = document.querySelectorAll(".fichacambia");
       pestanias.forEach(function(pestania) {
@@ -22460,6 +22464,7 @@
     }
     cambiarficha() {
       if (event.target.dataset.enviarFichaCasoTarget == "actos-pestana") {
+        document.getElementById("cargando").style.display = "flex";
         let casoId = this.idcasoTarget.value;
         let puntomontaje = window.puntomontaje;
         let url = puntomontaje + "casos/" + casoId + "/guardar_y_editar";
