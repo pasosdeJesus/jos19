@@ -18,8 +18,8 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 588c599a21f9faa94f4552133f9f0be947024e9d
-  branch: main
+  revision: 85308526d14a21a804d0a4a17b2b52b7b5ce2fe2
+  branch: v2.2
   specs:
     cor1440_gen (2.2.0.beta4)
       devise
@@ -31,8 +31,8 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: efb0a43506f8cf5bc327ace436feaf0c32260d98
-  branch: main
+  revision: ee13e1b437ad0c4f3c02fd66b4d68fa6d7f05d34
+  branch: v2.2
   specs:
     heb412_gen (2.2.0.beta4)
       mr519_gen
@@ -42,8 +42,8 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: 44446bcafef7dac19ac2a47c807950b10dbfe21a
-  branch: main
+  revision: e3a9946bd7806be25ae2b0a99cab462117822b6c
+  branch: v2.2
   specs:
     mr519_gen (2.2.0.beta4)
       msip
@@ -51,10 +51,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 0f184ae0dd0979cdd79328f2886b58b15c417e08
-  branch: main
+  revision: fb5b70cf720c671f3d0ca53e47f9579f89900e39
+  branch: v2.2
   specs:
-    msip (2.2.0.beta4)
+    msip (2.2.0.beta5)
       cancancan (~> 3)
       devise (~> 4)
       devise-i18n (~> 1)
@@ -71,8 +71,8 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 4e70193718bb96daab9a2bce51b9506adbab4add
-  branch: main
+  revision: c0e6efcb5eef4bef6488dbeb2845f1cb9d601a90
+  branch: v2.2
   specs:
     sivel2_gen (2.2.0.beta4)
       color

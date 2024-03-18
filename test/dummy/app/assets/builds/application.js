@@ -22433,7 +22433,7 @@
   // app/javascript/controllers/sivel2_gen/enviar_ficha_caso_controller.js
   var enviar_ficha_caso_controller_default = class extends Controller {
     connect() {
-      document.getElementById("cargando").style.display = "none";
+      document.getElementById("capa-cargando").style.display = "none";
       console.log("Conexion de controlador enviar ficha caso establecida");
       const pestanias = document.querySelectorAll(".fichacambia");
       pestanias.forEach(function(pestania) {
@@ -22464,7 +22464,7 @@
     }
     cambiarficha() {
       if (event.target.dataset.enviarFichaCasoTarget == "actos-pestana") {
-        document.getElementById("cargando").style.display = "flex";
+        document.getElementById("capa-cargando").style.display = "flex";
         let casoId = this.idcasoTarget.value;
         let puntomontaje = window.puntomontaje;
         let url = puntomontaje + "casos/" + casoId + "/guardar_y_editar";
@@ -22499,6 +22499,8 @@
           if (response.ok) {
             localStorage.setItem("pestanaActiva", "actos-pestana");
             window.location = puntomontaje + "casos/" + casoId + "/edita";
+          } else {
+            document.getElementById("capa-cargando").style.display = "none";
           }
         });
       }

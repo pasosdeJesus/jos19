@@ -834,6 +834,7 @@ CREATE TABLE public.msip_persona (
     departamento_id integer,
     municipio_id integer,
     centropoblado_id integer,
+    etnia_id integer DEFAULT 1 NOT NULL,
     CONSTRAINT persona_check CHECK (((dianac IS NULL) OR (((dianac >= 1) AND (((mesnac = 1) OR (mesnac = 3) OR (mesnac = 5) OR (mesnac = 7) OR (mesnac = 8) OR (mesnac = 10) OR (mesnac = 12)) AND (dianac <= 31))) OR (((mesnac = 4) OR (mesnac = 6) OR (mesnac = 9) OR (mesnac = 11)) AND (dianac <= 30)) OR ((mesnac = 2) AND (dianac <= 29))))),
     CONSTRAINT persona_mesnac_check CHECK (((mesnac IS NULL) OR ((mesnac >= 1) AND (mesnac <= 12)))),
     CONSTRAINT persona_sexo_check CHECK (((sexo = 'S'::bpchar) OR (sexo = 'F'::bpchar) OR (sexo = 'M'::bpchar)))
@@ -903,7 +904,6 @@ CREATE TABLE public.sivel2_gen_victima (
     organizacionarmada integer DEFAULT 35 NOT NULL,
     anotaciones character varying(1000),
     persona_id integer NOT NULL,
-    etnia_id integer DEFAULT 1 NOT NULL,
     iglesia_id integer DEFAULT 1,
     orientacionsexual character(1) DEFAULT 'S'::bpchar NOT NULL,
     created_at timestamp without time zone,
@@ -3511,6 +3511,42 @@ ALTER SEQUENCE public.msip_etiqueta_persona_id_seq OWNED BY public.msip_etiqueta
 
 
 --
+-- Name: msip_etnia; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.msip_etnia (
+    id bigint NOT NULL,
+    nombre character varying(500) NOT NULL COLLATE public.es_co_utf_8,
+    descripcion character varying(1000),
+    observaciones character varying(5000),
+    fechacreacion date NOT NULL,
+    fechadeshabilitacion date,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    CONSTRAINT etnia_check CHECK (((fechadeshabilitacion IS NULL) OR (fechadeshabilitacion >= fechacreacion)))
+);
+
+
+--
+-- Name: msip_etnia_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.msip_etnia_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: msip_etnia_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.msip_etnia_id_seq OWNED BY public.msip_etnia.id;
+
+
+--
 -- Name: msip_fuenteprensa_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -3631,11 +3667,11 @@ UNION
 --
 
 CREATE MATERIALIZED VIEW public.msip_mundep AS
- SELECT msip_mundep_sinorden.idlocal,
-    msip_mundep_sinorden.nombre,
-    to_tsvector('spanish'::regconfig, public.unaccent(msip_mundep_sinorden.nombre)) AS mundep
+ SELECT idlocal,
+    nombre,
+    to_tsvector('spanish'::regconfig, public.unaccent(nombre)) AS mundep
    FROM public.msip_mundep_sinorden
-  ORDER BY (msip_mundep_sinorden.nombre COLLATE public.es_co_utf_8)
+  ORDER BY (nombre COLLATE public.es_co_utf_8)
   WITH NO DATA;
 
 
@@ -4332,13 +4368,13 @@ ALTER SEQUENCE public.msip_vereda_id_seq OWNED BY public.msip_vereda.id;
 --
 
 CREATE MATERIALIZED VIEW public.napellidos AS
- SELECT s.apellido,
+ SELECT apellido,
     count(*) AS frec
    FROM ( SELECT public.divarr(string_to_array(btrim((msip_persona.apellidos)::text), ' '::text)) AS apellido
            FROM public.msip_persona,
             public.sivel2_gen_victima
           WHERE (sivel2_gen_victima.persona_id = msip_persona.id)) s
-  GROUP BY s.apellido
+  GROUP BY apellido
   ORDER BY (count(*))
   WITH NO DATA;
 
@@ -4348,13 +4384,13 @@ CREATE MATERIALIZED VIEW public.napellidos AS
 --
 
 CREATE MATERIALIZED VIEW public.nhombres AS
- SELECT s.nombre,
+ SELECT nombre,
     count(*) AS frec
    FROM ( SELECT public.divarr(string_to_array(btrim((msip_persona.nombres)::text), ' '::text)) AS nombre
            FROM public.msip_persona,
             public.sivel2_gen_victima
           WHERE ((sivel2_gen_victima.persona_id = msip_persona.id) AND (msip_persona.sexo = 'M'::bpchar))) s
-  GROUP BY s.nombre
+  GROUP BY nombre
   ORDER BY (count(*))
   WITH NO DATA;
 
@@ -4364,13 +4400,13 @@ CREATE MATERIALIZED VIEW public.nhombres AS
 --
 
 CREATE MATERIALIZED VIEW public.nmujeres AS
- SELECT s.nombre,
+ SELECT nombre,
     count(*) AS frec
    FROM ( SELECT public.divarr(string_to_array(btrim((msip_persona.nombres)::text), ' '::text)) AS nombre
            FROM public.msip_persona,
             public.sivel2_gen_victima
           WHERE ((sivel2_gen_victima.persona_id = msip_persona.id) AND (msip_persona.sexo = 'F'::bpchar))) s
-  GROUP BY s.nombre
+  GROUP BY nombre
   ORDER BY (count(*))
   WITH NO DATA;
 
@@ -4380,8 +4416,8 @@ CREATE MATERIALIZED VIEW public.nmujeres AS
 --
 
 CREATE MATERIALIZED VIEW public.persona_nomap AS
- SELECT msip_persona.id,
-    upper(btrim(((btrim((msip_persona.nombres)::text) || ' '::text) || btrim((msip_persona.apellidos)::text)))) AS nomap
+ SELECT id,
+    upper(btrim(((btrim((nombres)::text) || ' '::text) || btrim((apellidos)::text)))) AS nomap
    FROM public.msip_persona
   WITH NO DATA;
 
@@ -5037,29 +5073,12 @@ CREATE SEQUENCE public.sivel2_gen_etnia_id_seq
 
 
 --
--- Name: sivel2_gen_etnia; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sivel2_gen_etnia (
-    id integer DEFAULT nextval('public.sivel2_gen_etnia_id_seq'::regclass) NOT NULL,
-    nombre character varying(500) NOT NULL COLLATE public.es_co_utf_8,
-    descripcion character varying(1000),
-    fechacreacion date NOT NULL,
-    fechadeshabilitacion date,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    observaciones character varying(5000),
-    CONSTRAINT etnia_check CHECK (((fechadeshabilitacion IS NULL) OR (fechadeshabilitacion >= fechacreacion)))
-);
-
-
---
 -- Name: sivel2_gen_etnia_victimacolectiva; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.sivel2_gen_etnia_victimacolectiva (
-    etnia_id integer NOT NULL,
-    victimacolectiva_id integer NOT NULL
+    victimacolectiva_id integer NOT NULL,
+    etnia_id integer DEFAULT 1 NOT NULL
 );
 
 
@@ -6142,6 +6161,13 @@ ALTER TABLE ONLY public.msip_etiqueta_persona ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: msip_etnia id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.msip_etnia ALTER COLUMN id SET DEFAULT nextval('public.msip_etnia_id_seq'::regclass);
+
+
+--
 -- Name: msip_grupo id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -6958,6 +6984,14 @@ ALTER TABLE ONLY public.msip_etiqueta
 
 
 --
+-- Name: msip_etnia msip_etnia_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.msip_etnia
+    ADD CONSTRAINT msip_etnia_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: msip_fuenteprensa msip_fuenteprensa_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7470,14 +7504,6 @@ ALTER TABLE ONLY public.sivel2_gen_estadocivil
 
 
 --
--- Name: sivel2_gen_etnia sivel2_gen_etnia_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sivel2_gen_etnia
-    ADD CONSTRAINT sivel2_gen_etnia_pkey PRIMARY KEY (id);
-
-
---
 -- Name: sivel2_gen_etnia_victimacolectiva sivel2_gen_etnia_victimacolectiva_pkey1; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7860,6 +7886,13 @@ CREATE INDEX index_msip_orgsocial_on_pais_id ON public.msip_orgsocial USING btre
 
 
 --
+-- Name: index_msip_persona_on_etnia_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_msip_persona_on_etnia_id ON public.msip_persona USING btree (etnia_id);
+
+
+--
 -- Name: index_msip_solicitud_usuarionotificar_on_solicitud_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8207,13 +8240,6 @@ CREATE INDEX sivel2_gen_obs_fildep_u_idx ON public.sivel2_gen_observador_filtrod
 --
 
 CREATE INDEX sivel2_gen_victima_id_caso ON public.sivel2_gen_victima USING btree (caso_id);
-
-
---
--- Name: sivel2_gen_victima_id_etnia; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX sivel2_gen_victima_id_etnia ON public.sivel2_gen_victima USING btree (etnia_id);
 
 
 --
@@ -8785,14 +8811,6 @@ ALTER TABLE ONLY public.sivel2_gen_caso_etiqueta
 
 
 --
--- Name: sivel2_gen_etnia_victimacolectiva etnia_victimacolectiva_etnia_id_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sivel2_gen_etnia_victimacolectiva
-    ADD CONSTRAINT etnia_victimacolectiva_etnia_id_fkey1 FOREIGN KEY (etnia_id) REFERENCES public.sivel2_gen_etnia(id);
-
-
---
 -- Name: sivel2_gen_etnia_victimacolectiva etnia_victimacolectiva_victimacolectiva_id_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -9230,6 +9248,14 @@ ALTER TABLE ONLY public.cor1440_gen_efecto
 
 ALTER TABLE ONLY public.cor1440_gen_valorcampotind
     ADD CONSTRAINT fk_rails_4f2fc96457 FOREIGN KEY (campotind_id) REFERENCES public.cor1440_gen_campotind(id);
+
+
+--
+-- Name: sivel2_gen_etnia_victimacolectiva fk_rails_4fafec807e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sivel2_gen_etnia_victimacolectiva
+    ADD CONSTRAINT fk_rails_4fafec807e FOREIGN KEY (etnia_id) REFERENCES public.msip_etnia(id);
 
 
 --
@@ -9814,6 +9840,14 @@ ALTER TABLE ONLY public.cor1440_gen_indicadorpf
 
 ALTER TABLE ONLY public.cor1440_gen_plantillahcm_proyectofinanciero
     ADD CONSTRAINT fk_rails_d56d245f70 FOREIGN KEY (proyectofinanciero_id) REFERENCES public.cor1440_gen_proyectofinanciero(id);
+
+
+--
+-- Name: msip_persona fk_rails_d5b92f1c45; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.msip_persona
+    ADD CONSTRAINT fk_rails_d5b92f1c45 FOREIGN KEY (etnia_id) REFERENCES public.msip_etnia(id);
 
 
 --
@@ -10417,14 +10451,6 @@ ALTER TABLE ONLY public.sivel2_gen_victima
 
 
 --
--- Name: sivel2_gen_victima victima_id_etnia_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sivel2_gen_victima
-    ADD CONSTRAINT victima_id_etnia_fkey FOREIGN KEY (etnia_id) REFERENCES public.sivel2_gen_etnia(id);
-
-
---
 -- Name: sivel2_gen_victima victima_id_filiacion_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -10519,6 +10545,15 @@ ALTER TABLE ONLY public.sivel2_gen_victimacolectiva_vinculoestado
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240312182320'),
+('20240305165644'),
+('20240221015729'),
+('20240221002426'),
+('20240220233356'),
+('20240220164637'),
+('20240220111410'),
+('20240219221519'),
+('20240219220944'),
 ('20231208162022'),
 ('20231205205600'),
 ('20231205205549'),
