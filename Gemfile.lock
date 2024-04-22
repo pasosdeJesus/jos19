@@ -18,10 +18,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: e5d9cdb4da1e91496fb5723f746dcce224f4231c
+  revision: 90ed979dc70b697ed79f807a3263036e10568aa2
   branch: v2.2
   specs:
-    cor1440_gen (2.2.0.beta4)
+    cor1440_gen (2.2.0.beta5)
       devise
       heb412_gen
       kt-paperclip
@@ -31,10 +31,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: 9c6f38132a51415236c2bc8b11615a5a38d31987
+  revision: 57b9b4a334b1d0f1c87ed650f9bfb5e204f92905
   branch: v2.2
   specs:
-    heb412_gen (2.2.0.beta4)
+    heb412_gen (2.2.0.beta5)
       mr519_gen
       msip
       redcarpet
@@ -42,16 +42,16 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: e3a9946bd7806be25ae2b0a99cab462117822b6c
+  revision: 0a40f10e2759671366764a3244a3b26ae6ec063d
   branch: v2.2
   specs:
-    mr519_gen (2.2.0.beta4)
+    mr519_gen (2.2.0.beta5)
       msip
       rails
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 3ff638da9fa36d2404d96022f9c893753b6fe992
+  revision: 9ad803fbf57846d880d6c8d5ef50ca756ffd2697
   branch: v2.2
   specs:
     msip (2.2.0.beta5)
@@ -71,10 +71,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 7b6cf8ce3e075885b5abb37d87862465342f53e8
+  revision: 3b86b69cb48d7a7f01ebd0f5d1dae3333c1dd064
   branch: v2.2
   specs:
-    sivel2_gen (2.2.0.beta4)
+    sivel2_gen (2.2.0.beta5)
       color
       devise
       rails
@@ -210,10 +210,10 @@ GEM
       capybara (~> 3.0)
       ferrum (~> 0.14.0)
     date (3.3.4)
-    debug (1.9.1)
+    debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    devise (4.9.3)
+    devise (4.9.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 4.1.0)
@@ -284,7 +284,7 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.1)
-    nokogiri (1.16.3)
+    nokogiri (1.16.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     odf-report (0.8.1)
@@ -535,4 +535,4 @@ RUBY VERSION
    ruby 3.2.0p0
 
 BUNDLED WITH
-   2.5.7
+   2.5.9
