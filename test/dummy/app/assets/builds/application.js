@@ -22137,7 +22137,7 @@
   };
   // Conecta por ejemplo en form con data-controller="msip--bitacoraap"
   // En el botón para enviar agregar
-  // data-msip--bitacoraap-action='submit->msip--bitacoraap#enviarFormulario'
+  // data-action='submit->msip--bitacoraap#enviarFormulario'
   __publicField(bitacoraap_controller_default, "targets", []);
 
   // app/javascript/controllers/msip/cancelar_vacio_es_eliminar_controller.js
@@ -22226,6 +22226,239 @@
     "seleccion"
   ]);
 
+  // app/javascript/controllers/msip/motor.js
+  var _Msip__Motor = class {
+    static arreglarPuntoMontaje() {
+      var purl = window.puntomontaje;
+      if (purl == "/") {
+        purl = "";
+      }
+      return purl;
+    }
+    static partirFechaLocalizada(fechaLocalizada, formato) {
+      let anio = 1900;
+      let dia = 15;
+      let mes = 6;
+      if (formato == "dd/M/yyyy" || formato == "dd-M-yyyy") {
+        anio = +fechaLocalizada.slice(7, 11);
+        dia = +fechaLocalizada.slice(0, 2);
+        let nmes = fechaLocalizada.slice(3, 6);
+        if (typeof nmes != "undefined" && _Msip__Motor.MESES.includes(nmes.toLowerCase())) {
+          mes = _Msip__Motor.MESES.indexOf(nmes.toLowerCase()) + 1;
+        } else {
+          mes = 6;
+        }
+      } else {
+        if (typeof fechaLocalizada == "string") {
+          anio = +fechaLocalizada.slice(0, 4);
+          mes = +fechaLocalizada.slice(5, 7);
+          dia = +fechaLocalizada.slice(8, 10);
+        } else {
+          anio = 1900;
+          mes = 1;
+          dia = 1;
+        }
+      }
+      return [anio, mes, dia];
+    }
+    /* Remplaza las opciones de un cuadro de seleccion por unas nuevas
+     * @idsel es identificación del select
+     * @nuevasop Arreglo de hashes con nuevas opciones, cada una tiene propiedades
+     *   para la id (por omision id) y la etiqueta (por omisión nombre).
+     * @usatomselect Es verdadero si y solo si el cuadro de selección usa tom-select
+     * @cid campo con id en cada elemento de @nuevasop por omision id
+     * @cetiqueta campo con etiqueta en cada elemento de @nuevasop por omision nombre
+     * @opvacia Incluye opción vacia entre las posibles
+     */
+    static remplazarOpcionesSelect(idElemento, nuevasop, usatomselect = false, cid = "id", cetiqueta = "nombre", opvacia = false) {
+      let elemento = document.getElementById(idElemento);
+      let sel = elemento.value;
+      for (; elemento.length > 0; elemento.remove(0)) {
+      }
+      if (opvacia) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.text = "";
+        elemento.add(opt);
+      }
+      let index = 0;
+      let encontrado = false;
+      for (const v of nuevasop) {
+        const opt = document.createElement("option");
+        opt.value = v[cid];
+        if (opt.value == sel) {
+          encontrado = true;
+        }
+        opt.text = v[cetiqueta];
+        elemento.add(opt);
+        index++;
+      }
+      if (!encontrado) {
+        sel = "";
+        elemento.value = "";
+      }
+      if (usatomselect) {
+        if (typeof elemento.tomselect != "undefined") {
+          elemento.tomselect.clear();
+          elemento.tomselect.clearOptions();
+          elemento.tomselect.sync();
+          elemento.tomselect.refreshOptions();
+        } else {
+          let et = new TomSelect("#" + idElemento, {
+            create: true,
+            sortField: {
+              field: "text",
+              direction: "asc"
+            }
+          });
+        }
+      }
+      elemento.value = sel;
+    }
+  };
+  var Msip__Motor = _Msip__Motor;
+  /* 
+   * Librería de funciones comunes.
+   * Aunque no es un controlador lo dejamos dentro del directorio
+   * controllers para aprovechar método de msip para compartir controladores
+   * Stimulus de motores.
+   *
+   * Como su nombre no termina en _controller no será incluido en 
+   * controllers/index.js
+   *
+   * Desde controladores stimulus importelo con
+   *
+   *  import Msip__Motor from "../msip/motor"
+   *
+   * Use funciones por ejemplo con
+   *
+   *  Msip__Motor.partiFechaLocalizada(fl, formato)
+   */
+  __publicField(Msip__Motor, "MESES", ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]);
+
+  // app/javascript/controllers/msip/geodep_controller.js
+  var geodep_controller_default = class extends Controller {
+    initialize() {
+      console.log("inicializa controlador geodep");
+    }
+    connect() {
+      console.log("conectado controlador geodep");
+    }
+    cambiar_pais(e) {
+      var purl = Msip__Motor.arreglarPuntoMontaje();
+      console.log("departamento ahora es", this.departamentoTarget.value);
+      let url = purl + "/admin/departamentos.json?pais_id=" + e.target.value;
+      window.Rails.ajax({
+        type: "GET",
+        url,
+        data: null,
+        success: (resp, estado, xhr) => {
+          Msip__Motor.remplazarOpcionesSelect(
+            this.departamentoTarget.id,
+            resp,
+            true,
+            "id",
+            "nombre",
+            true
+          );
+          Msip__Motor.remplazarOpcionesSelect(
+            this.municipioTarget.id,
+            [],
+            true,
+            "id",
+            "nombre",
+            true
+          );
+          Msip__Motor.remplazarOpcionesSelect(
+            this.centropobladoTarget.id,
+            [],
+            true,
+            "id",
+            "nombre",
+            true
+          );
+        },
+        error: (req, estado, xhr) => {
+          window.alert("No pudo consultar departamentos");
+        }
+      });
+    }
+    cambiar_departamento(e) {
+      var purl = Msip__Motor.arreglarPuntoMontaje();
+      console.log("municipio ahora es", this.municipioTarget.value);
+      let url = purl + "/admin/municipios.json?departamento_id=" + e.target.value;
+      window.Rails.ajax({
+        type: "GET",
+        url,
+        data: null,
+        success: (resp, estado, xhr) => {
+          Msip__Motor.remplazarOpcionesSelect(
+            this.municipioTarget.id,
+            resp,
+            true,
+            "id",
+            "nombre",
+            true
+          );
+          Msip__Motor.remplazarOpcionesSelect(
+            this.centropobladoTarget.id,
+            [],
+            true,
+            "id",
+            "nombre",
+            true
+          );
+        },
+        error: (req, estado, xhr) => {
+          window.alert("No pudo consultar municipios");
+        }
+      });
+    }
+    cambiar_municipio(e) {
+      var purl = Msip__Motor.arreglarPuntoMontaje();
+      console.log("centro poblado ahora es", this.centropobladoTarget.value);
+      let url = purl + "/admin/centrospoblados.json?municipio_id=" + e.target.value;
+      window.Rails.ajax({
+        type: "GET",
+        url,
+        data: null,
+        success: (resp, estado, xhr) => {
+          Msip__Motor.remplazarOpcionesSelect(
+            this.centropobladoTarget.id,
+            resp,
+            true,
+            "id",
+            "nombre",
+            true
+          );
+        },
+        error: (req, estado, xhr) => {
+          window.alert("No pudo consultar centrospoblados");
+        }
+      });
+    }
+    cambiar_centropoblado(e) {
+    }
+  };
+  // Conecta un área que incluye campos pais/dep/mun con 
+  //   data-controller="msip--geodep"
+  // En el campo para el país agrega
+  //   data-action='change->msip--geodep#cambiar_pais'
+  // En el campo para el departamento agrega
+  //   data-action='change->msip--geodep#cambiar_departamento y
+  //   data-msip--geodep-target='departamento'
+  // En el campo para el municipio agrega
+  //   data-action='change->msip--geodep#cambiar_municipio y
+  //   data-msip--geodep-target='municipio'
+  // En el campo para el centro poblado agrega
+  //   data-action='change->msip--geodep#cambiar_centropoblado y
+  //   data-msip--geodep-target='centropoblado'
+  __publicField(geodep_controller_default, "targets", [
+    "departamento",
+    "municipio",
+    "centropoblado"
+  ]);
+
   // app/javascript/controllers/msip/sindocaut_controller.js
   var sindocaut_controller_default = class extends Controller {
     initialize() {
@@ -22279,7 +22512,7 @@
   };
   // Conecta con data-controller="msip--sindocaut"
   // En el campo para el tipo de documento agregar
-  // data-msip--sindocaut-action='change->msip--sindocaut#cambia_tdocumento
+  // data-action='change->msip--sindocaut#cambia_tdocumento
   // En el campo con la id de la persona agregar
   // data-msip--sindocaut-target='id'
   // Y en el campo con el número de documento agregar
@@ -22289,50 +22522,13 @@
     "id"
   ]);
 
-  // app/javascript/controllers/msip/motor.js
-  var _MsipMotor = class {
-    static partirFechaLocalizada(fechaLocalizada, formato) {
-      let anio = 1900;
-      let dia = 15;
-      let mes = 6;
-      if (formato == "dd/M/yyyy" || formato == "dd-M-yyyy") {
-        anio = +fechaLocalizada.slice(7, 11);
-        dia = +fechaLocalizada.slice(0, 2);
-        let nmes = fechaLocalizada.slice(3, 6);
-        if (typeof nmes != "undefined" && _MsipMotor.MESES.includes(nmes.toLowerCase())) {
-          mes = _MsipMotor.MESES.indexOf(nmes.toLowerCase()) + 1;
-        } else {
-          mes = 6;
-        }
-      } else {
-        if (typeof fechaLocalizada == "string") {
-          anio = +fechaLocalizada.slice(0, 4);
-          mes = +fechaLocalizada.slice(5, 7);
-          dia = +fechaLocalizada.slice(8, 10);
-        } else {
-          anio = 1900;
-          mes = 1;
-          dia = 1;
-        }
-      }
-      return [anio, mes, dia];
-    }
-  };
-  var MsipMotor = _MsipMotor;
-  /* 
-   * Aunque este no es un controlador lo dejamos dentro del directorio
-   * controllers para aprovechar lo avanzado para compartir controladores
-   * Stimulus de motores.
-   */
-  __publicField(MsipMotor, "MESES", ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]);
-
   // app/javascript/controllers/sivel2_gen/edad_controller.js
   var edad_controller_default = class extends Controller {
     connect() {
       console.log("Conexion de controlador edades establecida");
     }
     obtenerNumeroMes(nombreMes) {
-      return MsipMotor.MESES.indexOf(nombreMes.toLowerCase());
+      return Msip__Motor.MESES.indexOf(nombreMes.toLowerCase());
     }
     actualizarEdad(event2) {
       let anio = parseInt(this.anionacTarget.value);
@@ -22354,7 +22550,7 @@
         alert("No se encontr\xF3 campo con la fecha del caso");
       }
       let anioCaso, mesCaso, diaCaso;
-      [anioCaso, mesCaso, diaCaso] = MsipMotor.partirFechaLocalizada(
+      [anioCaso, mesCaso, diaCaso] = Msip__Motor.partirFechaLocalizada(
         campoFechaCaso.value,
         formatoFecha
       );
@@ -22389,10 +22585,12 @@
       } else {
         this.edadTarget.value = 0;
       }
-      if (edadactual > 0) {
-        this.edadactualTarget.value = edadactual;
-      } else {
-        this.edadactualTarget.value = 0;
+      if (this.hasEdadactualTarget) {
+        if (edadactual > 0) {
+          this.edadactualTarget.value = edadactual;
+        } else {
+          this.edadactualTarget.value = 0;
+        }
       }
       const opcionesRangoedad = this.rangoedadTarget.options;
       for (let i = 0; i < opcionesRangoedad.length; i++) {
@@ -22465,47 +22663,64 @@
         localStorage.removeItem("pestanaActiva");
       }
     }
+    requiereGuardar() {
+      let created_at = document.querySelector("input#caso_created_at").value;
+      let updated_at = document.querySelector("input#caso_updated_at").value;
+      let c = new Date(created_at);
+      let u = new Date(updated_at);
+      let diffechas = Math.abs(c - u);
+      let inicialmente_valido = document.querySelector(
+        "input#caso_bitacora_inicialmente_valido"
+      ).value;
+      let cambios = MsipCalcularCambiosParaBitacora();
+      return Object.keys(cambios).length > 0 || diffechas < 1e3 || inicialmente_valido != "true";
+    }
     cambiarficha() {
       if (event.target.dataset.enviarFichaCasoTarget == "actos-pestana") {
         document.getElementById("capa-cargando").style.display = "flex";
-        let casoId = this.idcasoTarget.value;
-        let puntomontaje = window.puntomontaje;
-        let url = puntomontaje + "casos/" + casoId + "/guardar_y_editar";
-        let datosFormulario = new FormData(document.querySelector("form"));
-        let objetoFormulario = Object.fromEntries(datosFormulario);
-        for (let [key, value] of datosFormulario.entries()) {
-          let coincidencia = key.match(/^caso\[(.+?)\]$/);
-          if (coincidencia) {
-            let ruta = coincidencia[1].split(/\]\[|\[|\]/).filter((p) => p !== "");
-            let actual = objetoFormulario;
-            for (let i = 0; i < ruta.length; i++) {
-              if (i === ruta.length - 1) {
-                actual[ruta[i]] = value;
-              } else {
-                if (!actual[ruta[i]]) {
-                  actual[ruta[i]] = ruta[i + 1].match(/^\d+$/) ? [] : {};
+        if (this.requiereGuardar()) {
+          let casoId = this.idcasoTarget.value;
+          let puntomontaje = window.puntomontaje;
+          let url = puntomontaje + "casos/" + casoId + "/guardar_y_editar";
+          let datosFormulario = new FormData(document.querySelector("form"));
+          let objetoFormulario = Object.fromEntries(datosFormulario);
+          for (let [key, value] of datosFormulario.entries()) {
+            let coincidencia = key.match(/^caso\[(.+?)\]$/);
+            if (coincidencia) {
+              let ruta = coincidencia[1].split(/\]\[|\[|\]/).filter((p) => p !== "");
+              let actual = objetoFormulario;
+              for (let i = 0; i < ruta.length; i++) {
+                if (i === ruta.length - 1) {
+                  actual[ruta[i]] = value;
+                } else {
+                  if (!actual[ruta[i]]) {
+                    actual[ruta[i]] = ruta[i + 1].match(/^\d+$/) ? [] : {};
+                  }
+                  actual = actual[ruta[i]];
                 }
-                actual = actual[ruta[i]];
               }
             }
           }
+          let datosCaso = { caso: objetoFormulario };
+          fetch(url, {
+            method: "PATCH",
+            headers: {
+              "X-CSRF-Token": Rails.csrfToken(),
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(datosCaso)
+          }).then((response) => {
+            if (response.ok) {
+              localStorage.setItem("pestanaActiva", "actos-pestana");
+              window.location = puntomontaje + "casos/" + casoId + "/edita";
+            } else {
+              document.getElementById("capa-cargando").style.display = "none";
+            }
+          });
+        } else {
+          console.log("No requiere guardar caso");
+          document.getElementById("capa-cargando").style.display = "none";
         }
-        let datosCaso = { caso: objetoFormulario };
-        fetch(url, {
-          method: "PATCH",
-          headers: {
-            "X-CSRF-Token": Rails.csrfToken(),
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(datosCaso)
-        }).then((response) => {
-          if (response.ok) {
-            localStorage.setItem("pestanaActiva", "actos-pestana");
-            window.location = puntomontaje + "casos/" + casoId + "/edita";
-          } else {
-            document.getElementById("capa-cargando").style.display = "none";
-          }
-        });
       }
       const campo_presponsables_acto = document.querySelector("#caso_acto_presponsable_id");
       const campo_presponsables_actocol = document.querySelector("#caso_actocolectivo_presponsable_id");
@@ -22515,6 +22730,9 @@
       actualizarPresponsables(campo_presponsables_actocol);
       actualizarVictimas(campo_victimas_acto);
       function actualizarPresponsables(s) {
+        if (s == null) {
+          return;
+        }
         var sel = s.value;
         var cadena = "";
         var campo = document.querySelectorAll('#presponsables .control-group:not([style="display: none;"])');
@@ -22592,6 +22810,7 @@
   application.register("msip--bitacoraap", bitacoraap_controller_default);
   application.register("msip--cancelar-vacio-es-eliminar", cancelar_vacio_es_eliminar_controller_default);
   application.register("msip--filtro-tan", filtro_tan_controller_default);
+  application.register("msip--geodep", geodep_controller_default);
   application.register("msip--sindocaut", sindocaut_controller_default);
   application.register("sivel2-gen--edad", edad_controller_default);
   application.register("sivel2-gen--enviar-ficha-caso", enviar_ficha_caso_controller_default);
