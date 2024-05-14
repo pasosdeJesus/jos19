@@ -18,10 +18,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 6048cf34bd01a3b5770d4c18a57540d14457d1c9
+  revision: 882dfc9454cd9a4593530a7a1ce4976370c03d4d
   branch: v2.2
   specs:
-    cor1440_gen (2.2.0.beta5)
+    cor1440_gen (2.2.0.beta6)
       devise
       heb412_gen
       kt-paperclip
@@ -31,10 +31,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: 37b3deab7dfe2e0853e6a42d969feb53358af561
+  revision: 082a3d2a9b00aac6f96849b4dfe363fab162c945
   branch: v2.2
   specs:
-    heb412_gen (2.2.0.beta5)
+    heb412_gen (2.2.0.beta6)
       mr519_gen
       msip
       redcarpet
@@ -42,19 +42,19 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: bf7e47135f9f6c6dd6d8b856cf3adf0ac3a109d3
+  revision: 66e2052f8f6ea47be26d6bd6bb214df7aba550cd
   branch: v2.2
   specs:
-    mr519_gen (2.2.0.beta5)
+    mr519_gen (2.2.0.beta6)
       msip
       rails
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 247acd717bf0dfe03086ca541c0ba11b76a5f944
+  revision: fec412ce16b7b805abf634dbe3a276aba2c9abe6
   branch: v2.2
   specs:
-    msip (2.2.0.beta5)
+    msip (2.2.0.beta6)
       cancancan (~> 3)
       devise (~> 4)
       devise-i18n (~> 1)
@@ -71,10 +71,10 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 4bf4fa296989e7620c8a18140c2ae7a1f340fd29
+  revision: a94f2295a2fe78c1bf055de1ae8041985c559559
   branch: v2.2
   specs:
-    sivel2_gen (2.2.0.beta5)
+    sivel2_gen (2.2.0.beta6)
       color
       devise
       rails
@@ -284,7 +284,7 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.1)
-    nokogiri (1.16.4)
+    nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     odf-report (0.8.1)
@@ -535,4 +535,4 @@ RUBY VERSION
    ruby 3.2.0p0
 
 BUNDLED WITH
-   2.5.9
+   2.5.10
