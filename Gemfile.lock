@@ -266,7 +266,7 @@ GEM
     mime-types-data (3.2024.0305)
     mini_mime (1.1.5)
     mini_portile2 (2.8.5)
-    minitest (5.22.3)
+    minitest (5.23.0)
     minitest-reporters (1.6.1)
       ansi
       builder
@@ -394,7 +394,7 @@ GEM
     rubocop-minitest (0.35.0)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails (2.24.1)
+    rubocop-rails (2.25.0)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)

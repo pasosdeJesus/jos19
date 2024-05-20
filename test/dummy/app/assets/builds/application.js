@@ -22235,6 +22235,16 @@
       }
       return purl;
     }
+    // Busca elementos input y select con la clase tom-select
+    // y si les falta los inicializa como campos de selección
+    // con TomSelect
+    static configurarElementosTomSelect() {
+      document.querySelectorAll(".tom-select").forEach((el) => {
+        if (typeof el.tomselect == "undefined" && (el.tagName == "INPUT" || el.tagName == "SELECT")) {
+          new window.TomSelect(el, window.configuracionTomSelect);
+        }
+      });
+    }
     static partirFechaLocalizada(fechaLocalizada, formato) {
       let anio = 1900;
       let dia = 15;
@@ -22476,15 +22486,16 @@
       }
       console.log("numerodocumento ahora es", this.numerodocumentoTarget.value);
       if (e.target.value == "11" && this.numerodocumentoTarget.value == "") {
-        let indice = this.idTarget.id.match(
-          new RegExp("attributes_([0-9]+)_persona")
+        let bindice = this.idTarget.id.match(
+          new RegExp("attributes_([0-9]+)_persona", "g")
         );
-        if (indice == null) {
-          indice = [0, 0];
+        if (bindice == null) {
+          bindice = ["attributes_0_persona"];
         }
+        let indice = bindice.at(-1).substr(11, bindice.at(-1).length - 19);
         window.Rails.ajax({
           type: "GET",
-          url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value + "&indice=" + indice[1],
+          url: purl + "/personas/identificacionsd?persona_id=" + this.idTarget.value + "&indice=" + indice,
           data: null,
           success: (resp, estado, xhr) => {
             this.numerodocumentoTarget.value = resp;
