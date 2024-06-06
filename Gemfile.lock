@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: b19a31a1f266cbe17e6a6e7622f80b32279c88bb
+  revision: e0c39828449ae81f0f99b374308c6a31b3309392
   branch: tomselect
   specs:
     cor1440_gen (2.2.0.beta6)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: 21984f53d06035bc8cc0293faca45d80af20f037
+  revision: 60dbf58b5d1646cc32028de3ecf7ac94f7cd96be
   branch: tomselect
   specs:
     heb412_gen (2.2.0.beta6)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: dcbc0b2d92b55c85e19e5a1f183077304c0acd34
+  revision: 5997a881b73529d007ac268bad0c2ef2d4f591d3
   branch: tomselect
   specs:
     mr519_gen (2.2.0.beta6)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 183bdc09cd1d88a1e777b624fb9809b63118ffc9
+  revision: 876f63094344ae3b61e15136399b96a5f8251c6f
   branch: tomselect
   specs:
     msip (2.2.0.beta6)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: acd76b1ca500808737b3d4abc45abfa886c71fab
+  revision: f94e50f27cf047ca17d13240e33f642b21d32169
   branch: tomselect
   specs:
     sivel2_gen (2.2.0.beta6)
@@ -179,7 +179,7 @@ GEM
       bundler (>= 1.2.0, < 3)
       thor (~> 1.0)
     camertron-eprun (1.1.1)
-    cancancan (3.6.0)
+    cancancan (3.6.1)
     capybara (3.40.0)
       addressable
       matrix
@@ -219,7 +219,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise-i18n (1.12.0)
+    devise-i18n (1.12.1)
       devise (>= 4.9.0)
     docile (1.4.0)
     dotenv (3.1.0)
