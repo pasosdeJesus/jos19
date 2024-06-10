@@ -18,3 +18,4 @@ test/dummy/coverage/
 tmp
 test/dummy/app/javascript/controllers/sivel2_gen
 test/dummy/app/assets/builds/
+assets/
