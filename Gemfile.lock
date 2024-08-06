@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 7e967dace4a9f680e70be72b1613de7ff9c9850f
+  revision: 79269569a1d9655435ec623c3835c18f2e15c3b5
   branch: tomselect
   specs:
     cor1440_gen (2.2.0.beta6)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: a6fe20558f67d4127e43ee2e63f193cb2a5dabd0
+  revision: b192dc79480343ffc7f72f2ea87c2e32463dcff8
   branch: tomselect
   specs:
     heb412_gen (2.2.0.beta6)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: c3523f67ba6c6828d6de1b3606a744fee5c38c1d
+  revision: 68847d76816524c50244e379a4d123e3fd6c4855
   branch: tomselect
   specs:
     mr519_gen (2.2.0.beta6)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 049ed9053e9ffcc312f07da347b31d53d878032a
+  revision: dfe2f5fa615f0caa67c7af6d228aff49af485c75
   branch: tomselect
   specs:
     msip (2.2.0.beta6)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 010ef7cb738932ba09d24dab36cc744d01d0690a
+  revision: df5d11a2dc52eda7b8b3832dfda4b8c59aa6f536
   branch: tomselect
   specs:
     sivel2_gen (2.2.0.beta6)
@@ -170,7 +170,7 @@ GEM
     bcrypt (3.1.20)
     bigdecimal (3.1.7)
     bindex (0.8.1)
-    bootsnap (1.18.3)
+    bootsnap (1.18.4)
       msgpack (~> 1.2)
     brakeman (6.1.2)
       racc
@@ -246,7 +246,7 @@ GEM
     jbuilder (2.12.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    jsbundling-rails (1.3.0)
+    jsbundling-rails (1.3.1)
       railties (>= 6.0.0)
     json (2.7.1)
     language_server-protocol (3.17.0.3)
@@ -284,7 +284,7 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.1)
-    nokogiri (1.16.6)
+    nokogiri (1.16.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     odf-report (0.8.1)
@@ -298,7 +298,7 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.10.0)
-    pg (1.5.6)
+    pg (1.5.7)
     prawn (2.5.0)
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
@@ -391,7 +391,7 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.2)
       parser (>= 3.3.0.4)
-    rubocop-minitest (0.35.0)
+    rubocop-minitest (0.35.1)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
     rubocop-rails (2.25.1)
@@ -425,7 +425,7 @@ GEM
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.1)
+    sprockets-rails (3.5.2)
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
@@ -535,4 +535,4 @@ RUBY VERSION
    ruby 3.2.0p0
 
 BUNDLED WITH
-   2.5.14
+   2.5.17
