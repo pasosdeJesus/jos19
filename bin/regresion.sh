@@ -72,6 +72,9 @@ if (test "$SALTAUNITARIAS" != "1") then {
       exit 1;
     } fi;
   } fi;
+  if (test ! -f cobuertura-unitarias/index.html) then {
+    rm -rf cobertura-unitarias
+  } fi;
 } fi;
 
 if (test -d test/integration -a "$SALTAINTEGRACION" != "1") then {
@@ -93,6 +96,11 @@ if (test -f $rutaap/bin/pruebasjs.sh -a -d $rutaap/test/puppeteer -a "x$NOPRUEBA
     echo "No pasaron pruebas del sistema js";
     exit 1;
   } fi;
+} fi;
+
+if (test ! -d cobertura-unitarias -a ! -d cobertura-sistema -a ! -d test/dummy/cobertura-sistema) then {
+  echo "== Nada por unificar"
+  exit 0;
 } fi;
 
 echo "== Unificando resultados de pruebas en directorio clásico coverage"

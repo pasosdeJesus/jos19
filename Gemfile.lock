@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 4618f90cd69815dea904c520bd2a3b116e0db751
+  revision: 7b0cd5d57c7a8b52599afeb79cacf7dd41923769
   branch: tomselect
   specs:
     cor1440_gen (2.2.0.beta6)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: ea8e90ec9ff537affc7aade3ba5b33d5247dd439
+  revision: 8f49a0aa923679f67481d930874838802aa5723e
   branch: tomselect
   specs:
     heb412_gen (2.2.0.beta6)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: 2770039e3eb438ab92c69abc187aa147e52319de
+  revision: e56715c30bfe5dfcabceedaa6f3a0c06e69109b3
   branch: tomselect
   specs:
     mr519_gen (2.2.0.beta6)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 43e85f2a0415a379b743a433fcbb903ac7958eae
+  revision: e513fabeb9d56774f7eb00963430767c41657d4e
   branch: tomselect
   specs:
     msip (2.2.0.beta6)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 81ecf44de22f2cf52154b5acc30e45db0fdcf3cf
+  revision: 27b47ebde72c54a168654e9a79562eb434303ea5
   branch: tomselect
   specs:
     sivel2_gen (2.2.0.beta6)
@@ -294,7 +294,7 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.10.0)
-    pg (1.5.7)
+    pg (1.5.8)
     prawn (2.5.0)
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
@@ -388,10 +388,10 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.32.1)
       parser (>= 3.3.1.0)
-    rubocop-minitest (0.35.1)
+    rubocop-minitest (0.36.0)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails (2.26.0)
+    rubocop-rails (2.26.1)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.52.0, < 2.0)
@@ -433,7 +433,7 @@ GEM
     strscan (3.1.0)
     terrapin (1.0.1)
       climate_control
-    thor (1.3.1)
+    thor (1.3.2)
     tilt (2.4.0)
     timeout (0.4.1)
     ttfunk (1.8.0)
