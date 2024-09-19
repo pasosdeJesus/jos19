@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 4618f90cd69815dea904c520bd2a3b116e0db751
+  revision: db0e77179b2953851a9cbce7194319e819037afa
   branch: tomselect
   specs:
     cor1440_gen (2.2.0.beta6)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: ea8e90ec9ff537affc7aade3ba5b33d5247dd439
+  revision: 1506ad35c0e3559b56477b631fc12eecf130cf83
   branch: tomselect
   specs:
     heb412_gen (2.2.0.beta6)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: 2770039e3eb438ab92c69abc187aa147e52319de
+  revision: 14704cbd535b6af994c4f4a0654c27754496db8e
   branch: tomselect
   specs:
     mr519_gen (2.2.0.beta6)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: 43e85f2a0415a379b743a433fcbb903ac7958eae
+  revision: 9eb58a3c2904e8ea83b77678cd59d39d986ec5cd
   branch: tomselect
   specs:
     msip (2.2.0.beta6)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: 2228ad433c168df713359d82611b414310e48adf
+  revision: 8b8db150de24a44917213d575a1058b700f0453c
   branch: tomselect
   specs:
     sivel2_gen (2.2.0.beta6)
@@ -249,7 +249,7 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.12.0)
+    jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     jsbundling-rails (1.3.1)
@@ -316,7 +316,7 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.10.0)
-    pg (1.5.7)
+    pg (1.5.8)
     prawn (2.5.0)
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
@@ -329,7 +329,7 @@ GEM
     psych (5.1.2)
       stringio
     public_suffix (6.0.1)
-    puma (6.4.2)
+    puma (6.4.3)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (2.2.9)
@@ -410,10 +410,10 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.32.1)
       parser (>= 3.3.1.0)
-    rubocop-minitest (0.35.1)
+    rubocop-minitest (0.36.0)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails (2.26.0)
+    rubocop-rails (2.26.1)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.52.0, < 2.0)
@@ -455,7 +455,7 @@ GEM
     strscan (3.1.0)
     terrapin (1.0.1)
       climate_control
-    thor (1.3.1)
+    thor (1.3.2)
     tilt (2.4.0)
     timeout (0.4.1)
     ttfunk (1.8.0)
@@ -572,4 +572,4 @@ RUBY VERSION
    ruby 3.3.3p89
 
 BUNDLED WITH
-   2.5.18
+   2.5.19
