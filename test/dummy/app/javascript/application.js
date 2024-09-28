@@ -14,6 +14,14 @@ import * as bootstrap from 'bootstrap'              // Maquetacion y elementos d
 import Msip__Motor from "./controllers/msip/motor"
 window.Msip__Motor = Msip__Motor
 Msip__Motor.iniciar()  // Este se ejecuta una vez cuando se está cargando la aplicación tal vez antes que la página completa o los recursos
+import Mr519Gen__Motor from "./controllers/mr519_gen/motor"
+window.Mr519Gen__Motor = Mr519Gen__Motor
+import Heb412Gen__Motor from "./controllers/heb412_gen/motor"
+window.Heb412Gen__Motor = Heb412Gen__Motor
+import Cor1440Gen__Motor from "./controllers/cor1440_gen/motor"
+window.Cor1440Gen__Motor = Cor1440Gen__Motor
+import Sivel2Gen__Motor from "./controllers/sivel2_gen/motor"
+window.Sivel2Gen__Motor = Sivel2Gen__Motor
 
 import TomSelect from 'tom-select';
 window.TomSelect = TomSelect;
