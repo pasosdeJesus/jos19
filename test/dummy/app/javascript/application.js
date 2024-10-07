@@ -11,6 +11,7 @@ import "./jquery"
 import 'popper.js'              // Dialogos emergentes usados por bootstrap
 import * as bootstrap from 'bootstrap'              // Maquetacion y elementos de diseño
 
+<<<<<<< HEAD
 import Msip__Motor from "./controllers/msip/motor"
 window.Msip__Motor = Msip__Motor
 Msip__Motor.iniciar()  // Este se ejecuta una vez cuando se está cargando la aplicación tal vez antes que la página completa o los recursos
@@ -23,6 +24,8 @@ window.Cor1440Gen__Motor = Cor1440Gen__Motor
 import Sivel2Gen__Motor from "./controllers/sivel2_gen/motor"
 window.Sivel2Gen__Motor = Sivel2Gen__Motor
 
+=======
+>>>>>>> bfdc8ee (Actualiza a msip 2.2.0.beta7)
 import TomSelect from 'tom-select';
 window.TomSelect = TomSelect;
 window.configuracionTomSelect = {
@@ -33,6 +36,19 @@ window.configuracionTomSelect = {
           direction: "asc"
         }
 }
+<<<<<<< HEAD
+=======
+
+import Msip__Motor from "./controllers/msip/motor"
+window.Msip__Motor = Msip__Motor
+Msip__Motor.iniciar()
+import Mr519Gen__Motor from "./controllers/mr519_gen/motor"
+window.Mr519Gen__Motor = Mr519Gen__Motor
+import Heb412Gen__Motor from "./controllers/heb412_gen/motor"
+window.Heb412Gen__Motor = Heb412Gen__Motor
+import Sivel2Gen__Motor from "./controllers/sivel2_gen/motor"
+window.Sivel2Gen__Motor = Sivel2Gen__Motor
+>>>>>>> bfdc8ee (Actualiza a msip 2.2.0.beta7)
 
 let esperarRecursosSprocketsYDocumento = function (resolver) {
   if (typeof window.puntomontaje == 'undefined') {
@@ -56,7 +72,11 @@ promesaRecursosSprocketsYDocumento.then((mensaje) => {
   var root;
   root = window;
   msip_prepara_eventos_comunes(root);
+<<<<<<< HEAD
   Msip__Motor.ejecutarAlCargarDocumentoYRecursos()  // Este se ejecuta cada vez que se carga una página que no está en cache y tipicamente después de que se ha cargado la página completa y los recursos
+=======
+  Msip__Motor.ejecutarAlCargarDocumentoYRecursos()
+>>>>>>> bfdc8ee (Actualiza a msip 2.2.0.beta7)
 })
 
 
@@ -70,6 +90,7 @@ document.addEventListener('turbo:load', (e) => {
 
   Msip__Motor.ejecutarAlCargarPagina()  // Este puede ejecutarse varias veces consecutivas cada vez que se termina de cargar una página que incluso pudiera estar en cache
   msip_ejecutarAlCargarPagina(window)
+  Msip__Motor.ejecutarAlCargarPagina()
 })
 
 

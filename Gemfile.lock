@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 1b6678cb4b73d7f2b2383b46e7026ece0c100e2f
+  revision: 3e07256fc1615b3ae4b3d8aa6db0cf4e16107630
   branch: v2.2
   specs:
     cor1440_gen (2.2.0.beta7)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: 5bbc1c1476797206a44a70802e2553c067b5ea08
+  revision: f98dc89f1bc83878ad6c7d71802fb53ad63c629e
   branch: v2.2
   specs:
     heb412_gen (2.2.0.beta7)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: f792ce2ded8e68217903d5049243797c13b95c4a
+  revision: 920b688159c414e74159d71a12625fe67490f988
   branch: v2.2
   specs:
     mr519_gen (2.2.0.beta7)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: dd616eb63f0db1b5d9a384b1c121f8670f4d479d
+  revision: a4106aee602528687161ed278b98e114497bb126
   branch: v2.2
   specs:
     msip (2.2.0.beta7)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: df4b9da0b4008b59e6ee8d0880f0cee06d4a6a24
+  revision: 2d3250426e25739420f04f5b874d75ae88bfebfb
   branch: v2.2
   specs:
     sivel2_gen (2.2.0.beta7)
@@ -231,6 +231,16 @@ GEM
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
     ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-gnu)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm-linux-gnu)
+    ffi (1.17.0-arm-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86-linux-gnu)
+    ffi (1.17.0-x86-linux-musl)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.17.0-x86_64-linux-musl)
     globalid (1.2.1)
       activesupport (>= 6.1)
     i18n (1.14.6)
@@ -283,6 +293,18 @@ GEM
     nio4r (2.7.3)
     nokogiri (1.16.7)
       mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.16.7-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.7-arm-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.7-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.16.7-x86-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.7-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
     odf-report (0.8.1)
       mime-types
@@ -465,6 +487,21 @@ GEM
     zeitwerk (2.6.18)
 
 PLATFORMS
+  aarch64-linux
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux
+  arm-linux-gnu
+  arm-linux-musl
+  arm64-darwin
+  ruby
+  x86-linux
+  x86-linux-gnu
+  x86-linux-musl
+  x86_64-darwin
+  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
   x86_64-openbsd
 
 DEPENDENCIES
@@ -530,7 +567,7 @@ DEPENDENCIES
   will_paginate
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.21

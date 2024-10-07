@@ -100,7 +100,7 @@ gem "heb412_gen", # Motor de nube y llenado de plantillas
 
 gem "sivel2_gen", # Motor de casos de VPS
   git: "https://gitlab.com/pasosdeJesus/sivel2_gen.git", branch: "v2.2"
-  #path: "../heb412_gen-2.2"
+  #path: "../sivel2_gen-2.2"
 
 gem "cor1440_gen", # Motor de proyectos y actividades
   git: "https://gitlab.com/pasosdeJesus/cor1440_gen.git", branch: "v2.2"

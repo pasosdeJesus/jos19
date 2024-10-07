@@ -16,6 +16,17 @@ Rails.application.routes.draw do
 
   root "msip/hogar#index"
 
+  namespace :admin do
+    ab = Ability.new
+    ab.tablasbasicas.each do |t|
+      next unless t[0] == ""
+
+      c = t[1].pluralize
+      resources c.to_sym,
+        path_names: { new: "nueva", edit: "edita" }
+    end
+  end
+
   mount Sivel2Gen::Engine, at: "/", as: "sivel2_gen"
   mount Cor1440Gen::Engine, at: "/", as: "cor1440_gen"
   mount Mr519Gen::Engine => "/", as: "mr519_gen"
