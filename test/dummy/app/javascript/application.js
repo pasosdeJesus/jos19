@@ -57,7 +57,13 @@ promesaRecursosSprocketsYDocumento.then((mensaje) => {
   console.log('Cargando recursos sprockets')
   var root;
   root = window;
-  msip_prepara_eventos_comunes(root);
+  msip_prepara_eventos_comunes(root, false, false);
+  mr519_gen_prepara_eventos_comunes(root);
+  heb412_gen_prepara_eventos_comunes(root);
+  sivel2_gen_prepara_eventos_comunes(root);
+  cor1440_gen_prepara_eventos_comunes(root);
+  sivel2_gen_prepara_eventos_unicos(root);
+
   Msip__Motor.ejecutarAlCargarDocumentoYRecursos()
 })
 
