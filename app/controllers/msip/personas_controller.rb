@@ -1,4 +1,4 @@
-require 'jos19/concerns/controllers/persona_controller'
+require 'jos19/concerns/controllers/personas_controller'
 
 module Msip
   class PersonasController < Heb412Gen::ModelosController
