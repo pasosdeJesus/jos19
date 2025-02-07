@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: f18f835f4c84b75e28e36e407b335e69b149db76
+  revision: fbd2ae589d8e8d84326142b231ff74a99f23ac81
   branch: v2.2
   specs:
     sivel2_gen (2.2.0.beta7)
@@ -288,7 +288,7 @@ GEM
       net-protocol
     net-protocol (0.2.2)
       timeout
-    net-smtp (0.5.0)
+    net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.3)
     nokogiri (1.18.2)
