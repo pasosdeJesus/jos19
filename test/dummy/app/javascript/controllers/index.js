@@ -10,6 +10,9 @@ application.register("msip--bitacoraap", Msip__BitacoraapController)
 import Msip__CancelarVacioEsEliminarController from "./msip/cancelar_vacio_es_eliminar_controller"
 application.register("msip--cancelar-vacio-es-eliminar", Msip__CancelarVacioEsEliminarController)
 
+import Msip__EnviarautomaticoController from "./msip/enviarautomatico_controller"
+application.register("msip--enviarautomatico", Msip__EnviarautomaticoController)
+
 import Msip__FiltroTanController from "./msip/filtro_tan_controller"
 application.register("msip--filtro-tan", Msip__FiltroTanController)
 
@@ -19,11 +22,20 @@ application.register("msip--geodep", Msip__GeodepController)
 import Msip__SindocautController from "./msip/sindocaut_controller"
 application.register("msip--sindocaut", Msip__SindocautController)
 
+import Sivel2Gen__ContarAutomaticoController from "./sivel2_gen/contar_automatico_controller"
+application.register("sivel2-gen--contar-automatico", Sivel2Gen__ContarAutomaticoController)
+
 import Sivel2Gen__EdadController from "./sivel2_gen/edad_controller"
 application.register("sivel2-gen--edad", Sivel2Gen__EdadController)
 
 import Sivel2Gen__EnviarFichaCasoController from "./sivel2_gen/enviar_ficha_caso_controller"
 application.register("sivel2-gen--enviar-ficha-caso", Sivel2Gen__EnviarFichaCasoController)
 
-import Sivel2Gen__MotorController from "./sivel2_gen/motor_controller"
-application.register("sivel2-gen--motor", Sivel2Gen__MotorController)
+import Sivel2Gen__FiltroAvanzadoController from "./sivel2_gen/filtro_avanzado_controller"
+application.register("sivel2-gen--filtro-avanzado", Sivel2Gen__FiltroAvanzadoController)
+
+import Sivel2Gen__MapaosmController from "./sivel2_gen/mapaosm_controller"
+application.register("sivel2-gen--mapaosm", Sivel2Gen__MapaosmController)
+
+import Sivel2Gen__PlotlyActosController from "./sivel2_gen/plotly_actos_controller"
+application.register("sivel2-gen--plotly-actos", Sivel2Gen__PlotlyActosController)
