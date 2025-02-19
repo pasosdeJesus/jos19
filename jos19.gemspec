@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "lib/jos19/version"
 
 Gem::Specification.new do |spec|
@@ -8,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = "https://gitlab.com/pasosdeJesus/jos19"
   spec.summary     = "Seguimiento con cor1440 a casos de sivel2_gen"
   spec.description = "Facilita crear sistemas sobre cor1440 y sivel2_gen."
-    spec.license     = "ISC"
+  spec.license = "ISC"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://gitlab.com/pasosdeJesus/jos19"
@@ -18,5 +20,5 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "LICENSE.md", "Rakefile", "README.md"]
   end
 
-  spec.add_dependency "rails", ">= 7.0.4"
+  spec.add_dependency("rails", ">= 7.0.4")
 end

@@ -4,13 +4,14 @@
 <%= f.input :busactividad_proyectofinanciero,
   collection: col.order(:nombre),
   include_blank: true,
-  label_method: :nombre,
-  value_method: :id,
-  label: false,
-  selected: Msip::ModeloHelper.poromision(params, 
-                                         :busactividad_proyectofinanciero),
   input_html: {
     class: 'chosen-select',
-    'data-enviarautomatico' => ''
-  }
+    'data-action': 'change->msip--enviarautomatico#enviar'
+  },
+  label: false,
+  label_method: :nombre,
+  selected: Msip::ModeloHelper.poromision(
+    params, :busactividad_proyectofinanciero
+  ),
+  value_method: :id
 %>

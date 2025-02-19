@@ -19,11 +19,9 @@ module Jos19
         end
       end
     end
-
   end
 
   def self.setup(&block)
     yield self
   end
-
 end
