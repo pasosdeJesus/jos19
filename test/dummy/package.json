@@ -1,21 +1,25 @@
 {
   "scripts": {
     "build": "esbuild app/javascript/*.* --preserve-symlinks --bundle --sourcemap --outdir=app/assets/builds",
-    "start": "node esbuild-des.config.js"
+    "start": "node esbuild-des.config.js",
+    "build:css": "postcss ./app/assets/stylesheets/application.postcss.css -o ./app/assets/builds/application.css"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.3.0",
-    "@hotwired/stimulus": "^3.2.1",
-    "@hotwired/turbo-rails": "^7.3.0",
-    "@popperjs/core": "^2.11.6",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^8.0.13",
+    "@popperjs/core": "^2.11.8",
     "@rails/ujs": "^7.0.4-3",
-    "bootstrap": "^5.2.3",
-    "esbuild": "^0.17.11",
-    "jquery": "^3.6.4",
+    "autoprefixer": "^10.4.21",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "esbuild": "^0.25.1",
+    "gridstack": "^11.5.1",
     "popper.js": "2.0.0-next.4",
-    "tom-select": "^2.3.1"
-  },
-  "devDependencies": {
-    "babel-plugin-macros": "^3.1.0"
+    "postcss": "^8.5.3",
+    "postcss-cli": "^11.0.1",
+    "postcss-import": "^16.1.0",
+    "postcss-nesting": "^13.0.1",
+    "tom-select": "^2.4.3"
   }
 }
