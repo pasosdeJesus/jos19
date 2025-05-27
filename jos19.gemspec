@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "lib/jos19/version"
 
 Gem::Specification.new do |spec|
@@ -17,5 +19,4 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     Dir["{app,config,db,lib}/**/*", "LICENSE.md", "Rakefile", "README.md"]
   end
-
 end

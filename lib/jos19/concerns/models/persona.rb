@@ -12,7 +12,6 @@ module Jos19
         included do
           include Sivel2Gen::Concerns::Models::Persona
           include Cor1440Gen::Concerns::Models::Persona
-
         end # included
 
         class_methods do

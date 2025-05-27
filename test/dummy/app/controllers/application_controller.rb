@@ -5,4 +5,3 @@ class ApplicationController < Msip::ApplicationController
   # En el caso de APIs, en cambio puedes querer usar :null_session
   protect_from_forgery with: :exception
 end
-

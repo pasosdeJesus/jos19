@@ -3,8 +3,8 @@
 require "jos19/version"
 
 Msip.setup do |config|
-  config.ruta_anexos = "#{Rails.root}/archivos/anexos"
-  config.ruta_volcados = "#{Rails.root}/archivos/bd"
+  config.ruta_anexos = "#{Rails.root.join("archivos/anexos")}"
+  config.ruta_volcados = "#{Rails.root.join("archivos/bd")}"
   config.titulo = "Jos19 " + Jos19::VERSION
 
   config.descripcion = "Seguimiento con cor1440 a casos de sivel2_gen"

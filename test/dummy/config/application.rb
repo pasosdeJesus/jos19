@@ -16,14 +16,12 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "rails/test_unit/railtie"
 
-
 Bundler.require(*Rails.groups)
 require "jos19"
 
 module Dummy
   class Application < Rails::Application
-    config.load_defaults Rails::VERSION::STRING.to_f
-
+    config.load_defaults(Rails::VERSION::STRING.to_f)
 
     config.time_zone = "America/Bogota"
 
@@ -51,7 +49,7 @@ module Dummy
 
     # cor1440
     config.x.cor1440_permisos_por_oficina =
-      (ENV["COR1440_PERMISOS_POR_OFICINA"] && 
+      (ENV["COR1440_PERMISOS_POR_OFICINA"] &&
        ENV["COR1440_PERMISOS_POR_OFICINA"] != "")
 
     config.x.cor1440_pf_comunes =
@@ -64,6 +62,5 @@ module Dummy
       ENV.fetch("COR1440_PF_CALIDAD", 0).to_i
 
     config.x.jos19_etiquetaunificadas = "PERSONAS UNIFICADAS"
-
   end
 end
