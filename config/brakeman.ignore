@@ -1,0 +1,277 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "4bbc40d85f0197d6ef73c030636b0cdecf4989f4fb5656d86777ab7ef454ced8",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/jos19/concerns/models/consactividadcaso.rb",
+      "line": 198,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"CREATE\\n              MATERIALIZED VIEW jos19_consactividadcaso AS\\n              #{consulta}\\n              #{(w + (\" ORDER BY \" + interpreta_ordenar_por(ordenar_por)))} ;\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Jos19::Concerns::Models::Consactividadcaso::ClassMethods",
+        "method": "crea_consulta"
+      },
+      "user_input": "consulta",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5402b3357c827021d2f6f9f28ada3fd4573c89d5a7ccf484468a0926a0b4d06d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "personas.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_nombresrepetidos_fechas"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5402b3357c827021d2f6f9f28ada3fd4573c89d5a7ccf484468a0926a0b4d06d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 71,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "personas.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_nombresrepetidos_fechas"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5402b3357c827021d2f6f9f28ada3fd4573c89d5a7ccf484468a0926a0b4d06d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 74,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "personas.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_nombresrepetidos_fechas"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "6198a2a48b6c8e16fd08bd1dfdf1f47d244e0ce6e96b7e015f5c7516f8505704",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/jos19/concerns/controllers/personas_controller.rb",
+      "line": 71,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "personas.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s)).where(\"#{cfecha} <= ?\", Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechafin]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Jos19::Concerns::Controllers::PersonasController",
+        "method": "filtro_nombresrepetidos_fechas"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 123,
+      "fingerprint": "715ee6d743a8af33c7b930d728708ce19c765fb40e2ad9d2b974db04d92dc7d1",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 3.1.2 ends on 2025-03-31",
+      "file": ".ruby-version",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        1104
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9cf031c7efcd180a10ee9bcab0821ef272ef50404f2e4b09bc15e25f5508232b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 268,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "benef.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_idsrepetidas_fecha"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9cf031c7efcd180a10ee9bcab0821ef272ef50404f2e4b09bc15e25f5508232b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 274,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "benef.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_idsrepetidas_fecha"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9cf031c7efcd180a10ee9bcab0821ef272ef50404f2e4b09bc15e25f5508232b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/msip/personas_controller.rb",
+      "line": 277,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "benef.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Msip::PersonasController",
+        "method": "filtro_idsrepetidas_fecha"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "cf30a1e9bfdf108795c76c4093b6c8c25eb5b01bbeadf01f7214f2bc62a20d43",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/jos19/concerns/controllers/personas_controller.rb",
+      "line": 274,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "benef.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s)).where(\"#{cfecha} <= ?\", Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechafin]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Jos19::Concerns::Controllers::PersonasController",
+        "method": "filtro_idsrepetidas_fecha"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "dd59d5f4081323de3d799c0ae5d60276d9a14b31be4d3c8bb85355682e4e841d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/jos19/concerns/controllers/personas_controller.rb",
+      "line": 268,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "benef.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:idsrepetidas][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Jos19::Concerns::Controllers::PersonasController",
+        "method": "filtro_idsrepetidas_fecha"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e1368711579fc010154d54e6f66ecb3999236942542d3dd1068fcd60d6dddee7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/jos19/concerns/controllers/personas_controller.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "personas.where(\"#{cfecha} >= ?\", ((\"\" or Msip::FormatoFechaHelper.fecha_local_estandar(params[:nombresrepetidos][:fechaini])) or Msip::FormatoFechaHelper.inicio_semestre(Date.today).to_s))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Jos19::Concerns::Controllers::PersonasController",
+        "method": "filtro_nombresrepetidos_fechas"
+      },
+      "user_input": "cfecha",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    }
+  ],
+  "brakeman_version": "7.0.0"
+}
