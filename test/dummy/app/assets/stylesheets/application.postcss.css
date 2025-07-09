@@ -1,0 +1,16 @@
+/* Entry point for your PostCSS build */
+
+/* Bootstrap */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Tomselect */
+@import "tom-select/dist/css/tom-select.bootstrap5.min.css";
+
+@import "gridstack/dist/gridstack.min.css";
+@import "gridstack/dist/gridstack-extra.min.css";
+
+@import 'msip/motor.css';
+@import 'mr519_gen/motor.css';
+@import 'heb412_gen/motor.css';
+@import 'cor1440_gen/motor.css';
+
