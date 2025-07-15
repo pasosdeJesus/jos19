@@ -17,8 +17,6 @@ gem "cancancan"
 
 gem "cocoon", git: "https://github.com/vtamara/cocoon.git", branch: "new_id_with_ajax" # Formularios anidados (algunos con ajax)
 
-gem "cssbundling-rails"
-
 gem "devise" # Autenticación
 
 gem "devise-i18n"
@@ -26,8 +24,6 @@ gem "devise-i18n"
 gem "execjs"
 
 gem "jbuilder"
-
-gem "jsbundling-rails"
 
 gem "kt-paperclip", # Anexos
   git: "https://github.com/kreeti/kt-paperclip.git"
@@ -52,8 +48,6 @@ gem "prawnto_2", require: "prawnto"
 
 gem "prawn-table"
 
-gem "propshaft"
-
 gem "rack", "~> 2"
 
 gem "rails", "~> 8.0"
@@ -67,6 +61,8 @@ gem "rspreadsheet"
 gem "rubyzip"
 
 gem "simple_form" # Formularios simples
+
+gem "sprockets-rails"
 
 gem "stimulus-rails"
 
