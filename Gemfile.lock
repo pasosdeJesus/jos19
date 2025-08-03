@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/cor1440_gen.git
-  revision: 1bd8db71bd8c94d359253f8d8b789cb89817bf6e
+  revision: 40876a9f23e3a4008c21f83425cd887b27b22a35
   branch: v2.2
   specs:
     cor1440_gen (2.2.0)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/heb412_gen.git
-  revision: 1597b9c8dfb8c9651b4ea914ed0261aad8708c40
+  revision: e5224943c03d7211aace4d9ecd3820b56193c601
   branch: v2.2
   specs:
     heb412_gen (2.2.0)
@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/mr519_gen.git
-  revision: 24608f1fe0d9dedb6fb3ffccaf791a4fd06c7817
+  revision: 4218f63d7673e73fff2e62feab2d23c760e337f9
   branch: v2.2
   specs:
     mr519_gen (2.2.0)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/msip.git
-  revision: c1ffbe951e6a4bcff7bc95b3232a944794ea53e5
+  revision: cc806f8286d12e5e04576e56ada4357d65d0c590
   branch: v2.2
   specs:
     msip (2.2.0)
@@ -71,7 +71,7 @@ GIT
 
 GIT
   remote: https://gitlab.com/pasosdeJesus/sivel2_gen.git
-  revision: f9be723958ebb4291e4dcf14777712d40ecbab86
+  revision: 460b2a6e2017707e4f8e045421617cb22029ce24
   branch: v2.2
   specs:
     sivel2_gen (2.2.0)
@@ -258,7 +258,7 @@ GEM
       railties (>= 6.0.0)
     json (2.7.2)
     language_server-protocol (3.17.0.3)
-    libxml-ruby (5.0.4)
+    libxml-ruby (5.0.5)
     lint_roller (1.1.0)
     logger (1.6.1)
     loofah (2.22.0)
@@ -342,7 +342,7 @@ GEM
     psych (5.1.2)
       stringio
     public_suffix (6.0.1)
-    puma (6.6.0)
+    puma (6.6.1)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (2.2.17)
@@ -569,7 +569,7 @@ DEPENDENCIES
   rubocop-minitest
   rubocop-rails
   rubocop-shopify
-  rubyzip (>= 2.0.0)
+  rubyzip (<= 2.4.1)
   sassc-rails
   simple_form
   simplecov
