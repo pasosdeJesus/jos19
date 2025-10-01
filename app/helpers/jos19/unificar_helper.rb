@@ -241,7 +241,7 @@ module Jos19
 
     def reporte_md_contenido_objeto(en, lista_params, objeto, ind)
       # puts "OJO " + ' '*ind + en.to_s + ' '
-      res = ""
+      res = "".dup
       lista_params.each do |atr|
         # puts "OJO   " + ' '*ind + 'atr: \'' + atr.to_s + '\''
         if atr.class == Symbol
