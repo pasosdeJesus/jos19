@@ -21,11 +21,15 @@ gem "cocoon", git: "https://github.com/vtamara/cocoon.git", branch: "new_id_with
 
 gem "coffee-rails" # CoffeeScript para recuersos .js.coffee y vistas
 
+gem "csv"
+
 gem "devise" # Autenticación
 
 gem "devise-i18n"
 
 gem "execjs"
+
+gem "hotwire-rails"
 
 gem "jbuilder"
 
@@ -46,13 +50,13 @@ gem "parslet"
 
 gem "pg" # Postgresql
 
-gem "puma"
-
 gem "prawn" # Generación de PDF
 
 gem "prawnto_2", require: "prawnto"
 
 gem "prawn-table"
+
+gem "puma"
 
 gem "rack", "~> 2"
 
@@ -62,9 +66,11 @@ gem "rails-i18n"
 
 gem "redcarpet"
 
+gem "rexml"
+
 gem "rspreadsheet"
 
-gem "rubyzip", "<= 2.4.1"
+gem "rubyzip"
 
 gem "sassc-rails" # CSS
 
@@ -111,12 +117,6 @@ gem "cor1440_gen", # Motor de proyectos y actividades
   branch: "v2.2"
 # path: "../cor1440_gen-2.2"
 
-group :development do
-  gem "thor" # Requerido por rake
-
-  gem "web-console" # ConSola irb en páginas
-end
-
 group :development, :test do
   gem "brakeman"
 
@@ -126,7 +126,7 @@ group :development, :test do
 
   gem "colorize"
 
-  gem "debug", ">= 1.0.0", platforms: [:mri, :mingw, :x64_mingw]
+  gem "debug"
 
   gem "dotenv-rails"
 
@@ -137,10 +137,18 @@ group :development, :test do
   gem "rubocop-rails"
 
   gem "rubocop-shopify"
+
+  gem "thor" # Requerido por rake
+
+  gem "yard"
+end
+
+group :development do
+  gem "web-console" # ConSola irb en páginas
 end
 
 group :test do
-  gem "cuprite"
+  gem "compare-xml" 
 
   gem "connection_pool"
 

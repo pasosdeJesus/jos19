@@ -4,6 +4,12 @@
 
 import { application } from "./application"
 
+import Cor1440Gen__PfDuracionController from "./cor1440_gen/pf_duracion_controller"
+application.register("cor1440-gen--pf-duracion", Cor1440Gen__PfDuracionController)
+
+import Cor1440Gen__PfMontospesosController from "./cor1440_gen/pf_montospesos_controller"
+application.register("cor1440-gen--pf-montospesos", Cor1440Gen__PfMontospesosController)
+
 import Msip__BitacoraapController from "./msip/bitacoraap_controller"
 application.register("msip--bitacoraap", Msip__BitacoraapController)
 
@@ -24,6 +30,9 @@ application.register("sivel2-gen--edad", Sivel2Gen__EdadController)
 
 import Sivel2Gen__EnviarFichaCasoController from "./sivel2_gen/enviar_ficha_caso_controller"
 application.register("sivel2-gen--enviar-ficha-caso", Sivel2Gen__EnviarFichaCasoController)
+
+import Sivel2Gen__MapaosmController from "./sivel2_gen/mapaosm_controller"
+application.register("sivel2-gen--mapaosm", Sivel2Gen__MapaosmController)
 
 import Sivel2Gen__PlotlyActosController from "./sivel2_gen/plotly_actos_controller"
 application.register("sivel2-gen--plotly-actos", Sivel2Gen__PlotlyActosController)
