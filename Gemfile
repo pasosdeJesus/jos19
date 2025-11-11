@@ -148,7 +148,7 @@ group :development do
 end
 
 group :test do
-  gem "compare-xml" 
+  gem "compare-xml"
 
   gem "connection_pool"
 
