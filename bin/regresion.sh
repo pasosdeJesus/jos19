@@ -47,11 +47,15 @@ if (test "$SALTAPREPARA" != "1") then {
   } fi;
 } fi;
 
+echo "== Prepara assets"
+(cd $rutaap; RAILS_ENV=test ${RAILS} msip:stimulus_motores assets:precompile)
+
 if (test "$SALTAUNITARIAS" != "1") then {
   echo "== Pruebas de regresión unitarias"
   mkdir -p cobertura-unitarias/
   rm -rf cobertura-unitarias/{*,.*}
   if (test -d test/models) then {
+    echo "== Pruebas a modelos"
     RUTA_RELATIVA=/ ${RAILS} test test/models
     if (test "$?" != "0") then {
       echo "No pasaron pruebas de regresión unitarias a modelos";
@@ -72,9 +76,6 @@ if (test "$SALTAUNITARIAS" != "1") then {
       exit 1;
     } fi;
   } fi;
-  if (test ! -f cobuertura-unitarias/index.html) then {
-    rm -rf cobertura-unitarias
-  } fi;
 } fi;
 
 if (test -d test/integration -a "$SALTAINTEGRACION" != "1") then {
@@ -89,7 +90,10 @@ if (test -d test/integration -a "$SALTAINTEGRACION" != "1") then {
   done;
 } fi;
 
-if (test -f $rutaap/bin/pruebasjs.sh -a -d $rutaap/test/puppeteer -a "x$NOPRUEBAJS" != "x1") then {
+# En adJ 7.5 no opera modo headless, ejecutar pruebasjs.sh manual y localmente
+# https://gitlab.com/pasosdeJesus/adJ/-/issues/15
+s=`uname`
+if (test "$s" != "OpenBSD" -a -f $rutaap/bin/pruebasjs.sh -a -d $rutaap/test/puppeteer -a "x$NOPRUEBAJS" != "x1") then {
   echo "== Con puppeteer"
   (cd $rutaap; ${RAILS} msip:stimulus_motores; bin/pruebasjs.sh)
   if (test "$?" != "0") then {
@@ -98,17 +102,14 @@ if (test -f $rutaap/bin/pruebasjs.sh -a -d $rutaap/test/puppeteer -a "x$NOPRUEBA
   } fi;
 } fi;
 
-if (test ! -d cobertura-unitarias -a ! -d cobertura-sistema -a ! -d test/dummy/cobertura-sistema) then {
-  echo "== Nada por unificar"
-  exit 0;
-} fi;
-
 echo "== Unificando resultados de pruebas en directorio clásico coverage"
 mkdir -p coverage/
 rm -rf coverage/{*,.*}
 
-${RAILS} ${MSIP_REPORTEREGRESION}
+echo  "Por ejecutar '${RAILS} ${MSIP_REPORTEREGRESION} --trace'"
+${RAILS} ${MSIP_REPORTEREGRESION} --trace
 r=$?
+echo "Resultado r=$r"
 if (test "$r" != "0") then {
   exit $r;
 } fi;
@@ -116,6 +117,11 @@ if (test "$r" != "0") then {
 
 echo "== Copiando resultados para hacerlos visibles en el web en ruta cobertura"
 # Copiar resultados para hacerlos visibles en web
+curdir=`pwd`
+echo "pwd=$curdir"
 mkdir -p $rutaap/public/${RUTA_RELATIVA}cobertura/
 cp -rf coverage/* $rutaap/public/${RUTA_RELATIVA}cobertura/
+exit_status=$?
+echo "1 exit_status=${exit_status}"
 cp -rf coverage/assets/* $rutaap/public/${RUTA_RELATIVA}assets/
+echo "2 exit_status=${exit_status}"

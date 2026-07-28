@@ -35,8 +35,7 @@ gem "jbuilder"
 
 gem "jsbundling-rails"
 
-gem "kt-paperclip", # Anexos
-  git: "https://github.com/kreeti/kt-paperclip.git"
+gem "kt-paperclip" # Anexos
 
 gem "libxml-ruby", "< 6.0"
 
@@ -93,9 +92,8 @@ gem "will_paginate" # Pagina listados
 # de apilamiento lógico y no alfabético como las gemas anteriores)
 
 gem "msip", # Motor generico
-  git: "https://gitlab.com/pasosdeJesus/msip.git",
-  branch: "v2.2"
-# path: "../msip-2.2"
+ git: "https://gitlab.com/pasosdeJesus/msip.git", branch: "v2.2"
+ #path: "../msip-2.2"
 
 gem "mr519_gen", # Motor de gestion de formularios y encuestas
   git: "https://gitlab.com/pasosdeJesus/mr519_gen.git",
